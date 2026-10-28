@@ -1,0 +1,366 @@
+.main-wrapper {
+    --admin-edit: #2563eb;
+    --admin-edit-hover: #1d4ed8;
+    --admin-save: #f5b301;
+    --admin-save-hover: #e2a400;
+    --admin-save-ink: #3d2b00;
+    --admin-delete: #dc2626;
+    --admin-delete-hover: #b91c1c;
+}
+
+.main-wrapper .page-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.main-wrapper .page-header-actions .btn-custom {
+    white-space: nowrap;
+}
+
+.main-wrapper .btn-custom-edit,
+.main-wrapper .btn-custom-save,
+.main-wrapper .btn-custom-danger {
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.main-wrapper .btn-custom-edit {
+    background-color: var(--admin-edit);
+    border-color: var(--admin-edit);
+    color: #ffffff;
+}
+
+.main-wrapper .btn-custom-edit:hover,
+.main-wrapper .btn-custom-edit:focus-visible {
+    background-color: var(--admin-edit-hover);
+    border-color: var(--admin-edit-hover);
+    color: #ffffff;
+}
+
+.main-wrapper .btn-custom-save {
+    background-color: var(--admin-save);
+    border-color: var(--admin-save);
+    color: var(--admin-save-ink);
+}
+
+.main-wrapper .btn-custom-save:hover,
+.main-wrapper .btn-custom-save:focus-visible {
+    background-color: var(--admin-save-hover);
+    border-color: var(--admin-save-hover);
+    color: var(--admin-save-ink);
+}
+
+.main-wrapper .btn-custom-danger {
+    background-color: var(--admin-delete);
+    border-color: var(--admin-delete);
+    color: #ffffff;
+}
+
+.main-wrapper .btn-custom-danger:hover,
+.main-wrapper .btn-custom-danger:focus-visible {
+    background-color: var(--admin-delete-hover);
+    border-color: var(--admin-delete-hover);
+    color: #ffffff;
+}
+
+.main-wrapper .btn-custom-edit:disabled,
+.main-wrapper .btn-custom-save:disabled,
+.main-wrapper .btn-custom-danger:disabled,
+.main-wrapper .btn-custom-edit.disabled,
+.main-wrapper .btn-custom-save.disabled,
+.main-wrapper .btn-custom-danger.disabled {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.main-wrapper .card-stat {
+    margin-bottom: 0;
+    padding: 1.15rem 1.25rem;
+    border-radius: 1.15rem;
+    box-shadow: 0 8px 22px rgba(7, 47, 31, 0.06);
+}
+
+.main-wrapper .card-stat .card-header {
+    margin-bottom: 0.55rem;
+}
+
+.main-wrapper .card-stat .stat-label {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0;
+    color: #5b7168;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.main-wrapper .card-stat .stat-label i {
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 2rem;
+    height: 2rem;
+    margin-right: 0 !important;
+    border-radius: 0.65rem;
+    background-color: #eaf7ee;
+    color: var(--brand-forest-medium);
+    font-size: 0.95rem;
+}
+
+.main-wrapper .card-stat .stat-value {
+    margin-bottom: 0.2rem;
+    font-size: 1.9rem;
+    line-height: 1.05;
+}
+
+.main-wrapper .card-stat .alert-green-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.8rem !important;
+    color: var(--brand-forest-medium);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.main-wrapper .card-stat .alert-green-link:hover {
+    color: var(--brand-forest-dark);
+}
+
+.main-wrapper .status-card {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    padding: 1.15rem 1.25rem;
+    border-radius: 1.15rem;
+    box-shadow: 0 8px 22px rgba(7, 47, 31, 0.06);
+}
+
+.main-wrapper .status-card .card-header {
+    margin-bottom: 0.45rem;
+}
+
+.main-wrapper .status-card .card-title {
+    font-size: 1rem;
+}
+
+.main-wrapper .status-card .badge-table {
+    flex: 0 0 auto;
+}
+
+.main-wrapper .status-card-copy {
+    margin: 0.15rem 0 0.9rem;
+    color: var(--text-muted-green);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.main-wrapper .status-card > form {
+    margin-top: auto;
+}
+
+.main-wrapper .card[data-admin-search-results] {
+    padding: 1.25rem;
+}
+
+.main-wrapper .table-responsive {
+    border-radius: 1rem;
+    scrollbar-width: thin;
+}
+
+.main-wrapper .table-custom {
+    min-width: 900px;
+}
+
+.main-wrapper .table-custom th,
+.main-wrapper .table-custom td {
+    padding: 0.75rem 0.65rem;
+    font-size: 0.83rem;
+    white-space: normal;
+    vertical-align: middle;
+}
+
+.main-wrapper .table-custom th {
+    font-size: 0.67rem;
+    white-space: nowrap;
+}
+
+.main-wrapper .table-custom td {
+    overflow-wrap: anywhere;
+}
+
+.main-wrapper .table-custom .text-nowrap,
+.main-wrapper .table-custom .text-nowrap * {
+    white-space: nowrap;
+}
+
+.main-wrapper .table-custom th:last-child,
+.main-wrapper .table-custom td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+    width: 1%;
+    white-space: nowrap;
+    background-color: #ffffff;
+    box-shadow: -1px 0 0 rgba(7, 47, 31, 0.08);
+}
+
+.main-wrapper .table-custom thead th:last-child {
+    z-index: 2;
+    background-color: #f8faf9;
+}
+
+.main-wrapper .table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.main-wrapper .table-actions form {
+    margin: 0;
+}
+
+.main-wrapper .table-actions .btn-custom {
+    white-space: nowrap;
+}
+
+.main-wrapper .table-actions-stack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    width: 15rem;
+    min-width: 15rem;
+}
+
+.main-wrapper .table-actions-stack .table-role-form,
+.main-wrapper .table-actions-stack .table-actions {
+    grid-column: 1 / -1;
+}
+
+.main-wrapper .table-actions-stack .table-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+}
+
+.main-wrapper .table-actions-stack .table-actions form {
+    width: 100%;
+}
+
+.main-wrapper .table-actions-stack .table-actions .btn-custom {
+    justify-content: center;
+    width: 100%;
+}
+
+.main-wrapper .table-actions-stack .table-role-form .btn-custom {
+    width: auto;
+    flex: 0 0 auto;
+}
+
+.main-wrapper .table-role-form {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.main-wrapper .table-role-form .form-select-custom {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.main-wrapper .table-role-form .btn-custom {
+    flex: 0 0 auto;
+}
+
+.main-wrapper .empty-state {
+    padding: 2.25rem 1rem !important;
+}
+
+.main-wrapper .empty-state .empty-state-icon {
+    margin-bottom: 0.85rem !important;
+    font-size: 2.5rem;
+    opacity: 0.45;
+}
+
+.main-wrapper .empty-state .card-title {
+    font-size: 1rem;
+}
+
+.main-wrapper .empty-state .page-subtitle {
+    max-width: 32rem;
+    margin-inline: auto;
+    font-size: 0.85rem;
+}
+
+.main-wrapper .alert-custom {
+    padding: 0.8rem 1rem;
+    border-radius: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.main-wrapper .pagination {
+    --bs-pagination-color: var(--brand-forest-medium);
+    --bs-pagination-hover-color: var(--brand-forest-dark);
+    --bs-pagination-active-bg: var(--brand-forest-medium);
+    --bs-pagination-active-border-color: var(--brand-forest-medium);
+    --bs-pagination-border-radius: 0.7rem;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.main-wrapper .page-link {
+    min-width: 2.25rem;
+    border-radius: 0.7rem !important;
+    text-align: center;
+}
+
+@media (max-width: 1199.98px) {
+    .main-wrapper .page-header-actions {
+        margin-left: 0;
+    }
+
+    .main-wrapper .table-custom th:last-child,
+    .main-wrapper .table-custom td:last-child {
+        position: static;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .main-wrapper .page-header {
+        align-items: stretch;
+    }
+
+    .main-wrapper .page-header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .main-wrapper .page-header-actions > .btn-custom {
+        flex: 1 1 auto;
+    }
+
+    .main-wrapper .table-custom {
+        min-width: 820px;
+    }
+
+    .main-wrapper .table-custom th:last-child,
+    .main-wrapper .table-custom td:last-child {
+        position: static;
+        box-shadow: none;
+    }
+
+    .main-wrapper .table-actions-stack {
+        min-width: 13rem;
+    }
+
+    .main-wrapper .card-stat .stat-value {
+        font-size: 1.65rem;
+    }
+}

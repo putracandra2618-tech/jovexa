@@ -1,0 +1,116 @@
+- generic [active] [ref=f36e1]:
+  - generic [ref=f36e2]:
+    - link " Jovexa" [ref=f36e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f36e4]: 
+      - generic [ref=f36e5]: Jovexa
+    - generic [ref=f36e7]:
+      - generic [ref=f36e8]: Menu
+      - list [ref=f36e9]:
+        - listitem [ref=f36e10]:
+          - link " Dashboard" [ref=f36e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin
+            - generic [ref=f36e12]: 
+            - generic [ref=f36e13]: Dashboard
+        - listitem [ref=f36e14]:
+          - link " Kelola Jasa" [ref=f36e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+            - generic [ref=f36e16]: 
+            - generic [ref=f36e17]: Kelola Jasa
+        - listitem [ref=f36e18]:
+          - link " Daftar Pesanan" [ref=f36e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan
+            - generic [ref=f36e20]: 
+            - generic [ref=f36e21]: Daftar Pesanan
+        - listitem [ref=f36e22]:
+          - link " Pesanan Revisi" [ref=f36e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/revisi
+            - generic [ref=f36e24]: 
+            - generic [ref=f36e25]: Pesanan Revisi
+        - listitem [ref=f36e26]:
+          - link " Riwayat Pesanan" [ref=f36e27] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/riwayat
+            - generic [ref=f36e28]: 
+            - generic [ref=f36e29]: Riwayat Pesanan
+        - listitem [ref=f36e30]:
+          - link " Kelola Pengguna" [ref=f36e31] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pengguna
+            - generic [ref=f36e32]: 
+            - generic [ref=f36e33]: Kelola Pengguna
+    - generic [ref=f36e34]:
+      - img "jovexa admin" [ref=f36e35]
+      - generic [ref=f36e36]:
+        - generic [ref=f36e37]: jovexa admin
+        - generic [ref=f36e38]: Super Admin
+  - generic [ref=f36e39]:
+    - banner [ref=f36e40]:
+      - generic [ref=f36e41]:
+        - button "Perkecil sidebar" [ref=f36e42] [cursor=pointer]:
+          - generic [ref=f36e43]: 
+        - text: 
+      - generic [ref=f36e44]:
+        - button "Mode layar penuh" [ref=f36e45] [cursor=pointer]:
+          - generic [ref=f36e46]: 
+        - generic [ref=f36e47]:
+          - button "Foto profil jovexa admin " [ref=f36e48] [cursor=pointer]:
+            - img "Foto profil" [ref=f36e49]
+            - generic [ref=f36e50]: jovexa admin
+            - generic [ref=f36e51]: 
+          - text: 
+    - generic [ref=f36e53]:
+      - heading "Ubah Jasa" [level=1] [ref=f36e54]
+      - paragraph [ref=f36e55]: Perbarui informasi jasa yang sudah ada di katalog.
+    - main [ref=f36e56]:
+      - generic [ref=f36e58]:
+        - generic [ref=f36e59]:
+          - generic [ref=f36e60]: Nama Jasa
+          - textbox "Nama Jasa" [ref=f36e61]:
+            - /placeholder: "Contoh: Pembuatan Skripsi Word"
+            - text: Analisis Data SPSS
+        - generic [ref=f36e62]:
+          - generic [ref=f36e64]:
+            - generic [ref=f36e65]: Slug
+            - textbox "Slug" [ref=f36e66]:
+              - /placeholder: Dibuat otomatis dari nama bila dikosongkan
+              - text: analisis-data-spss
+            - text: Dipakai pada URL halaman jasa.
+          - generic [ref=f36e68]:
+            - generic [ref=f36e69]: Status
+            - combobox "Status" [ref=f36e70]:
+              - option "Draf"
+              - option "Tayang" [selected]
+              - option "Arsip"
+        - generic [ref=f36e71]:
+          - generic [ref=f36e72]: Deskripsi
+          - textbox "Deskripsi" [ref=f36e73]:
+            - /placeholder: Jelaskan apa saja yang dikerjakan, apa yang kamu dapatkan, dan batasan jasanya.
+            - text: Pengolahan dan analisis data menggunakan SPSS, mulai dari input data, uji validitas, hingga interpretasi hasil. Diserahkan dengan file output dan ringkasan dari setiap uji.
+        - generic [ref=f36e74]:
+          - generic [ref=f36e76]:
+            - generic [ref=f36e77]: Harga (Rp)
+            - spinbutton "Harga (Rp)" [ref=f36e78]: "500000"
+          - generic [ref=f36e80]:
+            - generic [ref=f36e81]: Estimasi Pengerjaan (hari)
+            - spinbutton "Estimasi Pengerjaan (hari)" [ref=f36e82]: "4"
+        - generic [ref=f36e83]:
+          - generic [ref=f36e84]: Persyaratan
+          - textbox "Persyaratan" [ref=f36e85]:
+            - /placeholder: "Contoh: Siapkan outline, data yang harus dianalisis, dan referensi format."
+            - text: Data mentah beserta kategori variabel. Hipotesis yang akan diuji. Panduan dosen bila tersedia.
+        - generic [ref=f36e86]:
+          - link "Batal" [ref=f36e87] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+          - button " Simpan Perubahan" [ref=f36e88] [cursor=pointer]:
+            - generic [ref=f36e89]: 
+            - text: Simpan Perubahan
+    - contentinfo [ref=f36e90]:
+      - generic [ref=f36e91]:
+        - generic [ref=f36e92]:
+          - generic [ref=f36e93]: 
+          - text: Jovexa
+        - generic [ref=f36e94]: "|"
+        - generic [ref=f36e95]: © 2026 Jovexa
+      - list [ref=f36e97]:
+        - listitem [ref=f36e98]:
+          - link "Beranda" [ref=f36e99] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev

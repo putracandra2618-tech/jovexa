@@ -1,0 +1,293 @@
+- generic [active] [ref=f18e1]:
+  - generic [ref=f18e2]:
+    - link " Jovexa" [ref=f18e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f18e4]: 
+      - generic [ref=f18e5]: Jovexa
+    - generic [ref=f18e7]:
+      - generic [ref=f18e8]: Menu
+      - list [ref=f18e9]:
+        - listitem [ref=f18e10]:
+          - link " Dashboard" [ref=f18e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin
+            - generic [ref=f18e12]: 
+            - generic [ref=f18e13]: Dashboard
+        - listitem [ref=f18e14]:
+          - link " Kelola Jasa" [ref=f18e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+            - generic [ref=f18e16]: 
+            - generic [ref=f18e17]: Kelola Jasa
+        - listitem [ref=f18e18]:
+          - link " Daftar Pesanan" [ref=f18e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan
+            - generic [ref=f18e20]: 
+            - generic [ref=f18e21]: Daftar Pesanan
+        - listitem [ref=f18e22]:
+          - link " Pesanan Revisi" [ref=f18e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/revisi
+            - generic [ref=f18e24]: 
+            - generic [ref=f18e25]: Pesanan Revisi
+        - listitem [ref=f18e26]:
+          - link " Riwayat Pesanan" [ref=f18e27] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/riwayat
+            - generic [ref=f18e28]: 
+            - generic [ref=f18e29]: Riwayat Pesanan
+        - listitem [ref=f18e30]:
+          - link " Kelola Pengguna" [ref=f18e31] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pengguna
+            - generic [ref=f18e32]: 
+            - generic [ref=f18e33]: Kelola Pengguna
+    - generic [ref=f18e34]:
+      - img "jovexa admin" [ref=f18e35]
+      - generic [ref=f18e36]:
+        - generic [ref=f18e37]: jovexa admin
+        - generic [ref=f18e38]: Super Admin
+  - generic [ref=f18e39]:
+    - banner [ref=f18e40]:
+      - generic [ref=f18e41]:
+        - text: 
+        - button "Buka navigasi" [ref=f18e42] [cursor=pointer]:
+          - generic [ref=f18e43]: 
+      - generic [ref=f18e45]:
+        - generic [ref=f18e46]: Cari nama atau email pengguna
+        - searchbox "Cari nama atau email pengguna" [ref=f18e47]
+        - button "Cari" [ref=f18e48] [cursor=pointer]:
+          - generic [ref=f18e49]: 
+      - generic [ref=f18e50]:
+        - button "Mode layar penuh" [ref=f18e51] [cursor=pointer]:
+          - generic [ref=f18e52]: 
+        - generic [ref=f18e53]:
+          - button "Foto profil jovexa admin " [ref=f18e54] [cursor=pointer]:
+            - img "Foto profil" [ref=f18e55]
+            - generic [ref=f18e56]: jovexa admin
+            - generic [ref=f18e57]: 
+          - text: 
+    - generic [ref=f18e59]:
+      - heading "Kelola Pengguna" [level=1] [ref=f18e60]
+      - paragraph [ref=f18e61]: Kelola peran, status worker, dan akses akun pengguna.
+    - main [ref=f18e62]:
+      - generic [ref=f18e63]:
+        - generic [ref=f18e64]:
+          - combobox "Saring berdasarkan peran" [ref=f18e67]:
+            - option "Semua Peran" [selected]
+            - option "Customer"
+            - option "Worker"
+            - option "Admin"
+            - option "Super Admin"
+          - generic [ref=f18e68]: 9 data
+        - table [ref=f18e72]:
+          - rowgroup [ref=f18e73]:
+            - row [ref=f18e74]:
+              - columnheader "Nama" [ref=f18e75]
+              - columnheader "Email" [ref=f18e76]
+              - columnheader "Peran" [ref=f18e77]
+              - columnheader "Pesanan" [ref=f18e78]
+              - columnheader "Terdaftar" [ref=f18e79]
+              - columnheader "Aksi" [ref=f18e80]
+          - rowgroup [ref=f18e81]:
+            - row [ref=f18e82]:
+              - cell "Worker Jovexa Offline" [ref=f18e83]:
+                - text: Worker Jovexa
+                - generic [ref=f18e84]: Offline
+              - cell "worker@jovexa.test" [ref=f18e86]
+              - cell "Worker" [ref=f18e87]
+              - cell "0 sebagai customer 0 sebagai worker" [ref=f18e89]:
+                - generic [ref=f18e90]: 0 sebagai customer
+                - text: 0 sebagai worker
+              - cell "26 Oct 2026" [ref=f18e91]
+              - cell [ref=f18e92]:
+                - generic [ref=f18e93]:
+                  - generic [ref=f18e94]:
+                    - combobox "Peran Worker Jovexa" [ref=f18e95]:
+                      - option "Customer"
+                      - option "Worker" [selected]
+                      - option "Admin"
+                    - button " Simpan" [ref=f18e96] [cursor=pointer]:
+                      - generic [ref=f18e97]: 
+                      - text: Simpan
+                  - generic [ref=f18e98]:
+                    - button " Login sebagai" [ref=f18e100] [cursor=pointer]:
+                      - generic [ref=f18e101]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e103] [cursor=pointer]:
+                      - generic [ref=f18e104]: 
+                      - text: Hapus
+            - row [ref=f18e105]:
+              - cell "Putra Candra" [ref=f18e106]
+              - cell "putracandra2618@gmail.com" [ref=f18e107]
+              - cell "Customer" [ref=f18e108]
+              - cell "0 sebagai customer" [ref=f18e110]
+              - cell "26 Oct 2026" [ref=f18e112]
+              - cell [ref=f18e113]:
+                - generic [ref=f18e114]:
+                  - generic [ref=f18e115]:
+                    - combobox "Peran Putra Candra" [ref=f18e116]:
+                      - option "Customer" [selected]
+                      - option "Worker"
+                      - option "Admin"
+                    - button " Simpan" [ref=f18e117] [cursor=pointer]:
+                      - generic [ref=f18e118]: 
+                      - text: Simpan
+                  - generic [ref=f18e119]:
+                    - button " Login sebagai" [ref=f18e121] [cursor=pointer]:
+                      - generic [ref=f18e122]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e124] [cursor=pointer]:
+                      - generic [ref=f18e125]: 
+                      - text: Hapus
+            - row [ref=f18e126]:
+              - cell "Candra" [ref=f18e127]
+              - cell "candra@example.com" [ref=f18e128]
+              - cell "Customer" [ref=f18e129]
+              - cell "1 sebagai customer" [ref=f18e131]
+              - cell "29 Sep 2026" [ref=f18e133]
+              - cell [ref=f18e134]:
+                - generic [ref=f18e135]:
+                  - generic [ref=f18e136]:
+                    - combobox "Peran Candra" [ref=f18e137]:
+                      - option "Customer" [selected]
+                      - option "Worker"
+                      - option "Admin"
+                    - button " Simpan" [ref=f18e138] [cursor=pointer]:
+                      - generic [ref=f18e139]: 
+                      - text: Simpan
+                  - generic [ref=f18e140]:
+                    - button " Login sebagai" [ref=f18e142] [cursor=pointer]:
+                      - generic [ref=f18e143]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e145] [cursor=pointer]:
+                      - generic [ref=f18e146]: 
+                      - text: Hapus
+            - row [ref=f18e147]:
+              - cell "E2E Customer" [ref=f18e148]
+              - cell "e2e.customer@example.com" [ref=f18e149]
+              - cell "Customer" [ref=f18e150]
+              - cell "1 sebagai customer" [ref=f18e152]
+              - cell "29 Sep 2026" [ref=f18e154]
+              - cell [ref=f18e155]:
+                - generic [ref=f18e156]:
+                  - generic [ref=f18e157]:
+                    - combobox "Peran E2E Customer" [ref=f18e158]:
+                      - option "Customer" [selected]
+                      - option "Worker"
+                      - option "Admin"
+                    - button " Simpan" [ref=f18e159] [cursor=pointer]:
+                      - generic [ref=f18e160]: 
+                      - text: Simpan
+                  - generic [ref=f18e161]:
+                    - button " Login sebagai" [ref=f18e163] [cursor=pointer]:
+                      - generic [ref=f18e164]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e166] [cursor=pointer]:
+                      - generic [ref=f18e167]: 
+                      - text: Hapus
+            - row [ref=f18e168]:
+              - cell "Budi E2E" [ref=f18e169]
+              - cell "budi.e2e.20260929@example.com" [ref=f18e170]
+              - cell "Customer" [ref=f18e171]
+              - cell "1 sebagai customer" [ref=f18e173]
+              - cell "29 Sep 2026" [ref=f18e175]
+              - cell [ref=f18e176]:
+                - generic [ref=f18e177]:
+                  - generic [ref=f18e178]:
+                    - combobox "Peran Budi E2E" [ref=f18e179]:
+                      - option "Customer" [selected]
+                      - option "Worker"
+                      - option "Admin"
+                    - button " Simpan" [ref=f18e180] [cursor=pointer]:
+                      - generic [ref=f18e181]: 
+                      - text: Simpan
+                  - generic [ref=f18e182]:
+                    - button " Login sebagai" [ref=f18e184] [cursor=pointer]:
+                      - generic [ref=f18e185]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e187] [cursor=pointer]:
+                      - generic [ref=f18e188]: 
+                      - text: Hapus
+            - row [ref=f18e189]:
+              - cell "Dalima Wastuti" [ref=f18e190]
+              - cell "endah.prasetya@example.org" [ref=f18e191]
+              - cell "Admin" [ref=f18e192]
+              - cell "0 sebagai customer" [ref=f18e194]
+              - cell "29 Sep 2026" [ref=f18e196]
+              - cell [ref=f18e197]:
+                - generic [ref=f18e198]:
+                  - generic [ref=f18e199]:
+                    - combobox "Peran Dalima Wastuti" [ref=f18e200]:
+                      - option "Customer"
+                      - option "Worker"
+                      - option "Admin" [selected]
+                    - button " Simpan" [ref=f18e201] [cursor=pointer]:
+                      - generic [ref=f18e202]: 
+                      - text: Simpan
+                  - generic [ref=f18e203]:
+                    - button " Login sebagai" [ref=f18e205] [cursor=pointer]:
+                      - generic [ref=f18e206]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e208] [cursor=pointer]:
+                      - generic [ref=f18e209]: 
+                      - text: Hapus
+            - row [ref=f18e210]:
+              - cell "Mala Nasyidah M.M." [ref=f18e211]
+              - cell "ellis19@example.org" [ref=f18e212]
+              - cell "Customer" [ref=f18e213]
+              - cell "2 sebagai customer" [ref=f18e215]
+              - cell "29 Sep 2026" [ref=f18e217]
+              - cell [ref=f18e218]:
+                - generic [ref=f18e219]:
+                  - generic [ref=f18e220]:
+                    - combobox "Peran Mala Nasyidah M.M." [ref=f18e221]:
+                      - option "Customer" [selected]
+                      - option "Worker"
+                      - option "Admin"
+                    - button " Simpan" [ref=f18e222] [cursor=pointer]:
+                      - generic [ref=f18e223]: 
+                      - text: Simpan
+                  - generic [ref=f18e224]:
+                    - button " Login sebagai" [ref=f18e226] [cursor=pointer]:
+                      - generic [ref=f18e227]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e229] [cursor=pointer]:
+                      - generic [ref=f18e230]: 
+                      - text: Hapus
+            - row [ref=f18e231]:
+              - cell "Admin Jovexa" [ref=f18e232]
+              - cell "admin@jovexa.test" [ref=f18e233]
+              - cell "Admin" [ref=f18e234]
+              - cell "0 sebagai customer" [ref=f18e236]
+              - cell "29 Sep 2026" [ref=f18e238]
+              - cell [ref=f18e239]:
+                - generic [ref=f18e240]:
+                  - generic [ref=f18e241]:
+                    - combobox "Peran Admin Jovexa" [ref=f18e242]:
+                      - option "Customer"
+                      - option "Worker"
+                      - option "Admin" [selected]
+                    - button " Simpan" [ref=f18e243] [cursor=pointer]:
+                      - generic [ref=f18e244]: 
+                      - text: Simpan
+                  - generic [ref=f18e245]:
+                    - button " Login sebagai" [ref=f18e247] [cursor=pointer]:
+                      - generic [ref=f18e248]: 
+                      - text: Login sebagai
+                    - button " Hapus" [ref=f18e250] [cursor=pointer]:
+                      - generic [ref=f18e251]: 
+                      - text: Hapus
+            - row [ref=f18e252]:
+              - cell "jovexa admin" [ref=f18e253]
+              - cell "adminjovexa@test" [ref=f18e254]
+              - cell "Super Admin" [ref=f18e255]
+              - cell "0 sebagai customer" [ref=f18e257]
+              - cell [ref=f18e259]
+              - cell "Akun Anda" [ref=f18e260]
+    - contentinfo [ref=f18e261]:
+      - generic [ref=f18e262]:
+        - generic [ref=f18e263]:
+          - generic [ref=f18e264]: 
+          - text: Jovexa
+        - generic [ref=f18e265]: "|"
+        - generic [ref=f18e266]: © 2026 Jovexa
+      - list [ref=f18e268]:
+        - listitem [ref=f18e269]:
+          - link "Beranda" [ref=f18e270] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev

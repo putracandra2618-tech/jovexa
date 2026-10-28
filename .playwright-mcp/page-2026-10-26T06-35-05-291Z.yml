@@ -1,0 +1,120 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - link " Jovexa" [ref=f4e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f4e4]: 
+      - generic [ref=f4e5]: Jovexa
+    - generic [ref=f4e7]:
+      - generic [ref=f4e8]: Menu Worker
+      - list [ref=f4e9]:
+        - listitem [ref=f4e10]:
+          - link " Dashboard" [ref=f4e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker
+            - generic [ref=f4e12]: 
+            - generic [ref=f4e13]: Dashboard
+        - listitem [ref=f4e14]:
+          - link " Antrean Pesanan" [ref=f4e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+            - generic [ref=f4e16]: 
+            - generic [ref=f4e17]: Antrean Pesanan
+        - listitem [ref=f4e18]:
+          - link " Pesanan Saya" [ref=f4e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan
+            - generic [ref=f4e20]: 
+            - generic [ref=f4e21]: Pesanan Saya
+        - listitem [ref=f4e22]:
+          - link " Riwayat Saya" [ref=f4e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan/riwayat
+            - generic [ref=f4e24]: 
+            - generic [ref=f4e25]: Riwayat Saya
+    - generic [ref=f4e26]:
+      - img "Worker Jovexa" [ref=f4e27]
+      - generic [ref=f4e28]:
+        - generic [ref=f4e29]: Worker Jovexa
+        - generic [ref=f4e30]: Worker · Offline
+  - generic [ref=f4e31]:
+    - banner [ref=f4e32]:
+      - generic [ref=f4e33]:
+        - button "Perkecil sidebar" [ref=f4e34] [cursor=pointer]:
+          - generic [ref=f4e35]: 
+        - text: 
+      - generic [ref=f4e36]:
+        - button "Mode layar penuh" [ref=f4e37] [cursor=pointer]:
+          - generic [ref=f4e38]: 
+        - generic [ref=f4e39]:
+          - button "Foto profil Worker Jovexa " [ref=f4e40] [cursor=pointer]:
+            - img "Foto profil" [ref=f4e41]
+            - generic [ref=f4e42]: Worker Jovexa
+            - generic [ref=f4e43]: 
+          - text: 
+    - generic [ref=f4e44]:
+      - generic [ref=f4e45]:
+        - heading "Dashboard Worker" [level=1] [ref=f4e46]
+        - paragraph [ref=f4e47]: Pantau kuota, status online, dan pesanan yang sedang kamu kerjakan.
+      - link " Lihat Antrean" [ref=f4e48] [cursor=pointer]:
+        - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+        - generic [ref=f4e49]: 
+        - text: Lihat Antrean
+    - main [ref=f4e50]:
+      - generic [ref=f4e51]:
+        - generic [ref=f4e53]:
+          - generic [ref=f4e54]:
+            - generic [ref=f4e56]:
+              - generic [ref=f4e57]: 
+              - text: Pesanan Aktif
+            - generic [ref=f4e58]: 0/5
+          - link "Selengkapnya " [ref=f4e59] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan
+            - generic [ref=f4e60]: Selengkapnya
+            - generic [ref=f4e61]: 
+        - generic [ref=f4e63]:
+          - generic [ref=f4e64]:
+            - generic [ref=f4e66]:
+              - generic [ref=f4e67]: 
+              - text: Antrean Tersedia
+            - generic [ref=f4e68]: "0"
+          - link "Selengkapnya " [ref=f4e69] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+            - generic [ref=f4e70]: Selengkapnya
+            - generic [ref=f4e71]: 
+        - generic [ref=f4e73]:
+          - generic [ref=f4e74]:
+            - generic [ref=f4e76]:
+              - generic [ref=f4e77]: 
+              - text: Sudah Dikirim
+            - generic [ref=f4e78]: "0"
+          - link "Selengkapnya " [ref=f4e79] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan/riwayat
+            - generic [ref=f4e80]: Selengkapnya
+            - generic [ref=f4e81]: 
+        - generic [ref=f4e83]:
+          - heading "Status Kerja" [level=5] [ref=f4e86]
+          - generic [ref=f4e87]: Offline
+          - paragraph [ref=f4e88]: Aktifkan online untuk mengambil pesanan.
+          - button " Ubah ke Online" [ref=f4e90] [cursor=pointer]:
+            - generic [ref=f4e91]: 
+            - text: Ubah ke Online
+      - alert [ref=f4e92]:
+        - generic [ref=f4e93]: 
+        - generic [ref=f4e94]: Status kamu sedang offline. Kamu tetap bisa menyelesaikan pesanan aktif, tetapi belum bisa mengambil pesanan baru dari antrean.
+        - button "Tutup" [ref=f4e95] [cursor=pointer]:
+          - generic [ref=f4e96]: 
+      - generic [ref=f4e97]:
+        - heading "Pesanan Aktif" [level=5] [ref=f4e100]
+        - generic [ref=f4e101]:
+          - generic [ref=f4e102]: 
+          - heading "Belum ada pesanan aktif" [level=5] [ref=f4e103]
+          - paragraph [ref=f4e104]: Ambil pesanan dari antrean saat kamu siap bekerja.
+          - link "Buka Antrean" [ref=f4e106] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+    - contentinfo [ref=f4e107]:
+      - generic [ref=f4e108]:
+        - generic [ref=f4e109]:
+          - generic [ref=f4e110]: 
+          - text: Jovexa
+        - generic [ref=f4e111]: "|"
+        - generic [ref=f4e112]: © 2026 Jovexa
+      - list [ref=f4e114]:
+        - listitem [ref=f4e115]:
+          - link "Beranda" [ref=f4e116] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev

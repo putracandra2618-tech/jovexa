@@ -1,0 +1,52 @@
+- generic [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - complementary [ref=f2e4]:
+      - link " Jovexa" [ref=f2e5] [cursor=pointer]:
+        - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+        - generic [ref=f2e6]: 
+        - generic [ref=f2e8]: Jovexa
+      - heading "Semua jasa digitalmu, satu akun saja." [level=2] [ref=f2e9]
+      - paragraph [ref=f2e10]: Pesan tugas sekolah, coding, sampai desain, lalu pantau progresnya tanpa harus mengejar Admin lewat telepon atau chat.
+      - list [ref=f2e11]:
+        - listitem [ref=f2e12]:
+          - generic [ref=f2e13]: 
+          - text: Pesanan masuk antrean setelah pembayaran terkonfirmasi
+        - listitem [ref=f2e14]:
+          - generic [ref=f2e15]: 
+          - text: Progres pengerjaan bisa dipantau kapan saja
+        - listitem [ref=f2e16]:
+          - generic [ref=f2e17]: 
+          - text: File hasil dikumpulkan dalam satu halaman pesanan
+    - generic [ref=f2e18]:
+      - heading "Masuk" [level=1] [ref=f2e19]
+      - paragraph [ref=f2e20]: Masuk untuk melanjutkan pesananmu.
+      - generic [ref=f2e21]:
+        - generic [ref=f2e22]:
+          - generic [ref=f2e23]: Alamat Email
+          - generic [ref=f2e24]:
+            - generic: 
+            - textbox "Alamat Email" [active] [ref=f2e25]:
+              - /placeholder: nama@email.com
+        - generic [ref=f2e26]:
+          - generic [ref=f2e27]: Password
+          - generic [ref=f2e28]:
+            - generic: 
+            - textbox "Password" [ref=f2e29]:
+              - /placeholder: ••••••••
+            - button "Tampilkan password" [ref=f2e30] [cursor=pointer]:
+              - generic [ref=f2e31]: 
+        - generic [ref=f2e32]:
+          - generic [ref=f2e33] [cursor=pointer]:
+            - checkbox "Ingat saya" [ref=f2e34]
+            - generic [ref=f2e35]: Ingat saya
+          - link "Lupa password?" [ref=f2e36] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/lupa-password
+        - button "Masuk ke Dashboard " [ref=f2e37] [cursor=pointer]:
+          - generic [ref=f2e38]: Masuk ke Dashboard
+          - generic [ref=f2e39]: 
+      - paragraph [ref=f2e40]:
+        - text: Belum punya akun?
+        - link "Daftar sekarang" [ref=f2e41] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev/register
+  - button "Kembali ke atas":
+    - generic: 

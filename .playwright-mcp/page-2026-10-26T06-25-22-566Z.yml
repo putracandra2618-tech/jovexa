@@ -1,0 +1,261 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - banner [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - link " Jovexa" [ref=f1e5] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+          - generic [ref=f1e6]: 
+          - generic [ref=f1e8]: Jovexa
+        - text: 
+        - navigation [ref=f1e9]:
+          - list [ref=f1e10]:
+            - listitem [ref=f1e11]:
+              - link "Cara Pesan" [ref=f1e12] [cursor=pointer]:
+                - /url: https://repurpose-emote-haphazard.ngrok-free.dev#cara-pesan
+            - listitem [ref=f1e13]:
+              - link "Pertanyaan" [ref=f1e14] [cursor=pointer]:
+                - /url: https://repurpose-emote-haphazard.ngrok-free.dev#faq
+          - generic [ref=f1e15]:
+            - link "Masuk" [ref=f1e16] [cursor=pointer]:
+              - /url: https://repurpose-emote-haphazard.ngrok-free.dev/login
+            - link " Daftar" [ref=f1e17] [cursor=pointer]:
+              - /url: https://repurpose-emote-haphazard.ngrok-free.dev/register
+              - generic [ref=f1e18]: 
+              - text: Daftar
+    - main [ref=f1e19]:
+      - generic [ref=f1e22]:
+        - generic [ref=f1e23]:
+          - generic [ref=f1e24]:
+            - generic [ref=f1e25]: 
+            - text: Tugas, skripsi, coding & desain
+          - heading "Jasa digital dikerjakan ahlinya, tanpa drama ." [level=1] [ref=f1e26]:
+            - text: Jasa digital dikerjakan ahlinya,
+            - generic [ref=f1e27]: tanpa drama
+            - text: .
+          - paragraph [ref=f1e28]: Pilih jasanya, ceritakan kebutuhannya, lalu pantau progres pengerjaan sampai file hasilnya siap diunduh. Kamu tidak perlu menebak-nebak status pekerjaanmu.
+          - generic [ref=f1e29]:
+            - link " Lihat Katalog" [ref=f1e30] [cursor=pointer]:
+              - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa
+              - generic [ref=f1e31]: 
+              - text: Lihat Katalog
+            - link " Daftar Gratis" [ref=f1e32] [cursor=pointer]:
+              - /url: https://repurpose-emote-haphazard.ngrok-free.dev/register
+              - generic [ref=f1e33]: 
+              - text: Daftar Gratis
+          - generic [ref=f1e34]:
+            - generic [ref=f1e35]: 
+            - text: Harga jujur · Pengerjaan cepat
+          - generic [ref=f1e36]:
+            - generic [ref=f1e37]:
+              - generic [ref=f1e38]: 
+              - text: Progres terpantau
+            - generic [ref=f1e39]:
+              - generic [ref=f1e40]: 
+              - text: Bayar lewat Tripay
+            - generic [ref=f1e41]:
+              - generic [ref=f1e42]: 
+              - text: Revisi sesuai kesepakatan
+        - generic [ref=f1e43]:
+          - generic [ref=f1e44]:
+            - heading "Cara Pesan di Jovexa" [level=2] [ref=f1e45]
+            - generic [ref=f1e46]: Mulai hari ini
+          - list [ref=f1e47]:
+            - listitem [ref=f1e48]:
+              - generic [ref=f1e49]: "1"
+              - generic [ref=f1e50]:
+                - generic [ref=f1e51]: Pilih jasa
+                - text: Cek harga dan estimasi hari pengerjaannya.
+            - listitem [ref=f1e52]:
+              - generic [ref=f1e53]: "2"
+              - generic [ref=f1e54]:
+                - generic [ref=f1e55]: Ceritakan kebutuhan
+                - text: Tulis detail dan lampirkan contoh berkas.
+            - listitem [ref=f1e56]:
+              - generic [ref=f1e57]: "3"
+              - generic [ref=f1e58]:
+                - generic [ref=f1e59]: Bayar & pantau
+                - text: Status pesanan dan hasil akhir ada di dashboard.
+      - generic [ref=f1e62]:
+        - generic [ref=f1e63]:
+          - generic [ref=f1e64]: "0"
+          - generic [ref=f1e65]: Jasa tayang saat ini
+        - generic [ref=f1e66]:
+          - generic [ref=f1e67]: Real-time
+          - generic [ref=f1e68]: Status pesanan di dashboard
+        - generic [ref=f1e69]:
+          - generic [ref=f1e70]: Tripay
+          - generic [ref=f1e71]: Payment gateway terverifikasi
+      - generic [ref=f1e73]:
+        - generic [ref=f1e74]:
+          - generic [ref=f1e75]: Kenapa Jovexa
+          - heading "Tenang, semuanya kelihatan" [level=2] [ref=f1e76]
+          - paragraph [ref=f1e77]: Tidak ada lagi "sudah dikerjakkan tapi belum kabar". Setiap status punya arti dan bisa kamu pantau sendiri.
+        - generic [ref=f1e78]:
+          - generic [ref=f1e80]:
+            - generic [ref=f1e81]: 
+            - heading "Progres transparan" [level=3] [ref=f1e83]
+            - paragraph [ref=f1e84]: "Status pesanan berubah nyata: menunggu pembayaran, diverifikasi, dikerjakan, sampai dikirim."
+          - generic [ref=f1e86]:
+            - generic [ref=f1e87]: 
+            - heading "Bayar aman" [level=3] [ref=f1e89]
+            - paragraph [ref=f1e90]: Pembayaran lewat Tripay dan baru dikonfirmasi lewat callback dari penyedia, bukan dari klik tombol.
+          - generic [ref=f1e92]:
+            - generic [ref=f1e93]: 
+            - heading "Ada revisi" [level=3] [ref=f1e95]
+            - paragraph [ref=f1e96]: Hasil belum sesuai? Kirim catatan revisi dan pengerjaan diulang di halaman pesanan yang sama.
+          - generic [ref=f1e98]:
+            - generic [ref=f1e99]: 
+            - heading "Estimasi jelas" [level=3] [ref=f1e101]
+            - paragraph [ref=f1e102]: Tiap jasa menyebut estimasi hari pengerjaan sejak awal, jadi kamu tahu kapan harus menanti.
+      - generic [ref=f1e104]:
+        - generic [ref=f1e105]:
+          - generic [ref=f1e106]:
+            - generic [ref=f1e107]: Jasa populer
+            - heading "Mulai dari yang paling sering dipesan" [level=2] [ref=f1e108]
+          - link "Lihat semua jasa " [ref=f1e109] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa
+            - text: Lihat semua jasa
+            - generic [ref=f1e110]: 
+        - generic [ref=f1e111]:
+          - article [ref=f1e113]:
+            - generic [ref=f1e114]:
+              - generic [ref=f1e115]: 
+              - generic [ref=f1e117]:
+                - generic [ref=f1e118]: 
+                - text: 2 hari
+            - generic [ref=f1e119]:
+              - heading [level=3] [ref=f1e120]:
+                - link "Bantuan Tugas Kuliah" [ref=f1e121] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa/bantuan-tugas-kuliah
+              - paragraph [ref=f1e122]: Mengerjakan tugas mata kuliah seperti makalah, UTS, soal latihan, dan presentasi. Cocok untuk tugas esai, ana...
+              - generic [ref=f1e123]:
+                - generic [ref=f1e124]:
+                  - text: Rp150.000
+                  - generic [ref=f1e125]: sampai selesai
+                - link "Lihat Detail" [ref=f1e126] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa/bantuan-tugas-kuliah
+          - article [ref=f1e128]:
+            - generic [ref=f1e129]:
+              - generic [ref=f1e130]: 
+              - generic [ref=f1e132]:
+                - generic [ref=f1e133]: 
+                - text: 2 hari
+            - generic [ref=f1e134]:
+              - heading [level=3] [ref=f1e135]:
+                - link "Presentasi PowerPoint" [ref=f1e136] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa/presentasi-powerpoint
+              - paragraph [ref=f1e137]: Membuat slide presentasi yang rapi dan mudah dipahami, lengkap dengan visual dan speaker notes. Cocok untuk t...
+              - generic [ref=f1e138]:
+                - generic [ref=f1e139]:
+                  - text: Rp200.000
+                  - generic [ref=f1e140]: sampai selesai
+                - link "Lihat Detail" [ref=f1e141] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa/presentasi-powerpoint
+          - article [ref=f1e143]:
+            - generic [ref=f1e144]:
+              - generic [ref=f1e145]: 
+              - generic [ref=f1e147]:
+                - generic [ref=f1e148]: 
+                - text: 3 hari
+            - generic [ref=f1e149]:
+              - heading [level=3] [ref=f1e150]:
+                - link "Desain Landing Page" [ref=f1e151] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa/desain-landing-page
+              - paragraph [ref=f1e152]: Desain landing page yang conversion tinggi untuk produk, jasa, atau event. Diberikan dalam bentuk file Figma...
+              - generic [ref=f1e153]:
+                - generic [ref=f1e154]:
+                  - text: Rp450.000
+                  - generic [ref=f1e155]: sampai selesai
+                - link "Lihat Detail" [ref=f1e156] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa/desain-landing-page
+      - generic [ref=f1e158]:
+        - generic [ref=f1e159]:
+          - generic [ref=f1e160]: Cara pesan
+          - heading "Tiga langkah, beres" [level=2] [ref=f1e161]
+          - paragraph [ref=f1e162]: Tidak ada proses yang bertele-tele. Kalau ada yang kurang jelas, tim kami menghubungi kamu balik.
+        - generic [ref=f1e163]:
+          - generic [ref=f1e164]:
+            - generic [ref=f1e165]: "1"
+            - heading "Pilih jasa" [level=3] [ref=f1e166]
+            - paragraph [ref=f1e167]: Buka katalog, bandingkan harga dan estimasi pengerjaan, lalu masuk ke halaman detail.
+          - generic [ref=f1e168]:
+            - generic [ref=f1e169]: "2"
+            - heading "Isi kebutuhan" [level=3] [ref=f1e170]
+            - paragraph [ref=f1e171]: "Tulis sedetail mungkin: topik, jumlah halaman, format, dan tenggat. Lampirkan contoh berkas bila ada."
+          - generic [ref=f1e172]:
+            - generic [ref=f1e173]: "3"
+            - heading "Bayar & pantau" [level=3] [ref=f1e174]
+            - paragraph [ref=f1e175]: Pilih kanal pembayaran, selesaikan transaksi, lalu pantau progres sampai file hasil diunduh.
+      - generic [ref=f1e179]:
+        - generic [ref=f1e180]:
+          - heading "Sudah siap kerjain?" [level=2] [ref=f1e181]
+          - paragraph [ref=f1e182]: Buat akun gratis, lalu pesan jasanya dan pantau progresnya dari mana saja.
+        - generic [ref=f1e183]:
+          - link " Daftar Gratis" [ref=f1e184] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/register
+            - generic [ref=f1e185]: 
+            - text: Daftar Gratis
+          - link "Lihat Katalog" [ref=f1e186] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa
+      - generic [ref=f1e189]:
+        - generic [ref=f1e191]:
+          - generic [ref=f1e192]: Pertanyaan umum
+          - heading "Masih ragu? Ini jawaban singkatnya" [level=2] [ref=f1e193]
+          - paragraph [ref=f1e194]: Kalau pertanyaannya belum terjawab, hubungi kami lewat WhatsApp.
+        - generic [ref=f1e196]:
+          - group [ref=f1e197]:
+            - generic "Seberapa sering progres pesanan diperbarui? " [ref=f1e198] [cursor=pointer]:
+              - text: Seberapa sering progres pesanan diperbarui?
+              - generic [ref=f1e199]: 
+            - generic [ref=f1e200]: Setiap kali status berubah, halaman detail pesananmu ikut berubah. Kamu juga bisa melihat riwayat status lengkap beserta waktunya.
+          - group [ref=f1e201]:
+            - generic "Bisa minta revisi kalau hasilnya kurang sesuai? " [ref=f1e202] [cursor=pointer]:
+              - text: Bisa minta revisi kalau hasilnya kurang sesuai?
+              - generic [ref=f1e203]: 
+          - group [ref=f1e204]:
+            - generic "Bagaimana cara pembayarannya? " [ref=f1e205] [cursor=pointer]:
+              - text: Bagaimana cara pembayarannya?
+              - generic [ref=f1e206]: 
+          - group [ref=f1e207]:
+            - generic "Bagaimana cara mengunduh file hasil? " [ref=f1e208] [cursor=pointer]:
+              - text: Bagaimana cara mengunduh file hasil?
+              - generic [ref=f1e209]: 
+    - contentinfo [ref=f1e210]:
+      - generic [ref=f1e211]:
+        - generic [ref=f1e212]:
+          - generic [ref=f1e213]:
+            - link " Jovexa" [ref=f1e214] [cursor=pointer]:
+              - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+              - generic [ref=f1e215]: 
+              - generic [ref=f1e217]: Jovexa
+            - paragraph [ref=f1e218]: Jasa digital untuk tugas sekolah, kuliah, coding, dan desain. Pesanan diproses manusia, progresnya bisa kamu pantau sendiri.
+          - generic [ref=f1e219]:
+            - heading "Jelajahi" [level=2] [ref=f1e220]
+            - list [ref=f1e221]:
+              - listitem [ref=f1e222]:
+                - link "Katalog Jasa" [ref=f1e223] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa
+              - listitem [ref=f1e224]:
+                - link "Cara Pesan" [ref=f1e225] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev#cara-pesan
+              - listitem [ref=f1e226]:
+                - link "Pertanyaan Umum" [ref=f1e227] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev#faq
+              - listitem [ref=f1e228]:
+                - link "Masuk" [ref=f1e229] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/login
+              - listitem [ref=f1e230]:
+                - link "Daftar Akun" [ref=f1e231] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/register
+          - generic [ref=f1e232]:
+            - heading "Hubungi Kami" [level=2] [ref=f1e233]
+            - list [ref=f1e234]:
+              - listitem [ref=f1e235]:
+                - generic [ref=f1e236]:
+                  - generic [ref=f1e237]: 
+                  - text: Senin–Sabtu, 09.00–21.00 WIB
+        - generic [ref=f1e238]:
+          - generic [ref=f1e239]: © 2026 Jovexa. Seluruh hak dilindungi.
+          - generic [ref=f1e240]: Pembayaran aman lewat Tripay.
+  - button "Kembali ke atas":
+    - generic: 

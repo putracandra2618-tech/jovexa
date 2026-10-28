@@ -1,0 +1,3736 @@
+/* =====================================================================
+   Jovexa — playful design system (sisi pengguna: publik + customer)
+   ---------------------------------------------------------------------
+   Seluruh gaya di bawah ini di-scope di body.playful supaya halaman
+   admin yang memakai tema Spark (forest gelap) tetap utuh.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. Design tokens
+--------------------------------------------------------------------- */
+.playful {
+    /* Brand */
+    --jx-mint: #BFF6C3;
+    --jx-mint-hover: #A7EFB0;
+    --jx-mint-soft: #E9FCEB;
+    --jx-mint-strong: #5FCB84;
+    --jx-green: #1F7A4D;
+    --jx-green-hover: #155F3A;
+
+    /* Accents */
+    --jx-coral: #FF8E72;
+    --jx-coral-soft: #FFEDE7;
+    --jx-rose: #E5484D;
+    --jx-rose-soft: #FFE9E9;
+    --jx-mango: #FFC857;
+    --jx-mango-soft: #FFF3D9;
+    --jx-sky: #8FC7FF;
+    --jx-sky-soft: #E8F3FF;
+    --jx-lilac: #C3B4FF;
+    --jx-lilac-soft: #F1EDFF;
+
+    /* Neutrals */
+    --jx-bg: #FBFDF9;
+    --jx-surface: #FFFFFF;
+    --jx-ink: #16302A;
+    --jx-ink-soft: #3D5B52;
+    --jx-muted: #6C877E;
+    --jx-line: #E6EFE8;
+    --jx-line-strong: #D3E3D9;
+
+    /* Shape */
+    --jx-radius-sm: 12px;
+    --jx-radius-md: 18px;
+    --jx-radius-lg: 24px;
+    --jx-radius-xl: 32px;
+    --jx-radius-pill: 999px;
+
+    /* Elevation */
+    --jx-shadow-sm: 0 2px 10px rgba(22, 48, 42, 0.04);
+    --jx-shadow-md: 0 10px 24px rgba(22, 48, 42, 0.08);
+    --jx-shadow: 0 14px 34px rgba(22, 48, 42, 0.07);
+    --jx-shadow-lg: 0 26px 64px rgba(22, 48, 42, 0.12);
+
+    /* Easing */
+    --jx-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --jx-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Map ke token Spark supaya komponen bersama ikut berubah warna */
+    --bs-body-bg: var(--jx-bg);
+    --brand-lime: var(--jx-mint);
+    --brand-lime-hover: var(--jx-green-hover);
+    --brand-lime-translucent: rgba(191, 246, 195, 0.45);
+    --brand-forest-medium: var(--jx-green);
+    --brand-forest-dark: var(--jx-ink);
+    --text-main: var(--jx-ink);
+    --text-muted-green: var(--jx-muted);
+    --card-background: var(--jx-surface);
+    --border-light: var(--jx-line);
+    --radius-lg: var(--jx-radius-md);
+    --radius-xl: var(--jx-radius-lg);
+    --radius-xxl: var(--jx-radius-xl);
+    --shadow-md: var(--jx-shadow);
+    --shadow-lg: var(--jx-shadow-lg);
+}
+
+/* ---------------------------------------------------------------------
+   2. Base
+--------------------------------------------------------------------- */
+.playful {
+    --jx-font: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+
+    background-color: var(--jx-bg);
+    color: var(--jx-ink);
+    font-family: var(--jx-font);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.playful h1,
+.playful h2,
+.playful h3,
+.playful h4,
+.playful h5,
+.playful h6 {
+    color: var(--jx-ink);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+}
+
+.playful a {
+    color: var(--jx-green);
+}
+
+.playful a:hover {
+    color: var(--jx-green-hover);
+}
+
+.playful ::selection {
+    background-color: var(--jx-mint);
+    color: var(--jx-ink);
+}
+
+.playful .jx-container {
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    padding-inline: clamp(24px, 4vw, 72px);
+}
+
+.playful .jx-shell {
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    padding-inline: clamp(24px, 4vw, 72px);
+    padding-block: 40px 64px;
+}
+
+.jx-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------------------------------------------------------------------
+   3. Tombol
+--------------------------------------------------------------------- */
+.playful .btn-custom {
+    border-radius: var(--jx-radius-pill);
+    padding: 0.7rem 1.5rem;
+    font-weight: 800;
+    box-shadow: none;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.playful .btn-custom:hover {
+    transform: translateY(-2px);
+}
+
+.playful .btn-custom:active {
+    transform: scale(0.97);
+}
+
+.playful .btn-custom:focus-visible {
+    box-shadow: 0 0 0 4px rgba(191, 246, 195, 0.55);
+}
+
+.playful .btn-custom-primary {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-mint);
+    color: var(--jx-ink);
+    box-shadow: 0 8px 18px rgba(31, 122, 77, 0.14);
+}
+
+.playful .btn-custom-primary:hover {
+    background-color: var(--jx-mint-hover);
+    border-color: var(--jx-mint-hover);
+    color: var(--jx-ink);
+    box-shadow: 0 12px 24px rgba(31, 122, 77, 0.2);
+}
+
+.playful .btn-custom-primary:disabled,
+.playful .btn-custom-primary.disabled {
+    background-color: var(--jx-line);
+    border-color: var(--jx-line);
+    color: var(--jx-muted);
+    box-shadow: none;
+    transform: none;
+}
+
+.playful .btn-custom-secondary {
+    background-color: var(--jx-coral);
+    border-color: var(--jx-coral);
+    color: var(--jx-ink);
+}
+
+.playful .btn-custom-secondary:hover {
+    background-color: #FF7A5C;
+    border-color: #FF7A5C;
+    color: var(--jx-ink);
+}
+
+.playful .btn-custom-light {
+    background-color: var(--jx-surface);
+    border-color: var(--jx-line-strong);
+    color: var(--jx-ink);
+}
+
+.playful .btn-custom-light:hover {
+    background-color: var(--jx-mint-soft);
+    border-color: var(--jx-mint);
+    color: var(--jx-ink);
+}
+
+.playful .btn-custom-outline-primary {
+    background-color: transparent;
+    border: 2px solid var(--jx-green);
+    color: var(--jx-green);
+}
+
+.playful .btn-custom-outline-primary:hover {
+    background-color: var(--jx-green);
+    border-color: var(--jx-green);
+    color: #FFFFFF;
+}
+
+.playful .btn-custom-danger {
+    background-color: var(--jx-coral-soft);
+    border-color: var(--jx-coral-soft);
+    color: #B3401F;
+}
+
+.playful .btn-custom-danger:hover {
+    background-color: #FFDDD3;
+    border-color: #FFDDD3;
+    color: #B3401F;
+}
+
+.playful .btn-custom-warning {
+    background-color: var(--jx-mango-soft);
+    border-color: var(--jx-mango-soft);
+    color: #8A5B00;
+}
+
+.playful .btn-custom-warning:hover {
+    background-color: #FFE9B8;
+    border-color: #FFE9B8;
+    color: #8A5B00;
+}
+
+.playful .btn-custom-sm {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+    border-radius: var(--jx-radius-pill);
+}
+
+.playful .btn-custom-lg {
+    padding: 0.9rem 2rem;
+    font-size: 1rem;
+    border-radius: var(--jx-radius-pill);
+}
+
+/* ---------------------------------------------------------------------
+   4. Kartu
+--------------------------------------------------------------------- */
+.playful .card {
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-sm);
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.playful .card-header {
+    margin-bottom: 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.playful .card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+}
+
+.playful .card-footer {
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+}
+
+.playful .card-lift {
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.playful .card-lift:hover {
+    transform: translateY(-6px);
+    border-color: var(--jx-mint);
+    box-shadow: var(--jx-shadow);
+}
+
+.playful .card-flat {
+    box-shadow: none;
+    background-color: var(--jx-mint-soft);
+    border-color: transparent;
+}
+
+/* ---------------------------------------------------------------------
+   5. Judul halaman, label, statistik
+--------------------------------------------------------------------- */
+.playful .page-header {
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    gap: 1.25rem;
+}
+
+.playful .page-title {
+    font-size: clamp(1.6rem, 1.1rem + 1.7vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.35rem;
+}
+
+.playful .page-subtitle {
+    font-size: 1rem;
+    color: var(--jx-muted);
+    margin-bottom: 0;
+}
+
+.playful .stat-label {
+    font-size: 0.85rem;
+    color: var(--jx-muted);
+    font-weight: 500;
+}
+
+.playful .stat-value {
+    font-size: 2.15rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    letter-spacing: -0.025em;
+}
+
+.playful .card-stat {
+    background: linear-gradient(160deg, var(--jx-mint-soft), var(--jx-surface) 65%);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.playful .card-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--jx-shadow-md);
+}
+
+.playful .trend-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    align-self: flex-start;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border-radius: var(--jx-radius-pill);
+}
+
+.playful .trend-badge.trend-up {
+    color: var(--jx-green);
+    background-color: var(--jx-mint-soft);
+}
+
+.playful .trend-badge.trend-down {
+    color: var(--jx-rose);
+    background-color: var(--jx-coral-soft);
+}
+
+.playful .sparkline-card-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1.5px dashed var(--jx-line-strong);
+    font-size: 0.9rem;
+    color: var(--jx-muted);
+}
+
+.playful .text-muted {
+    color: var(--jx-muted) !important;
+}
+
+.playful .alert-green-link {
+    color: var(--jx-green);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.playful .alert-green-link:hover {
+    color: var(--jx-green-hover);
+}
+
+/* ---------------------------------------------------------------------
+   6. Lencana status
+--------------------------------------------------------------------- */
+.playful .badge-table {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.playful .badge-table.success {
+    background-color: var(--jx-mint-soft);
+    color: var(--jx-green);
+}
+
+.playful .badge-table.success::before {
+    background-color: var(--jx-mint-strong);
+}
+
+.playful .badge-table.pending {
+    background-color: var(--jx-mango-soft);
+    color: #8A5B00;
+}
+
+.playful .badge-table.pending::before {
+    background-color: var(--jx-mango);
+}
+
+.playful .badge-table.failed {
+    background-color: var(--jx-coral-soft);
+    color: #B3401F;
+}
+
+.playful .badge-table.failed::before {
+    background-color: var(--jx-coral);
+}
+
+/* ---------------------------------------------------------------------
+   7. Tabel
+--------------------------------------------------------------------- */
+.playful .table-custom {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.playful .table-custom th,
+.playful .table-custom td {
+    padding: 0.95rem 1.25rem;
+    border-bottom: 1px solid var(--jx-line);
+    white-space: nowrap;
+}
+
+.playful .table-custom th {
+    background-color: var(--jx-mint-soft);
+    color: var(--jx-ink-soft);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--jx-line);
+}
+
+.playful .table-custom thead th:first-child {
+    border-top-left-radius: var(--jx-radius-sm);
+    border-bottom-left-radius: var(--jx-radius-sm);
+}
+
+.playful .table-custom thead th:last-child {
+    border-top-right-radius: var(--jx-radius-sm);
+    border-bottom-right-radius: var(--jx-radius-sm);
+}
+
+.playful .table-custom tbody tr:hover {
+    background-color: var(--jx-mint-soft);
+}
+
+.playful .table-custom tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* ---------------------------------------------------------------------
+   8. Formulir
+--------------------------------------------------------------------- */
+.playful .form-label-custom {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    margin-bottom: 0.5rem;
+}
+
+.playful .form-control-custom,
+.playful .form-select-custom {
+    border-radius: var(--jx-radius-md);
+    border: 1.5px solid var(--jx-line-strong);
+    padding: 0.75rem 1.1rem;
+    font-size: 0.95rem;
+    background-color: var(--jx-surface);
+    color: var(--jx-ink);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.playful .form-control-custom::placeholder {
+    color: #9DB3AA;
+}
+
+.playful .form-control-custom:focus,
+.playful .form-select-custom:focus {
+    border-color: var(--jx-mint-strong);
+    box-shadow: 0 0 0 4px rgba(191, 246, 195, 0.5);
+    outline: 0;
+}
+
+.playful .form-control-custom.is-invalid-custom {
+    border-color: var(--jx-coral) !important;
+    background-color: var(--jx-coral-soft);
+}
+
+.playful .form-control-custom.is-invalid-custom:focus {
+    box-shadow: 0 0 0 4px rgba(255, 142, 114, 0.28) !important;
+}
+
+.playful .form-feedback-custom {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.playful .form-check-input-custom[type="checkbox"] {
+    border-radius: 7px;
+    border-width: 1.5px;
+}
+
+.playful .form-check-input-custom[type="checkbox"]:checked {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-green);
+}
+
+.playful .form-check-input-custom[type="radio"] {
+    border-width: 1.5px;
+}
+
+.playful .form-check-input-custom[type="radio"]:checked {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-green);
+}
+
+.playful .form-switch-input-custom {
+    border-radius: var(--jx-radius-pill);
+}
+
+.playful .form-switch-input-custom:checked {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-green);
+}
+
+/* Upload file — sebelumnya kelas ini tidak ada sama sekali di mana pun */
+.playful .form-control-file {
+    display: block;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--jx-ink-soft);
+    background-color: var(--jx-mint-soft);
+    border: 2px dashed var(--jx-mint-strong);
+    border-radius: var(--jx-radius-md);
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.playful .form-control-file:hover {
+    background-color: #DFF8E2;
+    border-color: var(--jx-green);
+}
+
+.playful .form-control-file::file-selector-button {
+    margin-right: 0.9rem;
+    padding: 0.45rem 0.9rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border: 0;
+    border-radius: var(--jx-radius-pill);
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------
+   9. Alert & empty state
+--------------------------------------------------------------------- */
+.playful .alert-custom {
+    border-radius: var(--jx-radius-md);
+    font-weight: 500;
+    border-width: 1.5px;
+}
+
+.playful .alert-custom-primary,
+.playful .alert-custom-success {
+    background-color: var(--jx-mint-soft);
+    border-color: var(--jx-mint-strong);
+    color: var(--jx-ink-soft);
+}
+
+.playful .alert-custom-danger {
+    background-color: var(--jx-coral-soft);
+    border-color: var(--jx-coral);
+    color: #8A2F14;
+}
+
+.playful .alert-custom-warning {
+    background-color: var(--jx-mango-soft);
+    border-color: var(--jx-mango);
+    color: #7A4E00;
+}
+
+.playful .alert-custom-info {
+    background-color: var(--jx-sky-soft);
+    border-color: var(--jx-sky);
+    color: #17456F;
+}
+
+.playful .empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin-inline: auto;
+    font-size: 2rem;
+    color: var(--jx-green);
+    background-color: var(--jx-mint-soft);
+    border-radius: 38px 26px 34px 30px;
+    opacity: 1;
+}
+
+/* ---------------------------------------------------------------------
+   10. Paginasi
+--------------------------------------------------------------------- */
+.playful .pagination {
+    gap: 0.35rem;
+    margin: 0;
+}
+
+.playful .pagination .page-link {
+    min-width: 42px;
+    border: 1.5px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-sm) !important;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    background-color: var(--jx-surface);
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.playful .pagination .page-link:hover {
+    background-color: var(--jx-mint-soft);
+    border-color: var(--jx-mint);
+    color: var(--jx-ink);
+}
+
+.playful .pagination .page-item.active .page-link {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-mint);
+    color: var(--jx-ink);
+}
+
+.playful .pagination .page-item.disabled .page-link {
+    background-color: var(--jx-bg);
+    border-color: var(--jx-line);
+    color: #A9BDB4;
+}
+
+/* =====================================================================
+   BAGIAN PUBLIK
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   11. Header publik
+--------------------------------------------------------------------- */
+.public-main {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+.jx-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: rgba(251, 253, 249, 0.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--jx-line);
+}
+
+.jx-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 76px;
+}
+
+.playful .jx-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--jx-ink);
+    text-decoration: none;
+}
+
+.playful .jx-brand:hover {
+    color: var(--jx-ink);
+}
+
+.playful .jx-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 14px 10px 14px 8px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.playful .jx-brand:hover .jx-brand-mark {
+    transform: rotate(-12deg) scale(1.06);
+}
+
+.jx-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    margin-left: auto;
+}
+
+.jx-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.playful .jx-nav-link {
+    display: inline-block;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    text-decoration: none;
+    border-radius: var(--jx-radius-pill);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.playful .jx-nav-link:hover,
+.playful .jx-nav-link.active {
+    color: var(--jx-ink);
+    background-color: var(--jx-mint-soft);
+}
+
+.jx-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.jx-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-left: auto;
+    font-size: 1.4rem;
+    color: var(--jx-ink);
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-sm);
+}
+
+@media (max-width: 991.98px) {
+    .jx-nav {
+        display: none;
+    }
+}
+
+@media (min-width: 992px) {
+    .jx-nav-toggle {
+        display: none;
+    }
+}
+
+/* ---------------------------------------------------------------------
+    11b. Drawer navigasi (mobile)
+    Menu hamburger meluncur dari sisi kiri memakai Bootstrap offcanvas.
+ --------------------------------------------------------------------- */
+.playful .jx-drawer {
+    --bs-offcanvas-width: 304px;
+    background-image: linear-gradient(180deg, var(--jx-mint-soft) 0%, var(--jx-surface) 300px);
+    border-right: 0;
+    border-radius: 0 var(--jx-radius-lg) var(--jx-radius-lg) 0;
+    box-shadow: 12px 0 32px rgba(31, 122, 77, 0.12);
+}
+
+.playful .jx-drawer .offcanvas-header {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1.5px dashed var(--jx-line-strong);
+}
+
+.playful .jx-drawer .offcanvas-title {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--jx-ink);
+}
+
+.playful .jx-drawer .offcanvas-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.jx-drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.playful .jx-drawer-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    text-decoration: none;
+    border-radius: var(--jx-radius-sm);
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.playful .jx-drawer-link:hover,
+.playful .jx-drawer-link.active {
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+}
+
+.playful .jx-drawer-link:hover {
+    transform: translateX(4px);
+}
+
+.jx-drawer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1.25rem;
+    border-top: 1.5px dashed var(--jx-line-strong);
+}
+
+.jx-drawer-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line);
+    border-radius: var(--jx-radius-sm);
+}
+
+.jx-drawer-user .jx-user-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.jx-drawer-user-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.jx-drawer-user-meta strong {
+    color: var(--jx-ink);
+    font-size: 0.95rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.jx-drawer-user-meta small {
+    color: var(--jx-muted);
+    font-size: 0.8rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* ---------------------------------------------------------------------
+   12. Footer publik
+--------------------------------------------------------------------- */
+.jx-footer {
+    margin-top: auto;
+    padding-block: 56px 32px;
+    background-color: var(--jx-surface);
+    border-top: 1px solid var(--jx-line);
+}
+
+.jx-footer-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 2.5rem;
+}
+
+.jx-footer-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--jx-muted);
+    margin-bottom: 1rem;
+}
+
+.jx-footer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+}
+
+.jx-footer-list a {
+    color: var(--jx-ink-soft);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.jx-footer-list a:hover {
+    color: var(--jx-green);
+}
+
+.jx-footer-tagline {
+    max-width: 34ch;
+    color: var(--jx-muted);
+    font-weight: 500;
+}
+
+.jx-footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--jx-line-strong);
+    color: var(--jx-muted);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 767.98px) {
+    .jx-footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   13. Bagian marketing
+--------------------------------------------------------------------- */
+.jx-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: 64px 72px;
+    background-color: var(--jx-mint-soft);
+    border-bottom: 1px solid var(--jx-line);
+}
+
+.jx-hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.jx-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-surface);
+    border-radius: var(--jx-radius-pill);
+    box-shadow: var(--jx-shadow-sm);
+}
+
+.jx-hero-title {
+    font-size: clamp(1.85rem, 1.1rem + 3.1vw, 3.05rem);
+    line-height: 1.1;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 1.1rem;
+}
+
+.jx-hero-title .jx-highlight {
+    position: relative;
+    display: inline-block;
+    padding: 0 0.2em;
+}
+
+.jx-hero-title .jx-highlight::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.12em;
+    height: 0.34em;
+    background-color: var(--jx-mango);
+    border-radius: var(--jx-radius-pill);
+    z-index: -1;
+}
+
+.jx-hero-text {
+    max-width: 48ch;
+    font-size: 1.075rem;
+    color: var(--jx-ink-soft);
+    margin-bottom: 2rem;
+}
+
+.jx-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.jx-hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--jx-line-strong);
+}
+
+.jx-hero-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+}
+
+.jx-hero-trust-item i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+/* Panel kanan: ringkasan cara pemesanan */
+.jx-hero-panel {
+    position: relative;
+    padding: 1.75rem;
+    background-color: var(--jx-surface);
+    border: 2px solid var(--jx-line);
+    border-radius: var(--jx-radius-xl);
+    box-shadow: var(--jx-shadow-lg);
+    transform: rotate(1.2deg);
+}
+
+.jx-hero-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.jx-hero-panel-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.jx-hero-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+}
+
+.jx-hero-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    background-color: var(--jx-bg);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-md);
+}
+
+.jx-hero-step-num {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-hero-step-title {
+    font-weight: 800;
+    font-size: 0.95rem;
+    margin-bottom: 0.1rem;
+}
+
+.jx-hero-step-text {
+    font-size: 0.85rem;
+    color: var(--jx-muted);
+}
+
+/* Dekorasi blob */
+.jx-blob {
+    position: absolute;
+    border-radius: 46% 54% 38% 62% / 55% 42% 58% 45%;
+    filter: blur(0.5px);
+    pointer-events: none;
+}
+
+.jx-blob-mint {
+    background-color: var(--jx-mint);
+}
+
+.jx-blob-mango {
+    background-color: var(--jx-mango);
+    opacity: 0.55;
+}
+
+.jx-blob-sky {
+    background-color: var(--jx-sky);
+    opacity: 0.45;
+}
+
+.jx-blob-lilac {
+    background-color: var(--jx-lilac);
+    opacity: 0.45;
+}
+
+.jx-blob-coral {
+    background-color: var(--jx-coral);
+    opacity: 0.4;
+}
+
+.jx-hero .jx-blob-1 {
+    width: 320px;
+    height: 320px;
+    top: -120px;
+    right: -60px;
+}
+
+.jx-hero .jx-blob-2 {
+    width: 180px;
+    height: 180px;
+    bottom: -70px;
+    left: 40%;
+}
+
+/* Section */
+.jx-section {
+    padding-block: 64px;
+}
+
+.jx-section-alt {
+    background-color: var(--jx-surface);
+    border-block: 1px solid var(--jx-line);
+}
+
+.jx-section-head {
+    max-width: 62ch;
+    margin-bottom: 2.5rem;
+}
+
+.jx-section-head.centered {
+    margin-inline: auto;
+    text-align: center;
+}
+
+.jx-section-eyebrow {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--jx-green);
+}
+
+.jx-section-title {
+    font-size: clamp(1.45rem, 1rem + 1.7vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.75rem;
+}
+
+.jx-section-text {
+    font-size: 1.05rem;
+    color: var(--jx-muted);
+    margin-bottom: 0;
+}
+
+.jx-feature-card {
+    position: relative;
+    height: 100%;
+    padding: 1.6rem;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-sm);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.jx-feature-card:hover {
+    transform: translateY(-6px) rotate(-0.6deg);
+    border-color: var(--jx-mint);
+    box-shadow: var(--jx-shadow);
+}
+
+.jx-feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 1.1rem;
+    font-size: 1.4rem;
+    color: var(--jx-ink);
+    border-radius: 20px 14px 18px 12px;
+}
+
+.jx-icon-mint {
+    background-color: var(--jx-mint);
+}
+
+.jx-icon-coral {
+    background-color: var(--jx-coral-soft);
+}
+
+.jx-icon-mango {
+    background-color: var(--jx-mango-soft);
+}
+
+.jx-icon-sky {
+    background-color: var(--jx-sky-soft);
+}
+
+.jx-icon-lilac {
+    background-color: var(--jx-lilac-soft);
+}
+
+.jx-feature-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 0.4rem;
+}
+
+.jx-feature-text {
+    font-size: 0.95rem;
+    color: var(--jx-muted);
+    margin-bottom: 0;
+}
+
+.jx-stat-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+}
+
+.jx-stat-tile {
+    padding: 1.5rem;
+    text-align: center;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+}
+
+.jx-stat-tile-value {
+    font-size: 1.85rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--jx-ink);
+}
+
+.jx-stat-tile-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--jx-muted);
+}
+
+/* Langkah pemesanan */
+.jx-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    counter-reset: jx-step;
+}
+
+.jx-step {
+    position: relative;
+    padding: 1.75rem 1.5rem;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-sm);
+}
+
+.jx-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50% 50% 50% 12px;
+}
+
+.jx-step-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 0.35rem;
+}
+
+.jx-step-text {
+    font-size: 0.95rem;
+    color: var(--jx-muted);
+    margin-bottom: 0;
+}
+
+/* Banner CTA */
+.jx-cta {
+    position: relative;
+    overflow: hidden;
+    padding-block: 56px;
+    background-color: var(--jx-ink);
+    border-radius: var(--jx-radius-xl);
+}
+
+.jx-cta-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2.5rem;
+}
+
+.jx-cta-title {
+    font-size: clamp(1.4rem, 1rem + 1.4vw, 1.9rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+    margin-bottom: 0.4rem;
+}
+
+.jx-cta-text {
+    color: rgba(255, 255, 255, 0.72);
+    margin-bottom: 0;
+}
+
+.jx-cta .jx-blob {
+    z-index: 0;
+}
+
+/* FAQ */
+.jx-faq {
+    display: grid;
+    gap: 0.85rem;
+}
+
+.jx-faq details {
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-md);
+    overflow: hidden;
+}
+
+.jx-faq summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.1rem 1.35rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    cursor: pointer;
+    list-style: none;
+}
+
+.jx-faq summary::-webkit-details-marker {
+    display: none;
+}
+
+.jx-faq summary i {
+    margin-left: auto;
+    color: var(--jx-muted);
+    transition: transform 0.2s ease;
+}
+
+.jx-faq details[open] summary i {
+    transform: rotate(180deg);
+}
+
+.jx-faq-answer {
+    padding: 0 1.35rem 1.25rem;
+    color: var(--jx-muted);
+}
+
+@media (max-width: 991.98px) {
+    .jx-hero {
+        padding-block: 40px 48px;
+    }
+
+    .jx-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 2.25rem;
+    }
+
+    .jx-hero-panel {
+        transform: none;
+    }
+
+    .jx-steps,
+    .jx-stat-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .jx-section {
+        padding-block: 48px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .jx-hero-trust {
+        gap: 0.9rem;
+    }
+
+    .jx-cta-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   14. Kartu jasa (katalog)
+--------------------------------------------------------------------- */
+.jx-service-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-sm);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.jx-service-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--jx-mint);
+    box-shadow: var(--jx-shadow);
+}
+
+.jx-service-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 1.25rem 1.35rem;
+    background-color: var(--jx-mint-soft);
+    border-bottom: 1px dashed var(--jx-line-strong);
+}
+
+.jx-service-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    font-size: 1.35rem;
+    color: var(--jx-ink);
+    border-radius: 20px 14px 18px 12px;
+}
+
+.jx-service-duration {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    background-color: var(--jx-surface);
+    border-radius: var(--jx-radius-pill);
+}
+
+.jx-service-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: 0.65rem;
+    padding: 1.35rem;
+}
+
+.jx-service-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.playful .jx-service-name a {
+    color: var(--jx-ink);
+    text-decoration: none;
+}
+
+.playful .jx-service-name a:hover {
+    color: var(--jx-green);
+}
+
+.jx-service-desc {
+    font-size: 0.95rem;
+    color: var(--jx-muted);
+    margin: 0;
+}
+
+.jx-service-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 0.35rem;
+}
+
+.jx-service-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--jx-ink);
+}
+
+.jx-service-price-note {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--jx-muted);
+}
+
+/* ---------------------------------------------------------------------
+   15. Halaman detail jasa
+--------------------------------------------------------------------- */
+.jx-detail-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+    background-color: var(--jx-mint-soft);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-xl);
+}
+
+.jx-detail-hero h1 {
+    font-size: clamp(1.45rem, 1rem + 1.9vw, 2.1rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-bottom: 0.9rem;
+}
+
+.jx-detail-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.jx-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.95rem;
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-pill);
+}
+
+.jx-chip-mint {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-mint);
+}
+
+.jx-prose {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--jx-ink-soft);
+    white-space: pre-line;
+    margin-bottom: 0;
+}
+
+.jx-check-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.jx-check-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    font-size: 0.95rem;
+    color: var(--jx-ink-soft);
+}
+
+.jx-check-list i {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    font-size: 0.7rem;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-order-card {
+    position: sticky;
+    top: 100px;
+    padding: 1.75rem;
+    background-color: var(--jx-surface);
+    border: 2px solid var(--jx-mint);
+    border-radius: var(--jx-radius-xl);
+    box-shadow: var(--jx-shadow);
+}
+
+.jx-order-price {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: var(--jx-ink);
+    margin-bottom: 0.25rem;
+}
+
+.playful .jx-breadcrumb-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    text-decoration: none;
+}
+
+.playful .jx-breadcrumb-back:hover {
+    color: var(--jx-green);
+}
+
+/* ---------------------------------------------------------------------
+   16. Kotak pencarian
+--------------------------------------------------------------------- */
+.jx-search {
+    position: relative;
+    max-width: 460px;
+    flex: 1 1 260px;
+}
+
+.jx-search i {
+    position: absolute;
+    top: 50%;
+    left: 1.1rem;
+    transform: translateY(-50%);
+    color: var(--jx-muted);
+    pointer-events: none;
+}
+
+.jx-search .form-control-custom {
+    padding-left: 2.85rem;
+    border-radius: var(--jx-radius-pill);
+}
+
+.jx-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.jx-filter-chip {
+    padding: 0.4rem 0.95rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-pill);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.jx-filter-chip:hover {
+    border-color: var(--jx-mint);
+    color: var(--jx-ink);
+}
+
+.jx-filter-chip.active {
+    background-color: var(--jx-mint);
+    border-color: var(--jx-mint);
+    color: var(--jx-ink);
+}
+
+/* =====================================================================
+   BAGIAN CUSTOMER
+   ===================================================================== */
+
+.jx-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--jx-bg);
+}
+
+.jx-app-main {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    padding-block: 36px 72px;
+}
+
+.jx-header-customer {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background-color: var(--jx-surface);
+    border-bottom: 1.5px solid var(--jx-line);
+}
+
+.jx-footer-customer {
+    margin-top: auto;
+    padding-block: 1.5rem;
+    background-color: var(--jx-surface);
+    border-top: 1.5px solid var(--jx-line);
+}
+
+.jx-footer-customer .jx-footer-copy {
+    font-size: 0.85rem;
+    color: var(--jx-ink-soft);
+}
+
+.jx-user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--jx-green);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-user-name {
+    max-width: 130px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 991.98px) {
+    .jx-user-name {
+        max-width: none;
+    }
+}
+
+.playful .jx-user-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.35rem 0.9rem 0.35rem 0.4rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-pill);
+    text-decoration: none;
+}
+
+.playful .jx-user-btn:hover {
+    color: var(--jx-ink);
+    border-color: var(--jx-mint);
+}
+
+.jx-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-avatar-lg {
+    width: 52px;
+    height: 52px;
+    font-size: 1.2rem;
+    border-radius: 18px 14px 16px 12px;
+}
+
+.jx-greeting {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--jx-mint-soft);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+}
+
+.jx-greeting-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+}
+
+.jx-greeting-text {
+    font-size: 0.95rem;
+    color: var(--jx-muted);
+    margin-bottom: 0;
+}
+
+/* Kartu statistik customer */
+.jx-stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    padding: 1.4rem 1.5rem;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-sm);
+    text-decoration: none;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.jx-stat-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--jx-mint);
+    box-shadow: var(--jx-shadow);
+    color: inherit;
+}
+
+.jx-stat-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.jx-stat-card-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--jx-muted);
+}
+
+.jx-stat-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 1.05rem;
+    color: var(--jx-ink);
+    border-radius: 14px 10px 12px 8px;
+}
+
+.jx-stat-card-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    color: var(--jx-ink);
+}
+
+.jx-stat-card-hint {
+    font-size: 0.8rem;
+    color: var(--jx-muted);
+}
+
+/* Kartu pesanan untuk tampilan mobile */
+.jx-order-card-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-md);
+}
+
+.jx-order-card-item-title {
+    font-weight: 800;
+    margin-bottom: 0.15rem;
+}
+
+.jx-order-card-item-meta {
+    font-size: 0.85rem;
+    color: var(--jx-muted);
+}
+
+.jx-hide-mobile {
+    display: block;
+}
+
+.jx-hide-desktop {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .jx-hide-mobile {
+        display: none !important;
+    }
+
+    .jx-hide-desktop {
+        display: block;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   17. Stepper status pesanan
+   --------------------------------------------------------------------- */
+.jx-stepper-card {
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    background: linear-gradient(140deg, var(--jx-mint-soft), var(--jx-surface) 60%);
+    border: 1.5px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+}
+
+.jx-stepper {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.jx-stepper-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.jx-stepper-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: calc(50% + 22px);
+    right: calc(-50% + 22px);
+    height: 3px;
+    background-color: var(--jx-line-strong);
+    border-radius: 3px;
+}
+
+.jx-stepper-item.done:not(:last-child)::after {
+    background-color: var(--jx-mint-strong);
+}
+
+.jx-stepper-dot {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-muted);
+    background-color: var(--jx-surface);
+    border: 2.5px solid var(--jx-line-strong);
+    border-radius: 50%;
+}
+
+.jx-stepper-item.done .jx-stepper-dot {
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-color: var(--jx-mint);
+}
+
+.jx-stepper-item.current .jx-stepper-dot {
+    color: var(--jx-ink);
+    background-color: var(--jx-mango);
+    border-color: var(--jx-mango);
+    box-shadow: 0 0 0 6px rgba(255, 200, 87, 0.25);
+}
+
+.jx-stepper-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+}
+
+.jx-stepper-item.upcoming .jx-stepper-label,
+.jx-stepper-item.muted .jx-stepper-label {
+    color: var(--jx-muted);
+    font-weight: 500;
+}
+
+@media (max-width: 767.98px) {
+    .jx-stepper {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .jx-stepper-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.85rem;
+        padding-bottom: 1.1rem;
+        text-align: left;
+    }
+
+    .jx-stepper-item:last-child {
+        padding-bottom: 0;
+    }
+
+    .jx-stepper-item:not(:last-child)::after {
+        top: 40px;
+        left: 18px;
+        right: auto;
+        width: 3px;
+        height: auto;
+        bottom: 0;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   18. Riwayat status
+   --------------------------------------------------------------------- */
+.jx-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+}
+
+.jx-timeline-item {
+    position: relative;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.jx-timeline-dot {
+    flex: 0 0 auto;
+    width: 9px;
+    height: 9px;
+    margin-top: 0.45rem;
+    background-color: var(--jx-mint-strong);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--jx-mint-soft);
+}
+
+.jx-timeline-title {
+    font-weight: 800;
+    color: var(--jx-ink);
+}
+
+.jx-timeline-meta {
+    font-size: 0.8rem;
+    color: var(--jx-muted);
+}
+
+/* ---------------------------------------------------------------------
+   19. Daftar file
+--------------------------------------------------------------------- */
+.jx-file-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.jx-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    background-color: var(--jx-bg);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-md);
+}
+
+.jx-file-name {
+    font-weight: 800;
+    font-size: 0.95rem;
+    word-break: break-all;
+}
+
+.jx-file-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 1.1rem;
+    color: var(--jx-green);
+    background-color: var(--jx-mint-soft);
+    border-radius: var(--jx-radius-sm);
+}
+
+.jx-file-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.jx-file-meta {
+    font-size: 0.8rem;
+    color: var(--jx-muted);
+}
+
+.jx-result-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.1rem 1.25rem;
+    background-color: var(--jx-mint-soft);
+    border: 1.5px solid var(--jx-mint);
+    border-radius: var(--jx-radius-md);
+}
+
+.jx-result-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-result-banner p {
+    font-size: 0.9rem;
+    color: var(--jx-muted);
+}
+
+.form-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--jx-muted);
+}
+
+.jx-hint-card {
+    display: flex;
+    gap: 0.85rem;
+    padding: 1rem 1.15rem;
+    background-color: var(--jx-sky-soft);
+    border: 1.5px dashed var(--jx-sky);
+    border-radius: var(--jx-radius-md);
+    font-size: 0.9rem;
+}
+
+.jx-hint-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    color: var(--jx-ink);
+    background-color: var(--jx-sky);
+    border-radius: 50%;
+}
+
+.jx-hint-card p {
+    margin-top: 0.2rem;
+    color: var(--jx-ink-soft);
+}
+
+/* ---------------------------------------------------------------------
+   20. Metode pembayaran
+--------------------------------------------------------------------- */
+.jx-pay-options {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.jx-pay-option {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.15rem;
+    background-color: var(--jx-bg);
+    border: 2px solid var(--jx-line);
+    border-radius: var(--jx-radius-md);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.jx-pay-option:hover {
+    border-color: var(--jx-mint-strong);
+}
+
+.jx-pay-option:has(input:checked) {
+    background-color: var(--jx-mint-soft);
+    border-color: var(--jx-green);
+}
+
+.jx-pay-option input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--jx-green);
+}
+
+.jx-pay-option-name {
+    font-weight: 800;
+}
+
+.jx-pay-option-code {
+    font-size: 0.8rem;
+    color: var(--jx-muted);
+}
+
+/* ---------------------------------------------------------------------
+   21. Ringkasan nilai (definition list)
+--------------------------------------------------------------------- */
+.jx-summary {
+    display: grid;
+    gap: 0.9rem;
+    margin: 0;
+}
+
+.jx-summary-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px dashed var(--jx-line-strong);
+}
+
+.jx-summary-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.jx-summary-term {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--jx-muted);
+}
+
+.jx-summary-value {
+    font-weight: 800;
+    text-align: right;
+    color: var(--jx-ink);
+}
+
+/* =====================================================================
+   BAGIAN AUTH
+   ===================================================================== */
+
+.jx-auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 20px;
+    background-color: var(--jx-mint-soft);
+}
+
+.jx-auth-card {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 1000px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-xl);
+    box-shadow: var(--jx-shadow-lg);
+}
+
+.jx-auth-aside {
+    position: relative;
+    overflow: hidden;
+    padding: 2.5rem;
+    background-color: var(--jx-ink);
+    color: #FFFFFF;
+}
+
+.jx-auth-aside-title {
+    position: relative;
+    z-index: 1;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #FFFFFF;
+    margin-bottom: 0.75rem;
+}
+
+.jx-auth-aside-text {
+    position: relative;
+    z-index: 1;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 2rem;
+}
+
+.jx-auth-points {
+    position: relative;
+    z-index: 1;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.9rem;
+}
+
+.jx-auth-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.jx-auth-points i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-auth-form {
+    padding: 2.5rem;
+}
+
+.playful .jx-auth-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    text-decoration: none;
+}
+
+.jx-auth-title {
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    margin-bottom: 0.4rem;
+}
+
+.jx-auth-subtitle {
+    font-size: 0.95rem;
+    color: var(--jx-muted);
+    margin-bottom: 1.75rem;
+}
+
+.jx-auth-footer {
+    margin: 1.5rem 0 0;
+    font-size: 0.9rem;
+    color: var(--jx-muted);
+    text-align: center;
+}
+
+.jx-auth-footer a {
+    font-weight: 800;
+}
+
+.jx-auth-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.jx-auth-check {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--jx-ink-soft);
+    cursor: pointer;
+}
+
+@media (max-width: 767.98px) {
+    .jx-auth {
+        padding: 20px 14px;
+    }
+
+    .jx-auth-card {
+        grid-template-columns: 1fr;
+        max-width: 480px;
+    }
+
+    .jx-auth-aside {
+        display: none;
+    }
+
+    .jx-auth-form {
+        padding: 1.75rem;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   21b. Komponen form Spark (login-*) di mode playful
+   --------------------------------------------------------------------- */
+.playful .login-form-group {
+    margin-bottom: 1.1rem;
+}
+
+.playful .login-form-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+}
+
+.playful .login-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.playful .login-input {
+    width: 100%;
+    height: 50px;
+    padding: 0.7rem 1rem 0.7rem 2.9rem;
+    font-size: 0.95rem;
+    color: var(--jx-ink);
+    background-color: var(--jx-bg);
+    border: 1.5px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-md);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.playful .login-input::placeholder {
+    color: var(--jx-muted);
+}
+
+.playful .login-input:focus {
+    background-color: var(--jx-surface);
+    border-color: var(--jx-mint-strong);
+    box-shadow: 0 0 0 4px rgba(95, 203, 132, 0.18);
+    outline: none;
+}
+
+.playful .login-input.is-invalid-custom {
+    border-color: var(--jx-rose);
+}
+
+.playful .login-input-password {
+    padding-right: 3rem;
+}
+
+.playful .login-input-group .input-icon {
+    position: absolute;
+    left: 1rem;
+    font-size: 1rem;
+    color: var(--jx-muted);
+    pointer-events: none;
+}
+
+.playful .password-toggle-btn {
+    position: absolute;
+    right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+    color: var(--jx-muted);
+    background: transparent;
+    border: 0;
+    border-radius: var(--jx-radius-sm);
+}
+
+.playful .password-toggle-btn:hover {
+    color: var(--jx-ink);
+    background-color: var(--jx-mint-soft);
+}
+
+.playful .login-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 0.25rem 0 1.5rem;
+}
+
+.playful .custom-control-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--jx-ink-soft);
+    cursor: pointer;
+}
+
+.playful .custom-checkbox-input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--jx-mint-strong);
+    cursor: pointer;
+}
+
+.playful .forgot-password-link {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-green);
+    text-decoration: none;
+}
+
+.playful .forgot-password-link:hover {
+    color: var(--jx-green-hover);
+}
+
+.playful .btn-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border: 2px solid var(--jx-ink);
+    border-radius: var(--jx-radius-pill);
+    box-shadow: 4px 5px 0 var(--jx-ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.playful .btn-login:hover {
+    background-color: var(--jx-mint-hover);
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 7px 0 var(--jx-ink);
+}
+
+.playful .btn-login:active {
+    transform: translate(2px, 3px);
+    box-shadow: 1px 2px 0 var(--jx-ink);
+}
+
+/* ---------------------------------------------------------------------
+   22. Halaman error
+   --------------------------------------------------------------------- */
+.jx-error {
+    position: relative;
+    overflow: hidden;
+    padding: 2rem 0 1rem;
+    text-align: center;
+}
+
+.jx-error-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: clamp(3rem, 1.8rem + 7vw, 5.2rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--jx-ink);
+    margin-bottom: 0.5rem;
+}
+
+.jx-error-code i {
+    color: var(--jx-green);
+}
+
+.jx-error-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.jx-error-text {
+    max-width: 46ch;
+    margin: 0 auto 2rem;
+    color: var(--jx-muted);
+}
+
+/* ---------------------------------------------------------------------
+   23. Animasi & interaksi JS (playful)
+--------------------------------------------------------------------- */
+@keyframes jxFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(28px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes jxSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes jxPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 200, 87, 0.5);
+    }
+
+    70% {
+        box-shadow: 0 0 0 16px rgba(255, 200, 87, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 200, 87, 0);
+    }
+}
+
+@keyframes jxPop {
+    0% {
+        transform: scale(0.2);
+        opacity: 0;
+    }
+
+    70% {
+        transform: scale(1.25);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes jxShake {
+    10%,
+    90% {
+        transform: translateX(-1px);
+    }
+
+    20%,
+    80% {
+        transform: translateX(2px);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translateX(-5px);
+    }
+
+    40%,
+    60% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes jxToastIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes jxToastOut {
+    to {
+        opacity: 0;
+        transform: translateX(24px) scale(0.96);
+    }
+}
+
+@keyframes jxFloat {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate3d(0, -16px, 0) scale(1.05);
+    }
+}
+
+/* Reveal saat masuk viewport.
+   Hidden state hanya berlaku kalau html.js sudah ada, yaitu inline script di
+   components/layouts/head.blade.php sempat jalan. Kalau JS diblokir atau gagal,
+   penanda itu tidak muncul dan seluruh konten tetap terbaca. */
+/* Hanya disembunyikan setelah initReveal() benar-benar siap. Kalau JS tidak
+   jalan atau bundle gagal dimuat, class ini tidak pernah muncul dan seluruh
+   konten tetap terlihat tanpa perlu pengguna melakukan apa pun. */
+.jx-reveal-ready .jx-reveal {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+}
+
+.jx-reveal-ready .jx-reveal-rotate {
+    transform: translateY(28px) rotate(-2.5deg) scale(0.94);
+}
+
+.jx-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition:
+        opacity 0.7s var(--jx-ease-out),
+        transform 0.7s var(--jx-ease-bounce);
+}
+
+/* Blob dekoratif mengapung */
+.playful .jx-blob {
+    animation: jxFloat 9s ease-in-out infinite;
+}
+
+/* Header kompak saat scroll */
+.jx-header {
+    transition:
+        box-shadow 0.25s ease,
+        background-color 0.25s ease,
+        border-color 0.25s ease;
+}
+
+.jx-header.is-scrolled {
+    background-color: rgba(255, 255, 255, 0.94);
+    border-bottom-color: var(--jx-line-strong);
+    box-shadow: 0 12px 30px rgba(22, 48, 42, 0.09);
+}
+
+/* Progress baca */
+.jx-scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 1090;
+    height: 3px;
+    pointer-events: none;
+}
+
+.jx-scroll-progress span {
+    display: block;
+    height: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: linear-gradient(90deg, var(--jx-mint-strong), var(--jx-mango), var(--jx-coral));
+}
+
+/* Tombol kembali ke atas */
+.jx-back-to-top {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 1070;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border: 2px solid var(--jx-ink);
+    border-radius: 50%;
+    box-shadow: 3px 4px 0 var(--jx-ink);
+    opacity: 0;
+    transform: translateY(16px) scale(0.85);
+    pointer-events: none;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s var(--jx-ease-bounce);
+}
+
+.jx-back-to-top.is-visible {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+.jx-back-to-top:hover {
+    background-color: var(--jx-mint-hover);
+}
+
+/* Toast */
+.jx-toasts {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 5.5rem;
+    z-index: 1080;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-width: min(92vw, 340px);
+}
+
+.jx-toast {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.1rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--jx-ink);
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line-strong);
+    border-left: 5px solid var(--jx-mint-strong);
+    border-radius: var(--jx-radius-md);
+    box-shadow: var(--jx-shadow-lg);
+    animation: jxToastIn 0.5s var(--jx-ease-bounce) both;
+}
+
+.jx-toast i {
+    color: var(--jx-green);
+    font-size: 1.05rem;
+}
+
+.jx-toast.is-leaving {
+    animation: jxToastOut 0.3s ease forwards;
+}
+
+@media (max-width: 575.98px) {
+    .jx-toasts {
+        left: 1rem;
+        right: 1rem;
+        max-width: none;
+    }
+}
+
+/* Alert flash masuk & keluar */
+.jx-alert-enter {
+    animation: jxFadeUp 0.55s var(--jx-ease-bounce);
+}
+
+.alert-custom-dismissible.is-leaving {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+/* Tombol loading */
+.btn-custom,
+.playful .btn-login {
+    --jx-spinner: var(--jx-ink);
+    position: relative;
+}
+
+.btn-custom.is-loading,
+.playful .btn-login.is-loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-custom-danger.is-loading {
+    --jx-spinner: #FFFFFF;
+}
+
+.btn-custom.is-loading > *,
+.playful .btn-login.is-loading > * {
+    visibility: hidden;
+}
+
+.btn-custom.is-loading::after,
+.playful .btn-login.is-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 2.5px solid var(--jx-spinner);
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: jxSpin 0.7s linear infinite;
+}
+
+/* Shake saat field tidak valid */
+.is-shaking {
+    animation: jxShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Umpan balik tombol salin */
+.is-copied {
+    background-color: var(--jx-mint-soft) !important;
+    border-color: var(--jx-mint-strong) !important;
+}
+
+/* Stepper: isi progres beranimasi + pulse + pop centang */
+.jx-stepper-item:not(:last-child)::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+    transition: transform 0.55s var(--jx-ease-bounce);
+}
+
+.jx-stepper:not(.is-active) .jx-stepper-item:not(:last-child)::after {
+    transform: scaleX(0);
+}
+
+.jx-stepper-item:nth-child(1)::after {
+    transition-delay: 0.05s;
+}
+
+.jx-stepper-item:nth-child(2)::after {
+    transition-delay: 0.15s;
+}
+
+.jx-stepper-item:nth-child(3)::after {
+    transition-delay: 0.25s;
+}
+
+.jx-stepper-item:nth-child(4)::after {
+    transition-delay: 0.35s;
+}
+
+.jx-stepper-item:nth-child(5)::after {
+    transition-delay: 0.45s;
+}
+
+.jx-stepper.is-active .jx-stepper-item.current .jx-stepper-dot {
+    animation: jxPulse 1.9s ease-out infinite;
+}
+
+.jx-stepper.is-active .jx-stepper-item.done .jx-stepper-dot i {
+    animation: jxPop 0.45s var(--jx-ease-bounce) both;
+}
+
+.jx-stepper.is-active .jx-stepper-item.done:nth-child(2) .jx-stepper-dot i {
+    animation-delay: 0.12s;
+}
+
+.jx-stepper.is-active .jx-stepper-item.done:nth-child(3) .jx-stepper-dot i {
+    animation-delay: 0.24s;
+}
+
+.jx-stepper.is-active .jx-stepper-item.done:nth-child(4) .jx-stepper-dot i {
+    animation-delay: 0.36s;
+}
+
+/* Modal konfirmasi playful */
+.playful .modal-content {
+    border: 1.5px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-lg);
+}
+
+.playful .modal-header {
+    border-bottom: 1.5px solid var(--jx-line);
+}
+
+.playful .modal-title {
+    font-weight: 800;
+    color: var(--jx-ink);
+}
+
+.playful .modal-body {
+    text-align: center;
+    font-weight: 500;
+    color: var(--jx-ink-soft);
+}
+
+.playful .modal-footer {
+    justify-content: center;
+    gap: 0.5rem;
+    border-top: 1.5px solid var(--jx-line);
+}
+
+.jx-confirm-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 1rem;
+    font-size: 1.6rem;
+    color: #B77800;
+    background-color: var(--jx-mango-soft);
+    border-radius: 50%;
+    animation: jxPop 0.5s var(--jx-ease-bounce) both;
+}
+
+/* ---------------------------------------------------------------------
+   23b. Interaksi form & filter
+--------------------------------------------------------------------- */
+.jx-dropzone {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 172px;
+    padding: 1.5rem;
+    text-align: center;
+    background: linear-gradient(160deg, var(--jx-mint-soft), var(--jx-surface) 70%);
+    border: 2px dashed var(--jx-line-strong);
+    border-radius: var(--jx-radius-lg);
+    cursor: pointer;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        transform 0.2s var(--jx-ease-out);
+}
+
+.jx-dropzone:hover {
+    border-color: var(--jx-mint-strong);
+}
+
+.jx-dropzone.is-dragover {
+    border-color: var(--jx-mint-strong);
+    background: var(--jx-mint-soft);
+    transform: scale(1.01);
+}
+
+.jx-dropzone.is-invalid {
+    border-color: var(--jx-rose);
+}
+
+.jx-dropzone-input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.jx-dropzone-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    pointer-events: none;
+}
+
+.jx-dropzone-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 0.4rem;
+    font-size: 1.5rem;
+    color: var(--jx-green);
+    background-color: var(--jx-mint);
+    border-radius: 50%;
+}
+
+.jx-dropzone-inner strong {
+    font-size: 1rem;
+    color: var(--jx-ink);
+}
+
+.jx-dropzone-hint {
+    font-size: 0.85rem;
+    color: var(--jx-muted);
+}
+
+.jx-dropzone-browse {
+    font-weight: 800;
+    color: var(--jx-green);
+    text-decoration: underline;
+}
+
+.jx-file-preview {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.jx-file-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line);
+    border-radius: var(--jx-radius-md);
+    animation: jxFadeUp 0.4s var(--jx-ease-bounce);
+}
+
+.jx-file-preview-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: var(--jx-green);
+    background-color: var(--jx-mint-soft);
+    border-radius: var(--jx-radius-sm);
+}
+
+.jx-file-preview-info {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.jx-file-preview-name {
+    font-size: 0.9rem;
+    font-weight: 800;
+    word-break: break-all;
+}
+
+.jx-file-preview-meta {
+    font-size: 0.78rem;
+    color: var(--jx-muted);
+}
+
+.jx-file-preview-remove {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--jx-rose);
+    background-color: var(--jx-rose-soft);
+    border: 0;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.jx-file-preview-remove:hover {
+    color: #FFFFFF;
+    background-color: var(--jx-rose);
+}
+
+.jx-char-counter {
+    margin-top: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--jx-muted);
+    text-align: right;
+}
+
+.jx-char-counter.is-near {
+    color: #B77800;
+}
+
+.jx-char-counter.is-over {
+    color: var(--jx-rose);
+}
+
+.jx-status-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.jx-status-tab {
+    padding: 0.5rem 1.05rem;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--jx-ink-soft);
+    background-color: var(--jx-surface);
+    border: 1.5px solid var(--jx-line-strong);
+    border-radius: var(--jx-radius-pill);
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.jx-status-tab:hover {
+    color: var(--jx-ink);
+    border-color: var(--jx-mint);
+}
+
+.jx-status-tab.is-active {
+    color: var(--jx-ink);
+    background-color: var(--jx-mint);
+    border-color: var(--jx-mint);
+    transform: translateY(-1px);
+}
+
+.jx-password-meter {
+    margin-top: 0.6rem;
+}
+
+.jx-password-bar {
+    height: 7px;
+    overflow: hidden;
+    background-color: var(--jx-line);
+    border-radius: 999px;
+}
+
+.jx-password-bar span {
+    display: block;
+    width: 0;
+    height: 100%;
+    background-color: var(--jx-rose);
+    border-radius: 999px;
+    transition:
+        width 0.35s var(--jx-ease-out),
+        background-color 0.35s ease;
+}
+
+.jx-password-bar span[data-level='1'] {
+    width: 25%;
+    background-color: var(--jx-rose);
+}
+
+.jx-password-bar span[data-level='2'] {
+    width: 50%;
+    background-color: var(--jx-mango);
+}
+
+.jx-password-bar span[data-level='3'] {
+    width: 75%;
+    background-color: #3FA96B;
+}
+
+.jx-password-bar span[data-level='4'] {
+    width: 100%;
+    background-color: var(--jx-mint-strong);
+}
+
+.jx-password-hint {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--jx-muted);
+}
+
+.jx-password-hint span[data-password-match][data-state='ok'] {
+    color: var(--jx-green);
+}
+
+.jx-password-hint span[data-password-match][data-state='no'] {
+    color: var(--jx-rose);
+}
+
+/* ---------------------------------------------------------------------
+   23b. Playful desktop — halaman utama
+   Hanya aktif di body.playful.jx-home pada layar >= 992px, sehingga
+   mobile, halaman lain, dan area admin tidak berubah sama sekali.
+--------------------------------------------------------------------- */
+.playful.jx-home .jx-sticker,
+.playful.jx-home .jx-confetti,
+.playful.jx-home .jx-hero-wave,
+.playful.jx-home .jx-blob-hero-sky,
+.playful.jx-home .jx-blob-hero-lilac,
+.playful.jx-home .jx-blob-hero-coral {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    /* -- Hero: blob besar, sticker, confetti, wave -- */
+    .playful.jx-home .jx-hero {
+        padding-block: 84px 132px;
+        border-bottom: 0;
+    }
+
+    .playful.jx-home .jx-hero .jx-blob-1 {
+        width: 420px;
+        height: 420px;
+        top: -160px;
+        right: -80px;
+    }
+
+    .playful.jx-home .jx-hero .jx-blob-2 {
+        width: 220px;
+        height: 220px;
+        bottom: 40px;
+        left: 34%;
+    }
+
+    .playful.jx-home .jx-blob-hero-sky {
+        display: block;
+        width: 380px;
+        height: 380px;
+        bottom: -90px;
+        right: -120px;
+        opacity: 0.5;
+    }
+
+    .playful.jx-home .jx-blob-hero-lilac {
+        display: block;
+        width: 220px;
+        height: 220px;
+        top: 6%;
+        left: -110px;
+        opacity: 0.5;
+    }
+
+    .playful.jx-home .jx-blob-hero-coral {
+        display: block;
+        width: 130px;
+        height: 130px;
+        bottom: 24%;
+        left: 45%;
+        opacity: 0.45;
+    }
+
+    .playful.jx-home .jx-sticker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.75rem;
+        padding: 0.55rem 1.1rem;
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: var(--jx-ink);
+        background-color: var(--jx-mango-soft);
+        border: 2px solid var(--jx-ink);
+        border-radius: var(--jx-radius-pill);
+        box-shadow: 4px 4px 0 rgba(22, 48, 42, 0.18);
+        transform: rotate(-3.5deg);
+    }
+
+    .playful.jx-home .jx-sticker i {
+        color: var(--jx-green);
+    }
+
+    .playful.jx-home .jx-confetti {
+        display: block;
+        position: absolute;
+        inset: 0;
+        background-image:
+            radial-gradient(circle, var(--jx-mango) 2.5px, transparent 3px),
+            radial-gradient(circle, var(--jx-sky) 2.5px, transparent 3px),
+            radial-gradient(circle, var(--jx-coral) 2.5px, transparent 3px),
+            radial-gradient(circle, var(--jx-lilac) 2.5px, transparent 3px);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-position: 12% 26%, 80% 16%, 64% 74%, 90% 60%;
+        opacity: 0.85;
+        pointer-events: none;
+    }
+
+    .playful.jx-home .jx-confetti-cta {
+        background-image:
+            radial-gradient(circle, rgba(255, 255, 255, 0.9) 2.5px, transparent 3px),
+            radial-gradient(circle, var(--jx-mango) 3px, transparent 3.5px),
+            radial-gradient(circle, var(--jx-mint) 3px, transparent 3.5px),
+            radial-gradient(circle, var(--jx-coral) 3px, transparent 3.5px);
+        background-position: 8% 30%, 30% 78%, 70% 22%, 92% 66%;
+        opacity: 0.9;
+    }
+
+    .playful.jx-home .jx-hero-wave {
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        line-height: 0;
+        pointer-events: none;
+    }
+
+    .playful.jx-home .jx-hero-wave svg {
+        display: block;
+        width: 100%;
+        height: 72px;
+    }
+
+    .playful.jx-home .jx-hero-wave path {
+        fill: var(--jx-bg);
+    }
+
+    .playful.jx-home .jx-hero-title .jx-highlight::after {
+        height: 0.42em;
+        border-radius: 46% 54% 40% 60% / 60% 45% 55% 40%;
+    }
+
+    /* -- Ritme section: padding panjang-pendek -- */
+    .playful .jx-section {
+        padding-block: 72px;
+    }
+
+    .playful.jx-home .jx-section-stats {
+        padding-block: 60px;
+    }
+
+    .playful.jx-home .jx-section-popular {
+        padding-block: 72px;
+        background-image: radial-gradient(60% 70% at 100% 0%, var(--jx-mango-soft) 0%, transparent 60%);
+    }
+
+    .playful.jx-home .jx-section-cta {
+        padding-block: 64px;
+    }
+
+    /* -- Pita tint section -- */
+    .playful .jx-band-lilac,
+    .playful .jx-band-sky,
+    .playful .jx-band-mint {
+        border-block: 0;
+    }
+
+    .playful .jx-band-lilac {
+        background-color: var(--jx-lilac-soft);
+        padding-block: 88px;
+    }
+
+    .playful .jx-band-sky {
+        background-color: var(--jx-sky-soft);
+        padding-block: 88px;
+    }
+
+    .playful .jx-band-mint {
+        background-color: var(--jx-mint-soft);
+        padding-block: 88px;
+    }
+
+    /* -- Stat tiles: tint bergantian + rotasi ringan -- */
+    .playful.jx-home .jx-stat-tile {
+        border-width: 2px;
+    }
+
+    .playful.jx-home .jx-stat-strip > .jx-stat-tile:nth-child(1) {
+        background-color: var(--jx-mint-soft);
+        transform: rotate(-0.9deg);
+    }
+
+    .playful.jx-home .jx-stat-strip > .jx-stat-tile:nth-child(2) {
+        background-color: var(--jx-mango-soft);
+        transform: rotate(0.7deg);
+    }
+
+    .playful.jx-home .jx-stat-strip > .jx-stat-tile:nth-child(3) {
+        background-color: var(--jx-sky-soft);
+        transform: rotate(-0.6deg);
+    }
+
+    /* -- Kartu: zig-zag + aksen sudut -- */
+    .playful.jx-home .jx-zigzag > [class*='col-']:nth-child(odd) .jx-feature-card,
+    .playful.jx-home .jx-zigzag > [class*='col-']:nth-child(odd) .jx-service-card {
+        transform: rotate(-1.3deg);
+    }
+
+    .playful.jx-home .jx-zigzag > [class*='col-']:nth-child(even) .jx-feature-card,
+    .playful.jx-home .jx-zigzag > [class*='col-']:nth-child(even) .jx-service-card {
+        transform: rotate(1.3deg);
+    }
+
+    .playful.jx-home .jx-zigzag > [class*='col-'] .jx-feature-card:hover,
+    .playful.jx-home .jx-zigzag > [class*='col-'] .jx-service-card:hover {
+        transform: translateY(-8px) rotate(0deg);
+        box-shadow: var(--jx-shadow-lg);
+    }
+
+    .playful .jx-feature-card::after,
+    .playful .jx-service-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 76px;
+        height: 76px;
+        background: radial-gradient(circle at 100% 0%, var(--jx-mango-soft) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .playful.jx-home .jx-zigzag > [class*='col-']:nth-child(even) .jx-feature-card::after,
+    .playful.jx-home .jx-zigzag > [class*='col-']:nth-child(even) .jx-service-card::after {
+        background: radial-gradient(circle at 100% 0%, var(--jx-sky-soft) 0%, transparent 70%);
+    }
+
+    /* -- Langkah cara pesan: ring + penghubung putus-putus -- */
+    .playful.jx-home .jx-step {
+        border-width: 2px;
+    }
+
+    .playful.jx-home .jx-step-num {
+        box-shadow: 0 0 0 6px var(--jx-surface), 0 0 0 7px var(--jx-line-strong);
+    }
+
+    .playful.jx-home .jx-step + .jx-step::before {
+        content: '';
+        position: absolute;
+        left: -1.5rem;
+        top: calc(1.75rem + 22px);
+        width: 1.5rem;
+        border-top: 2px dashed var(--jx-line-strong);
+        transform: translateY(-50%);
+    }
+
+    /* -- Tombol primer: gradient + shimmer -- */
+    .playful .btn-custom-primary {
+        position: relative;
+        overflow: hidden;
+        background-image: linear-gradient(135deg, var(--jx-mint) 0%, #D8FBDE 52%, var(--jx-mint) 100%);
+    }
+
+    .playful .btn-custom-primary::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -60%;
+        width: 45%;
+        background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+        transform: skewX(-18deg);
+        transition: left 0.5s ease;
+        pointer-events: none;
+    }
+
+    .playful .btn-custom-primary:hover::after {
+        left: 120%;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   23c. Full-width & dekorasi halaman playful
+   Kontainer sudah fluid; blok ini mengatur kolom teks agar tetap nyaman
+   dibaca, dekorasi latar full-bleed, wave footer, dan pita section.
+--------------------------------------------------------------------- */
+.playful .jx-app {
+    position: relative;
+    isolation: isolate;
+}
+
+.playful .jx-app::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.playful .jx-footer {
+    position: relative;
+}
+
+.playful .jx-footer-wave {
+    display: none;
+}
+
+/* Kolom teks dijepit supaya tidak melebar berlebihan di layar besar */
+.playful .jx-cta-text {
+    max-width: 52ch;
+}
+
+.playful .jx-feature-text,
+.playful .jx-step-text,
+.playful .jx-service-desc {
+    max-width: 46ch;
+}
+
+.playful .jx-prose,
+.playful .jx-check-list {
+    max-width: 72ch;
+}
+
+.playful .page-subtitle {
+    max-width: 62ch;
+}
+
+/* Blob auth: tetap bersih, hanya hiasan di sekitar kartu */
+.playful .jx-auth {
+    position: relative;
+    overflow: hidden;
+}
+
+.playful .jx-auth-blob {
+    display: none;
+}
+
+@media (min-width: 992px) {
+    /* Latar playful full-bleed untuk semua halaman selain home */
+    .playful:not(.jx-home) .jx-app::before {
+        background-image:
+            radial-gradient(520px 520px at 3% 6%, var(--jx-mint-soft) 0%, transparent 70%),
+            radial-gradient(460px 460px at 97% 16%, var(--jx-sky-soft) 0%, transparent 70%),
+            radial-gradient(500px 500px at 6% 58%, var(--jx-lilac-soft) 0%, transparent 70%),
+            radial-gradient(440px 440px at 95% 82%, var(--jx-mango-soft) 0%, transparent 70%),
+            radial-gradient(circle, rgba(22, 48, 42, 0.05) 1.6px, transparent 1.6px);
+        background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 34px 34px;
+        background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+    }
+
+    /* Wave di atas footer */
+    .playful .jx-footer-wave {
+        display: block;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: -55px;
+        height: 56px;
+        line-height: 0;
+        pointer-events: none;
+    }
+
+    .playful .jx-footer-wave svg {
+        display: block;
+        width: 100%;
+        height: 56px;
+    }
+
+    .playful .jx-footer-wave path {
+        fill: var(--jx-surface);
+    }
+
+    .playful .jx-footer {
+        border-top: 0;
+    }
+
+    /* Blob auth mengambang di sekitar kartu */
+    .playful .jx-auth-blob {
+        display: block;
+        position: absolute;
+        z-index: 0;
+    }
+
+    .playful .jx-auth-blob-a {
+        width: 320px;
+        height: 320px;
+        top: 4%;
+        left: 3%;
+        opacity: 0.55;
+    }
+
+    .playful .jx-auth-blob-b {
+        width: 240px;
+        height: 240px;
+        bottom: 5%;
+        right: 4%;
+        opacity: 0.5;
+    }
+
+    .playful .jx-auth-card {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Baris CTA: teks & tombol tetap berdampingan di layar lebar */
+    .playful .jx-cta-inner {
+        justify-content: flex-start;
+    }
+}
+
+/* ---------------------------------------------------------------------
+   24. Aksesibilitas: hormati preferensi gerak
+--------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .playful *,
+    .jx-brand-mark {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+
+    /* Menetralkan durasi saja tidak cukup: opacity yang disembunyikan oleh
+       .jx-reveal-ready harus dikembalikan, kalau tidak kontennya tidak pernah
+       muncul bagi pengguna yang meminta gerak minimal. */
+    .jx-reveal-ready .jx-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

@@ -1,0 +1,265 @@
+- generic [active] [ref=f8e1]:
+  - generic [ref=f8e2]:
+    - link " Jovexa" [ref=f8e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f8e4]: 
+      - generic [ref=f8e5]: Jovexa
+    - generic [ref=f8e7]:
+      - generic [ref=f8e8]: Menu
+      - list [ref=f8e9]:
+        - listitem [ref=f8e10]:
+          - link " Dashboard" [ref=f8e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin
+            - generic [ref=f8e12]: 
+            - generic [ref=f8e13]: Dashboard
+        - listitem [ref=f8e14]:
+          - link " Kelola Jasa" [ref=f8e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+            - generic [ref=f8e16]: 
+            - generic [ref=f8e17]: Kelola Jasa
+        - listitem [ref=f8e18]:
+          - link " Daftar Pesanan" [ref=f8e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan
+            - generic [ref=f8e20]: 
+            - generic [ref=f8e21]: Daftar Pesanan
+        - listitem [ref=f8e22]:
+          - link " Pesanan Revisi" [ref=f8e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/revisi
+            - generic [ref=f8e24]: 
+            - generic [ref=f8e25]: Pesanan Revisi
+        - listitem [ref=f8e26]:
+          - link " Riwayat Pesanan" [ref=f8e27] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/riwayat
+            - generic [ref=f8e28]: 
+            - generic [ref=f8e29]: Riwayat Pesanan
+        - listitem [ref=f8e30]:
+          - link " Kelola Pengguna" [ref=f8e31] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pengguna
+            - generic [ref=f8e32]: 
+            - generic [ref=f8e33]: Kelola Pengguna
+    - generic [ref=f8e34]:
+      - img "jovexa admin" [ref=f8e35]
+      - generic [ref=f8e36]:
+        - generic [ref=f8e37]: jovexa admin
+        - generic [ref=f8e38]: Super Admin
+  - generic [ref=f8e39]:
+    - banner [ref=f8e40]:
+      - generic [ref=f8e41]:
+        - button "Perkecil sidebar" [ref=f8e42] [cursor=pointer]:
+          - generic [ref=f8e43]: 
+        - text: 
+      - generic [ref=f8e45]:
+        - generic [ref=f8e46]: Cari nama, slug, atau deskripsi jasa
+        - searchbox "Cari nama, slug, atau deskripsi jasa" [ref=f8e47]
+        - button "Cari" [ref=f8e48] [cursor=pointer]:
+          - generic [ref=f8e49]: 
+      - generic [ref=f8e50]:
+        - button "Mode layar penuh" [ref=f8e51] [cursor=pointer]:
+          - generic [ref=f8e52]: 
+        - generic [ref=f8e53]:
+          - button "Foto profil jovexa admin " [ref=f8e54] [cursor=pointer]:
+            - img "Foto profil" [ref=f8e55]
+            - generic [ref=f8e56]: jovexa admin
+            - generic [ref=f8e57]: 
+          - text: 
+    - generic [ref=f8e59]:
+      - heading "Kelola Jasa" [level=1] [ref=f8e60]
+      - paragraph [ref=f8e61]: Tambah, ubah, dan arsipkan jasa yang tampil di katalog publik.
+    - main [ref=f8e62]:
+      - generic [ref=f8e63]:
+        - link " Tambah Jasa" [ref=f8e65] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/create
+          - generic [ref=f8e66]: 
+          - text: Tambah Jasa
+        - generic [ref=f8e67]:
+          - combobox "Saring berdasarkan status" [ref=f8e70]:
+            - option "Semua Status" [selected]
+            - option "Draf"
+            - option "Tayang"
+            - option "Arsip"
+          - generic [ref=f8e71]: 12 data
+        - table [ref=f8e75]:
+          - rowgroup [ref=f8e76]:
+            - row [ref=f8e77]:
+              - columnheader "Jasa" [ref=f8e78]
+              - columnheader "Harga" [ref=f8e79]
+              - columnheader "Estimasi" [ref=f8e80]
+              - columnheader "Status" [ref=f8e81]
+              - columnheader "Aksi" [ref=f8e82]
+          - rowgroup [ref=f8e83]:
+            - row [ref=f8e84]:
+              - cell "Sunt Ut At Voluptatum /sunt-ut-at-voluptatum" [ref=f8e85]:
+                - generic [ref=f8e86]: Sunt Ut At Voluptatum
+                - text: /sunt-ut-at-voluptatum
+              - cell "Rp1.779.000" [ref=f8e87]
+              - cell "1 hari" [ref=f8e88]
+              - cell "Tayang" [ref=f8e89]
+              - cell [ref=f8e91]:
+                - link " Ubah" [ref=f8e92] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/sunt-ut-at-voluptatum/edit
+                  - generic [ref=f8e93]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e95] [cursor=pointer]:
+                  - generic [ref=f8e96]: 
+                  - text: Arsipkan
+            - row [ref=f8e97]:
+              - cell "Et Consectetur Error Qui /et-consectetur-error-qui" [ref=f8e98]:
+                - generic [ref=f8e99]: Et Consectetur Error Qui
+                - text: /et-consectetur-error-qui
+              - cell "Rp1.326.000" [ref=f8e100]
+              - cell "14 hari" [ref=f8e101]
+              - cell "Tayang" [ref=f8e102]
+              - cell [ref=f8e104]:
+                - link " Ubah" [ref=f8e105] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/et-consectetur-error-qui/edit
+                  - generic [ref=f8e106]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e108] [cursor=pointer]:
+                  - generic [ref=f8e109]: 
+                  - text: Arsipkan
+            - row [ref=f8e110]:
+              - cell "Numquam Cum Expedita Harum /numquam-cum-expedita-harum" [ref=f8e111]:
+                - generic [ref=f8e112]: Numquam Cum Expedita Harum
+                - text: /numquam-cum-expedita-harum
+              - cell "Rp601.000" [ref=f8e113]
+              - cell "11 hari" [ref=f8e114]
+              - cell "Tayang" [ref=f8e115]
+              - cell [ref=f8e117]:
+                - link " Ubah" [ref=f8e118] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/numquam-cum-expedita-harum/edit
+                  - generic [ref=f8e119]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e121] [cursor=pointer]:
+                  - generic [ref=f8e122]: 
+                  - text: Arsipkan
+            - row [ref=f8e123]:
+              - cell "Quia Dicta Rem Illum /quia-dicta-rem-illum" [ref=f8e124]:
+                - generic [ref=f8e125]: Quia Dicta Rem Illum
+                - text: /quia-dicta-rem-illum
+              - cell "Rp1.062.000" [ref=f8e126]
+              - cell "3 hari" [ref=f8e127]
+              - cell "Tayang" [ref=f8e128]
+              - cell [ref=f8e130]:
+                - link " Ubah" [ref=f8e131] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/quia-dicta-rem-illum/edit
+                  - generic [ref=f8e132]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e134] [cursor=pointer]:
+                  - generic [ref=f8e135]: 
+                  - text: Arsipkan
+            - row [ref=f8e136]:
+              - cell "Corrupti Facere Non Molestiae /corrupti-facere-non-molestiae" [ref=f8e137]:
+                - generic [ref=f8e138]: Corrupti Facere Non Molestiae
+                - text: /corrupti-facere-non-molestiae
+              - cell "Rp1.090.000" [ref=f8e139]
+              - cell "8 hari" [ref=f8e140]
+              - cell "Tayang" [ref=f8e141]
+              - cell [ref=f8e143]:
+                - link " Ubah" [ref=f8e144] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/corrupti-facere-non-molestiae/edit
+                  - generic [ref=f8e145]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e147] [cursor=pointer]:
+                  - generic [ref=f8e148]: 
+                  - text: Arsipkan
+            - row [ref=f8e149]:
+              - cell "Quo Dolorem Voluptas Eius /quo-dolorem-voluptas-eius" [ref=f8e150]:
+                - generic [ref=f8e151]: Quo Dolorem Voluptas Eius
+                - text: /quo-dolorem-voluptas-eius
+              - cell "Rp1.081.000" [ref=f8e152]
+              - cell "10 hari" [ref=f8e153]
+              - cell "Tayang" [ref=f8e154]
+              - cell [ref=f8e156]:
+                - link " Ubah" [ref=f8e157] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/quo-dolorem-voluptas-eius/edit
+                  - generic [ref=f8e158]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e160] [cursor=pointer]:
+                  - generic [ref=f8e161]: 
+                  - text: Arsipkan
+            - row [ref=f8e162]:
+              - cell "Pembuatan Skripsi Word /pembuatan-skripsi-word" [ref=f8e163]:
+                - generic [ref=f8e164]: Pembuatan Skripsi Word
+                - text: /pembuatan-skripsi-word
+              - cell "Rp750.000" [ref=f8e165]
+              - cell "7 hari" [ref=f8e166]
+              - cell "Tayang" [ref=f8e167]
+              - cell [ref=f8e169]:
+                - link " Ubah" [ref=f8e170] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/pembuatan-skripsi-word/edit
+                  - generic [ref=f8e171]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e173] [cursor=pointer]:
+                  - generic [ref=f8e174]: 
+                  - text: Arsipkan
+            - row [ref=f8e175]:
+              - cell "Bantuan Tugas Kuliah /bantuan-tugas-kuliah" [ref=f8e176]:
+                - generic [ref=f8e177]: Bantuan Tugas Kuliah
+                - text: /bantuan-tugas-kuliah
+              - cell "Rp150.000" [ref=f8e178]
+              - cell "2 hari" [ref=f8e179]
+              - cell "Tayang" [ref=f8e180]
+              - cell [ref=f8e182]:
+                - link " Ubah" [ref=f8e183] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/bantuan-tugas-kuliah/edit
+                  - generic [ref=f8e184]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e186] [cursor=pointer]:
+                  - generic [ref=f8e187]: 
+                  - text: Arsipkan
+            - row [ref=f8e188]:
+              - cell "Jasa Coding Web /jasa-coding-web" [ref=f8e189]:
+                - generic [ref=f8e190]: Jasa Coding Web
+                - text: /jasa-coding-web
+              - cell "Rp1.200.000" [ref=f8e191]
+              - cell "10 hari" [ref=f8e192]
+              - cell "Tayang" [ref=f8e193]
+              - cell [ref=f8e195]:
+                - link " Ubah" [ref=f8e196] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/jasa-coding-web/edit
+                  - generic [ref=f8e197]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e199] [cursor=pointer]:
+                  - generic [ref=f8e200]: 
+                  - text: Arsipkan
+            - row [ref=f8e201]:
+              - cell "Desain Landing Page /desain-landing-page" [ref=f8e202]:
+                - generic [ref=f8e203]: Desain Landing Page
+                - text: /desain-landing-page
+              - cell "Rp450.000" [ref=f8e204]
+              - cell "3 hari" [ref=f8e205]
+              - cell "Tayang" [ref=f8e206]
+              - cell [ref=f8e208]:
+                - link " Ubah" [ref=f8e209] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa/desain-landing-page/edit
+                  - generic [ref=f8e210]: 
+                  - text: Ubah
+                - button " Arsipkan" [ref=f8e212] [cursor=pointer]:
+                  - generic [ref=f8e213]: 
+                  - text: Arsipkan
+        - navigation [ref=f8e215]:
+          - generic [ref=f8e216]:
+            - generic [ref=f8e217]: Showing 1 to 10 of 12 results
+            - list [ref=f8e219]:
+              - listitem "« Sebelumnya" [ref=f8e220]:
+                - generic [aria-hidden]: ‹
+              - listitem [ref=f8e221]:
+                - generic [ref=f8e222]: "1"
+              - listitem [ref=f8e223]:
+                - link "2" [ref=f8e224] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa?page=2
+              - listitem [ref=f8e225]:
+                - link "Berikutnya »" [ref=f8e226] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa?page=2
+                  - text: ›
+    - contentinfo [ref=f8e227]:
+      - generic [ref=f8e228]:
+        - generic [ref=f8e229]:
+          - generic [ref=f8e230]: 
+          - text: Jovexa
+        - generic [ref=f8e231]: "|"
+        - generic [ref=f8e232]: © 2026 Jovexa
+      - list [ref=f8e234]:
+        - listitem [ref=f8e235]:
+          - link "Beranda" [ref=f8e236] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev

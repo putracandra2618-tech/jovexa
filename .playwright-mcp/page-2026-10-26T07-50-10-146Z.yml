@@ -1,0 +1,181 @@
+- generic [active] [ref=f37e1]:
+  - generic [ref=f37e2]:
+    - link " Jovexa" [ref=f37e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f37e4]: 
+      - generic [ref=f37e5]: Jovexa
+    - generic [ref=f37e7]:
+      - generic [ref=f37e8]: Menu
+      - list [ref=f37e9]:
+        - listitem [ref=f37e10]:
+          - link " Dashboard" [ref=f37e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin
+            - generic [ref=f37e12]: 
+            - generic [ref=f37e13]: Dashboard
+        - listitem [ref=f37e14]:
+          - link " Kelola Jasa" [ref=f37e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+            - generic [ref=f37e16]: 
+            - generic [ref=f37e17]: Kelola Jasa
+        - listitem [ref=f37e18]:
+          - link " Daftar Pesanan" [ref=f37e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan
+            - generic [ref=f37e20]: 
+            - generic [ref=f37e21]: Daftar Pesanan
+        - listitem [ref=f37e22]:
+          - link " Pesanan Revisi" [ref=f37e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/revisi
+            - generic [ref=f37e24]: 
+            - generic [ref=f37e25]: Pesanan Revisi
+        - listitem [ref=f37e26]:
+          - link " Riwayat Pesanan" [ref=f37e27] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/riwayat
+            - generic [ref=f37e28]: 
+            - generic [ref=f37e29]: Riwayat Pesanan
+        - listitem [ref=f37e30]:
+          - link " Kelola Pengguna" [ref=f37e31] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pengguna
+            - generic [ref=f37e32]: 
+            - generic [ref=f37e33]: Kelola Pengguna
+    - generic [ref=f37e34]:
+      - img "jovexa admin" [ref=f37e35]
+      - generic [ref=f37e36]:
+        - generic [ref=f37e37]: jovexa admin
+        - generic [ref=f37e38]: Super Admin
+  - generic [ref=f37e39]:
+    - banner [ref=f37e40]:
+      - generic [ref=f37e41]:
+        - text: 
+        - button "Buka navigasi" [ref=f37e42] [cursor=pointer]:
+          - generic [ref=f37e43]: 
+      - generic [ref=f37e44]:
+        - button "Mode layar penuh" [ref=f37e45] [cursor=pointer]:
+          - generic [ref=f37e46]: 
+        - generic [ref=f37e47]:
+          - button "Foto profil jovexa admin " [ref=f37e48] [cursor=pointer]:
+            - img "Foto profil" [ref=f37e49]
+            - generic [ref=f37e50]: jovexa admin
+            - generic [ref=f37e51]: 
+          - text: 
+    - generic [ref=f37e52]:
+      - generic [ref=f37e53]:
+        - heading "Dashboard" [level=1] [ref=f37e54]
+        - paragraph [ref=f37e55]: Ringkasan pesanan yang sedang berjalan di Jovexa.
+      - link " Kelola Pesanan" [ref=f37e57] [cursor=pointer]:
+        - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan
+        - generic [ref=f37e58]: 
+        - text: Kelola Pesanan
+    - main [ref=f37e59]:
+      - generic [ref=f37e60]:
+        - generic [ref=f37e62]:
+          - generic [ref=f37e63]:
+            - generic [ref=f37e65]:
+              - generic [ref=f37e66]: 
+              - text: Menunggu Verifikasi
+            - generic [ref=f37e67]: "3"
+          - link "Selengkapnya " [ref=f37e68] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan?status=waiting_verification
+            - generic [ref=f37e69]: Selengkapnya
+            - generic [ref=f37e70]: 
+        - generic [ref=f37e72]:
+          - generic [ref=f37e73]:
+            - generic [ref=f37e75]:
+              - generic [ref=f37e76]: 
+              - text: Antrean Worker
+            - generic [ref=f37e77]: "0"
+          - link "Selengkapnya " [ref=f37e78] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan?status=queued
+            - generic [ref=f37e79]: Selengkapnya
+            - generic [ref=f37e80]: 
+        - generic [ref=f37e82]:
+          - generic [ref=f37e83]:
+            - generic [ref=f37e85]:
+              - generic [ref=f37e86]: 
+              - text: Sedang Dikerjakan
+            - generic [ref=f37e87]: "0"
+          - link "Selengkapnya " [ref=f37e88] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan?status=in_progress
+            - generic [ref=f37e89]: Selengkapnya
+            - generic [ref=f37e90]: 
+        - generic [ref=f37e92]:
+          - generic [ref=f37e93]:
+            - generic [ref=f37e95]:
+              - generic [ref=f37e96]: 
+              - text: Menunggu Info Customer
+            - generic [ref=f37e97]: "0"
+          - link "Selengkapnya " [ref=f37e98] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan?status=waiting_customer
+            - generic [ref=f37e99]: Selengkapnya
+            - generic [ref=f37e100]: 
+      - generic [ref=f37e101]:
+        - generic [ref=f37e103]:
+          - generic [ref=f37e104]:
+            - generic [ref=f37e106]:
+              - generic [ref=f37e107]: 
+              - text: Perlu Revisi
+            - generic [ref=f37e108]: "0"
+          - link "Selengkapnya " [ref=f37e109] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/revisi
+            - generic [ref=f37e110]: Selengkapnya
+            - generic [ref=f37e111]: 
+        - generic [ref=f37e114]:
+          - generic [ref=f37e116]:
+            - generic [ref=f37e117]: 
+            - text: Pendapatan Selesai
+          - generic [ref=f37e118]: Rp 0
+        - generic [ref=f37e120]:
+          - generic [ref=f37e121]:
+            - generic [ref=f37e123]:
+              - generic [ref=f37e124]: 
+              - text: Jasa Tayang
+            - generic [ref=f37e125]: "12"
+          - link "Selengkapnya " [ref=f37e126] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+            - generic [ref=f37e127]: Selengkapnya
+            - generic [ref=f37e128]: 
+      - generic [ref=f37e129]:
+        - heading "Pesanan Perlu Perhatian" [level=5] [ref=f37e132]
+        - table [ref=f37e134]:
+          - rowgroup [ref=f37e135]:
+            - row [ref=f37e136]:
+              - columnheader "Nomor Pesanan" [ref=f37e137]
+              - columnheader "Customer" [ref=f37e138]
+              - columnheader "Jasa" [ref=f37e139]
+              - columnheader "Status" [ref=f37e140]
+              - columnheader "Aksi" [ref=f37e141]
+          - rowgroup [ref=f37e142]:
+            - row [ref=f37e143]:
+              - cell "JVX-20260929-EEEE" [ref=f37e144]
+              - cell "Candra" [ref=f37e145]
+              - cell "Bantuan Tugas Kuliah" [ref=f37e146]
+              - cell "Menunggu Verifikasi" [ref=f37e147]
+              - cell [ref=f37e149]:
+                - link "Kelola" [ref=f37e150] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/JVX-20260929-EEEE
+            - row [ref=f37e151]:
+              - cell "JVX-20260929-B458" [ref=f37e152]
+              - cell "E2E Customer" [ref=f37e153]
+              - cell "Pembuatan Skripsi Word" [ref=f37e154]
+              - cell "Menunggu Verifikasi" [ref=f37e155]
+              - cell [ref=f37e157]:
+                - link "Kelola" [ref=f37e158] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/JVX-20260929-B458
+            - row [ref=f37e159]:
+              - cell "JVX-20260929-453D" [ref=f37e160]
+              - cell "Budi E2E" [ref=f37e161]
+              - cell "Bantuan Tugas Kuliah" [ref=f37e162]
+              - cell "Menunggu Verifikasi" [ref=f37e163]
+              - cell [ref=f37e165]:
+                - link "Kelola" [ref=f37e166] [cursor=pointer]:
+                  - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/JVX-20260929-453D
+    - contentinfo [ref=f37e167]:
+      - generic [ref=f37e168]:
+        - generic [ref=f37e169]:
+          - generic [ref=f37e170]: 
+          - text: Jovexa
+        - generic [ref=f37e171]: "|"
+        - generic [ref=f37e172]: © 2026 Jovexa
+      - list [ref=f37e174]:
+        - listitem [ref=f37e175]:
+          - link "Beranda" [ref=f37e176] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev

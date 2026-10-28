@@ -1,0 +1,31 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e2]:
+    - banner [ref=f3e3]:
+      - generic [ref=f3e4]:
+        - link " Jovexa" [ref=f3e5] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+          - generic [ref=f3e6]: 
+          - generic [ref=f3e8]: Jovexa
+        - link " Beranda" [ref=f3e9] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+          - generic [ref=f3e10]: 
+          - text: Beranda
+    - main [ref=f3e11]:
+      - generic [ref=f3e13]:
+        - generic [ref=f3e14]:
+          - generic [ref=f3e15]: "4"
+          - generic [ref=f3e16]: 
+          - generic [ref=f3e17]: "4"
+        - heading "Halaman Tidak Ditemukan" [level=1] [ref=f3e18]
+        - paragraph [ref=f3e19]: Halaman yang kamu cari mungkin sudah dihapus, berganti nama, atau sedang tidak tersedia.
+        - generic [ref=f3e20]:
+          - link " Kembali ke Beranda" [ref=f3e21] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+            - generic [ref=f3e22]: 
+            - text: Kembali ke Beranda
+          - link " Lihat Katalog" [ref=f3e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/jasa
+            - generic [ref=f3e24]: 
+            - text: Lihat Katalog
+  - button "Kembali ke atas":
+    - generic: 

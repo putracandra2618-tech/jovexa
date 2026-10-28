@@ -1,0 +1,36 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - text:    
+    - generic [ref=f1e4]:
+      - heading "Masuk" [level=1] [ref=f1e5]
+      - paragraph [ref=f1e6]: Masuk untuk melanjutkan pesananmu.
+      - generic [ref=f1e7]:
+        - generic [ref=f1e8]:
+          - generic [ref=f1e9]: Alamat Email
+          - generic [ref=f1e10]:
+            - generic: 
+            - textbox "Alamat Email" [active] [ref=f1e11]:
+              - /placeholder: nama@email.com
+        - generic [ref=f1e12]:
+          - generic [ref=f1e13]: Password
+          - generic [ref=f1e14]:
+            - generic: 
+            - textbox "Password" [ref=f1e15]:
+              - /placeholder: ••••••••
+            - button "Tampilkan password" [ref=f1e16] [cursor=pointer]:
+              - generic [ref=f1e17]: 
+        - generic [ref=f1e18]:
+          - generic [ref=f1e19] [cursor=pointer]:
+            - checkbox "Ingat saya" [ref=f1e20]
+            - generic [ref=f1e21]: Ingat saya
+          - link "Lupa password?" [ref=f1e22] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/lupa-password
+        - button "Masuk ke Dashboard " [ref=f1e23] [cursor=pointer]:
+          - generic [ref=f1e24]: Masuk ke Dashboard
+          - generic [ref=f1e25]: 
+      - paragraph [ref=f1e26]:
+        - text: Belum punya akun?
+        - link "Daftar sekarang" [ref=f1e27] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev/register
+  - button "Kembali ke atas":
+    - generic: 

@@ -1,0 +1,112 @@
+- generic [active] [ref=f35e1]:
+  - generic [ref=f35e2]:
+    - link " Jovexa" [ref=f35e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f35e4]: 
+      - generic [ref=f35e5]: Jovexa
+    - generic [ref=f35e7]:
+      - generic [ref=f35e8]: Menu
+      - list [ref=f35e9]:
+        - listitem [ref=f35e10]:
+          - link " Dashboard" [ref=f35e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin
+            - generic [ref=f35e12]: 
+            - generic [ref=f35e13]: Dashboard
+        - listitem [ref=f35e14]:
+          - link " Kelola Jasa" [ref=f35e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+            - generic [ref=f35e16]: 
+            - generic [ref=f35e17]: Kelola Jasa
+        - listitem [ref=f35e18]:
+          - link " Daftar Pesanan" [ref=f35e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan
+            - generic [ref=f35e20]: 
+            - generic [ref=f35e21]: Daftar Pesanan
+        - listitem [ref=f35e22]:
+          - link " Pesanan Revisi" [ref=f35e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/revisi
+            - generic [ref=f35e24]: 
+            - generic [ref=f35e25]: Pesanan Revisi
+        - listitem [ref=f35e26]:
+          - link " Riwayat Pesanan" [ref=f35e27] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pesanan/riwayat
+            - generic [ref=f35e28]: 
+            - generic [ref=f35e29]: Riwayat Pesanan
+        - listitem [ref=f35e30]:
+          - link " Kelola Pengguna" [ref=f35e31] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/pengguna
+            - generic [ref=f35e32]: 
+            - generic [ref=f35e33]: Kelola Pengguna
+    - generic [ref=f35e34]:
+      - img "jovexa admin" [ref=f35e35]
+      - generic [ref=f35e36]:
+        - generic [ref=f35e37]: jovexa admin
+        - generic [ref=f35e38]: Super Admin
+  - generic [ref=f35e39]:
+    - banner [ref=f35e40]:
+      - generic [ref=f35e41]:
+        - button "Perkecil sidebar" [ref=f35e42] [cursor=pointer]:
+          - generic [ref=f35e43]: 
+        - text: 
+      - generic [ref=f35e44]:
+        - button "Mode layar penuh" [ref=f35e45] [cursor=pointer]:
+          - generic [ref=f35e46]: 
+        - generic [ref=f35e47]:
+          - button "Foto profil jovexa admin " [ref=f35e48] [cursor=pointer]:
+            - img "Foto profil" [ref=f35e49]
+            - generic [ref=f35e50]: jovexa admin
+            - generic [ref=f35e51]: 
+          - text: 
+    - generic [ref=f35e53]:
+      - heading "Tambah Jasa" [level=1] [ref=f35e54]
+      - paragraph [ref=f35e55]: Jasa berstatus Tayang langsung tampil di katalog publik.
+    - main [ref=f35e56]:
+      - generic [ref=f35e58]:
+        - generic [ref=f35e59]:
+          - generic [ref=f35e60]: Nama Jasa
+          - textbox "Nama Jasa" [ref=f35e61]:
+            - /placeholder: "Contoh: Pembuatan Skripsi Word"
+        - generic [ref=f35e62]:
+          - generic [ref=f35e64]:
+            - generic [ref=f35e65]: Slug
+            - textbox "Slug" [ref=f35e66]:
+              - /placeholder: Dibuat otomatis dari nama bila dikosongkan
+            - text: Dipakai pada URL halaman jasa.
+          - generic [ref=f35e68]:
+            - generic [ref=f35e69]: Status
+            - combobox "Status" [ref=f35e70]:
+              - option "Draf" [selected]
+              - option "Tayang"
+              - option "Arsip"
+        - generic [ref=f35e71]:
+          - generic [ref=f35e72]: Deskripsi
+          - textbox "Deskripsi" [ref=f35e73]:
+            - /placeholder: Jelaskan apa saja yang dikerjakan, apa yang kamu dapatkan, dan batasan jasanya.
+        - generic [ref=f35e74]:
+          - generic [ref=f35e76]:
+            - generic [ref=f35e77]: Harga (Rp)
+            - spinbutton "Harga (Rp)" [ref=f35e78]
+          - generic [ref=f35e80]:
+            - generic [ref=f35e81]: Estimasi Pengerjaan (hari)
+            - spinbutton "Estimasi Pengerjaan (hari)" [ref=f35e82]
+        - generic [ref=f35e83]:
+          - generic [ref=f35e84]: Persyaratan
+          - textbox "Persyaratan" [ref=f35e85]:
+            - /placeholder: "Contoh: Siapkan outline, data yang harus dianalisis, dan referensi format."
+        - generic [ref=f35e86]:
+          - link "Batal" [ref=f35e87] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/admin/jasa
+          - button " Simpan Jasa" [ref=f35e88] [cursor=pointer]:
+            - generic [ref=f35e89]: 
+            - text: Simpan Jasa
+    - contentinfo [ref=f35e90]:
+      - generic [ref=f35e91]:
+        - generic [ref=f35e92]:
+          - generic [ref=f35e93]: 
+          - text: Jovexa
+        - generic [ref=f35e94]: "|"
+        - generic [ref=f35e95]: © 2026 Jovexa
+      - list [ref=f35e97]:
+        - listitem [ref=f35e98]:
+          - link "Beranda" [ref=f35e99] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev

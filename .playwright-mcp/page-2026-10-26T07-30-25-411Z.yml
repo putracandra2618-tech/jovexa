@@ -1,0 +1,110 @@
+- generic [active] [ref=f28e1]:
+  - generic [ref=f28e2]:
+    - link " Jovexa" [ref=f28e3] [cursor=pointer]:
+      - /url: https://repurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=f28e4]: 
+      - generic [ref=f28e5]: Jovexa
+    - generic [ref=f28e7]:
+      - generic [ref=f28e8]: Menu Worker
+      - list [ref=f28e9]:
+        - listitem [ref=f28e10]:
+          - link " Dashboard" [ref=f28e11] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker
+            - generic [ref=f28e12]: 
+            - generic [ref=f28e13]: Dashboard
+        - listitem [ref=f28e14]:
+          - link " Antrean Pesanan" [ref=f28e15] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+            - generic [ref=f28e16]: 
+            - generic [ref=f28e17]: Antrean Pesanan
+        - listitem [ref=f28e18]:
+          - link " Pesanan Saya" [ref=f28e19] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan
+            - generic [ref=f28e20]: 
+            - generic [ref=f28e21]: Pesanan Saya
+        - listitem [ref=f28e22]:
+          - link " Riwayat Saya" [ref=f28e23] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan/riwayat
+            - generic [ref=f28e24]: 
+            - generic [ref=f28e25]: Riwayat Saya
+    - generic [ref=f28e26]:
+      - img "Worker Jovexa" [ref=f28e27]
+      - generic [ref=f28e28]:
+        - generic [ref=f28e29]: Worker Jovexa
+        - generic [ref=f28e30]: Worker · Offline
+  - generic [ref=f28e31]:
+    - banner [ref=f28e32]:
+      - generic [ref=f28e33]:
+        - button "Perkecil sidebar" [ref=f28e34] [cursor=pointer]:
+          - generic [ref=f28e35]: 
+        - text: 
+      - generic [ref=f28e37]:
+        - generic [ref=f28e38]: Cari pesanan saya
+        - searchbox "Cari pesanan saya" [ref=f28e39]
+        - button "Cari" [ref=f28e40] [cursor=pointer]:
+          - generic [ref=f28e41]: 
+      - generic [ref=f28e42]:
+        - button "Mode layar penuh" [ref=f28e43] [cursor=pointer]:
+          - generic [ref=f28e44]: 
+        - generic [ref=f28e45]:
+          - button "Foto profil Worker Jovexa " [ref=f28e46] [cursor=pointer]:
+            - img "Foto profil" [ref=f28e47]
+            - generic [ref=f28e48]: Worker Jovexa
+            - generic [ref=f28e49]: 
+          - text: 
+    - generic [ref=f28e50]:
+      - generic [ref=f28e51]:
+        - generic [ref=f28e52]: 
+        - text: Anda sedang masuk sebagai
+        - strong [ref=f28e53]: Worker Jovexa
+        - text: (Worker).
+      - button " Kembali ke Super Admin" [ref=f28e55] [cursor=pointer]:
+        - generic [ref=f28e56]: 
+        - text: Kembali ke Super Admin
+    - generic [ref=f28e57]:
+      - generic [ref=f28e58]:
+        - heading "Pesanan Saya" [level=1] [ref=f28e59]
+        - paragraph [ref=f28e60]: Semua pesanan yang sedang kamu kerjakan.
+      - generic [ref=f28e61]:
+        - link " Antrean" [ref=f28e62] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+          - generic [ref=f28e63]: 
+          - text: Antrean
+        - link " Riwayat" [ref=f28e64] [cursor=pointer]:
+          - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/pesanan/riwayat
+          - generic [ref=f28e65]: 
+          - text: Riwayat
+    - main [ref=f28e66]:
+      - generic [ref=f28e67]:
+        - generic [ref=f28e68]:
+          - combobox "Saring berdasarkan status" [ref=f28e71]:
+            - option "Semua Status" [selected]
+            - option "Menunggu Pembayaran"
+            - option "Sudah Dibayar"
+            - option "Menunggu Verifikasi"
+            - option "Menunggu Worker"
+            - option "Menunggu Info Customer"
+            - option "Sedang Dikerjakan"
+            - option "Perlu Revisi"
+            - option "Selesai"
+            - option "Sudah Dikirim"
+            - option "Kedaluwarsa"
+            - option "Dibatalkan"
+          - generic [ref=f28e72]: 0 data
+        - generic [ref=f28e75]:
+          - generic [ref=f28e76]: 
+          - heading "Belum ada pesanan" [level=5] [ref=f28e77]
+          - paragraph [ref=f28e78]: Pesanan yang kamu ambil dari antrean akan muncul di sini.
+          - link "Buka Antrean" [ref=f28e80] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev/worker/antrean
+    - contentinfo [ref=f28e81]:
+      - generic [ref=f28e82]:
+        - generic [ref=f28e83]:
+          - generic [ref=f28e84]: 
+          - text: Jovexa
+        - generic [ref=f28e85]: "|"
+        - generic [ref=f28e86]: © 2026 Jovexa
+      - list [ref=f28e88]:
+        - listitem [ref=f28e89]:
+          - link "Beranda" [ref=f28e90] [cursor=pointer]:
+            - /url: https://repurpose-emote-haphazard.ngrok-free.dev
