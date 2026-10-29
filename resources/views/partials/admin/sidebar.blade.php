@@ -41,7 +41,7 @@
 @endphp
 
 <div class="sidebar-wrapper" id="sidebar">
-    <a href="{{ route('home') }}" class="sidebar-brand">
+    <a href="{{ route('home') }}" class="sidebar-brand" data-turbo="false">
         <i class="bi bi-asterisk"></i>
         <span>{{ config('app.name') }}</span>
     </a>

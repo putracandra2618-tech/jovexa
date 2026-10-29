@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @if (auth()->user()?->isStaff())
+        <meta name="staff-turbo" content="enabled">
+    @endif
+
     <title>@yield('title', 'Dashboard') &middot; {{ config('app.name') }}</title>
 
     <link rel="icon" type="image/png" href="{{ asset('favicon.ico') }}">
@@ -47,7 +51,7 @@
     @include('partials.admin.footer')
 </div>
 
-<script src="{{ asset('vendor/spark/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('vendor/spark/libs/bootstrap/js/bootstrap.bundle.min.js') }}" data-turbo-eval="false"></script>
 @stack('scripts')
 
 </body>

@@ -4,9 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\UpdateUserRoleRequest;
+use App\Http\Requests\Admin\UserRequest;
 use App\Models\Order;
-use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +22,6 @@ class UserController extends Controller
 
         $users = User::query()
             ->with('roleRecord')
-            ->withCount(['orders', 'assignedOrders'])
             ->when($search !== '', fn ($query) => $query->search($search))
             ->when($request->filled('role'), function ($query) use ($request): void {
                 $role = UserRole::tryFrom($request->string('role')->toString());
@@ -44,30 +42,66 @@ class UserController extends Controller
     }
 
     /**
-     * Update a user's role.
+     * Show the form for creating a new user.
      */
-    public function updateRole(UpdateUserRoleRequest $request, User $user): RedirectResponse
+    public function create(): View
     {
-        $auth = $request->user();
+        return view('admin.users.create', [
+            'user' => new User,
+            'roles' => $this->assignableRoles(),
+        ]);
+    }
 
-        if ($auth && $user->is($auth)) {
-            return back()->with('error', 'Anda tidak boleh mengubah peran akun sendiri.');
+    /**
+     * Store a newly created user.
+     */
+    public function store(UserRequest $request): RedirectResponse
+    {
+        $user = User::query()->create($request->userAttributes());
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "Akun {$user->name} berhasil ditambahkan.");
+    }
+
+    /**
+     * Show the form for editing a user.
+     */
+    public function edit(User $user): View|RedirectResponse
+    {
+        if ($user->isSuperAdmin()) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'Akun Super Admin tidak dapat diubah dari halaman ini.');
         }
 
+        return view('admin.users.edit', [
+            'user' => $user,
+            'roles' => $this->assignableRoles(),
+        ]);
+    }
+
+    /**
+     * Update a user's profile and role.
+     */
+    public function update(UserRequest $request, User $user): RedirectResponse
+    {
         if ($user->isSuperAdmin()) {
             return back()->with('error', 'Akun Super Admin tidak dapat diubah dari halaman ini.');
         }
 
-        if ($user->isWorker() && Order::query()->activeForWorker($user)->exists()) {
+        $newRole = $request->role();
+
+        if ($user->role !== $newRole && $user->isWorker() && Order::query()->activeForWorker($user)->exists()) {
             return back()->with('error', 'Worker masih memiliki pesanan aktif. Selesaikan atau batalkan pesanan terlebih dahulu.');
         }
 
-        $newRole = $request->role();
-
-        $user->forceFill(['role_id' => Role::ensureIdFor($newRole->value, $newRole->label())])->save();
+        $user->forceFill($request->userAttributes())->save();
         $user->unsetRelation('roleRecord');
 
-        return back()->with('success', "Peran {$user->name} berhasil diperbarui.");
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', "Akun {$user->name} berhasil diperbarui.");
     }
 
     /**
@@ -92,5 +126,19 @@ class UserController extends Controller
         $user->delete();
 
         return back()->with('success', "Akun {$user->name} berhasil dihapus.");
+    }
+
+    /**
+     * Roles that can be assigned from the management screens.
+     *
+     * @return array<int, UserRole>
+     */
+    private function assignableRoles(): array
+    {
+        return [
+            UserRole::Customer,
+            UserRole::Worker,
+            UserRole::Admin,
+        ];
     }
 }

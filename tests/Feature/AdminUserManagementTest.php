@@ -10,6 +10,7 @@ use App\Models\OrderFile;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AdminUserManagementTest extends TestCase
@@ -86,15 +87,188 @@ class AdminUserManagementTest extends TestCase
             ->assertSee('placeholder="Cari nama atau email pengguna"', escape: false);
     }
 
+    public function test_super_admin_can_open_create_user_page(): void
+    {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('admin.users.create'))
+            ->assertOk()
+            ->assertSee('Tambah Pengguna');
+    }
+
+    public function test_regular_admin_cannot_create_users(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.users.create'))
+            ->assertForbidden();
+    }
+
+    public function test_super_admin_can_create_user(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $this->actingAs($superAdmin)
+            ->post(route('admin.users.store'), [
+                'name' => 'Diana Putri',
+                'email' => 'diana@mail.test',
+                'phone' => '081234567890',
+                'role' => UserRole::Worker->value,
+                'password' => 'rahasia123',
+                'password_confirmation' => 'rahasia123',
+            ])
+            ->assertSessionHas('success')
+            ->assertRedirect(route('admin.users.index'));
+
+        $user = User::query()->where('email', 'diana@mail.test')->firstOrFail();
+
+        $this->assertSame('Diana Putri', $user->name);
+        $this->assertSame('081234567890', $user->phone);
+        $this->assertTrue($user->isWorker());
+        $this->assertTrue(Hash::check('rahasia123', $user->password));
+    }
+
+    public function test_create_user_rejects_duplicate_email(): void
+    {
+        $existing = User::factory()->customer()->create(['email' => 'diana@mail.test']);
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->post(route('admin.users.store'), [
+                'name' => 'Diana Putri',
+                'email' => $existing->email,
+                'role' => UserRole::Customer->value,
+                'password' => 'rahasia123',
+                'password_confirmation' => 'rahasia123',
+            ])
+            ->assertSessionHasErrors('email');
+    }
+
+    public function test_create_user_rejects_super_admin_role(): void
+    {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->post(route('admin.users.store'), [
+                'name' => 'Diana Putri',
+                'email' => 'diana@mail.test',
+                'role' => UserRole::SuperAdmin->value,
+                'password' => 'rahasia123',
+                'password_confirmation' => 'rahasia123',
+            ])
+            ->assertSessionHasErrors('role');
+    }
+
+    public function test_create_user_requires_matching_password_confirmation(): void
+    {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->post(route('admin.users.store'), [
+                'name' => 'Diana Putri',
+                'email' => 'diana@mail.test',
+                'role' => UserRole::Customer->value,
+                'password' => 'rahasia123',
+                'password_confirmation' => 'beda12345',
+            ])
+            ->assertSessionHasErrors('password');
+    }
+
+    public function test_super_admin_can_open_edit_user_page(): void
+    {
+        $user = User::factory()->customer()->create();
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('admin.users.edit', $user))
+            ->assertOk()
+            ->assertSee($user->email);
+    }
+
+    public function test_regular_admin_cannot_edit_users(): void
+    {
+        $user = User::factory()->customer()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.users.edit', $user))
+            ->assertForbidden();
+    }
+
+    public function test_super_admin_accounts_cannot_be_edited(): void
+    {
+        $otherSuperAdmin = User::factory()->superAdmin()->create();
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('admin.users.edit', $otherSuperAdmin))
+            ->assertSessionHas('error')
+            ->assertRedirect(route('admin.users.index'));
+    }
+
+    public function test_super_admin_can_update_user_profile_and_role(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+        $customer = User::factory()->customer()->create(['name' => 'Diana Putri']);
+
+        $this->actingAs($superAdmin)
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'name' => 'Diana Baru',
+                'email' => 'diana.baru@mail.test',
+                'phone' => '089876543210',
+                'role' => UserRole::Admin->value,
+            ]))
+            ->assertSessionHas('success')
+            ->assertRedirect(route('admin.users.index'));
+
+        $customer->refresh();
+
+        $this->assertSame('Diana Baru', $customer->name);
+        $this->assertSame('diana.baru@mail.test', $customer->email);
+        $this->assertSame('089876543210', $customer->phone);
+        $this->assertTrue($customer->isAdmin());
+    }
+
+    public function test_update_user_rejects_duplicate_email(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $other = User::factory()->customer()->create(['email' => 'diana@mail.test']);
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'email' => $other->email,
+            ]))
+            ->assertSessionHasErrors('email');
+    }
+
+    public function test_blank_password_keeps_the_existing_password(): void
+    {
+        $customer = User::factory()->customer()->create();
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'password' => '',
+                'password_confirmation' => '',
+            ]))
+            ->assertSessionHas('success');
+
+        $this->assertTrue(Hash::check('password', $customer->fresh()->password));
+    }
+
+    public function test_filled_password_is_rehashed_on_update(): void
+    {
+        $customer = User::factory()->customer()->create();
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'password' => 'passwordbaru',
+                'password_confirmation' => 'passwordbaru',
+            ]))
+            ->assertSessionHas('success');
+
+        $this->assertTrue(Hash::check('passwordbaru', $customer->fresh()->password));
+    }
+
     public function test_super_admin_can_promote_customer_to_admin(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
         $customer = User::factory()->customer()->create();
 
         $this->actingAs($superAdmin)
-            ->patch(route('admin.users.role', $customer), ['role' => UserRole::Admin->value])
-            ->assertSessionHas('success')
-            ->assertRedirect();
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'role' => UserRole::Admin->value,
+            ]))
+            ->assertSessionHas('success');
 
         $this->assertTrue($customer->fresh()->isAdmin());
     }
@@ -105,7 +279,9 @@ class AdminUserManagementTest extends TestCase
         $customer = User::factory()->customer()->create();
 
         $this->actingAs($superAdmin)
-            ->patch(route('admin.users.role', $customer), ['role' => UserRole::Worker->value])
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'role' => UserRole::Worker->value,
+            ]))
             ->assertSessionHas('success');
 
         $this->assertTrue($customer->fresh()->isWorker());
@@ -117,7 +293,9 @@ class AdminUserManagementTest extends TestCase
         $customer = User::factory()->customer()->create();
 
         $this->actingAs($superAdmin)
-            ->patch(route('admin.users.role', $customer), ['role' => UserRole::SuperAdmin->value])
+            ->put(route('admin.users.update', $customer), $this->updatePayload($customer, [
+                'role' => UserRole::SuperAdmin->value,
+            ]))
             ->assertSessionHasErrors('role');
 
         $this->assertTrue($customer->fresh()->isCustomer());
@@ -128,7 +306,9 @@ class AdminUserManagementTest extends TestCase
         $superAdmin = User::factory()->superAdmin()->create();
 
         $this->actingAs($superAdmin)
-            ->patch(route('admin.users.role', $superAdmin), ['role' => UserRole::Customer->value])
+            ->put(route('admin.users.update', $superAdmin), $this->updatePayload($superAdmin, [
+                'role' => UserRole::Customer->value,
+            ]))
             ->assertSessionHas('error')
             ->assertRedirect();
 
@@ -141,7 +321,9 @@ class AdminUserManagementTest extends TestCase
         $otherSuperAdmin = User::factory()->superAdmin()->create();
 
         $this->actingAs($superAdmin)
-            ->patch(route('admin.users.role', $otherSuperAdmin), ['role' => UserRole::Customer->value])
+            ->put(route('admin.users.update', $otherSuperAdmin), $this->updatePayload($otherSuperAdmin, [
+                'role' => UserRole::Customer->value,
+            ]))
             ->assertSessionHas('error');
 
         $this->assertTrue($otherSuperAdmin->fresh()->isSuperAdmin());
@@ -154,7 +336,9 @@ class AdminUserManagementTest extends TestCase
         Order::factory()->inProgress()->assignedTo($worker)->create();
 
         $this->actingAs($superAdmin)
-            ->patch(route('admin.users.role', $worker), ['role' => UserRole::Customer->value])
+            ->put(route('admin.users.update', $worker), $this->updatePayload($worker, [
+                'role' => UserRole::Customer->value,
+            ]))
             ->assertSessionHas('error');
 
         $this->assertTrue($worker->fresh()->isWorker());
@@ -279,5 +463,19 @@ class AdminUserManagementTest extends TestCase
     {
         $this->get(route('admin.users.index'))
             ->assertRedirect(route('login'));
+    }
+
+    /**
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    private function updatePayload(User $user, array $overrides = []): array
+    {
+        return array_merge([
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->role?->value,
+        ], $overrides);
     }
 }

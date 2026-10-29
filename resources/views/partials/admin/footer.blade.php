@@ -8,7 +8,7 @@
     </div>
     <div class="footer-right">
         <ul class="footer-links">
-            <li><a href="{{ route('home') }}" class="footer-link">Beranda</a></li>
+            <li><a href="{{ route('home') }}" class="footer-link" data-turbo="false">Beranda</a></li>
         </ul>
     </div>
 </footer>

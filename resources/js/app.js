@@ -56,9 +56,12 @@ const initMobileSidebar = () => {
         return;
     }
 
-    const overlay = document.createElement('div');
+    const overlay = document.querySelector('.sidebar-overlay') ?? document.createElement('div');
     overlay.className = 'sidebar-overlay';
-    document.body.appendChild(overlay);
+
+    if (!overlay.isConnected) {
+        document.body.appendChild(overlay);
+    }
 
     const setOpen = (isOpen) => {
         sidebar.classList.toggle('show', isOpen);
@@ -100,6 +103,16 @@ const initDesktopSidebar = () => {
     });
 };
 
+let fullscreenListenerBound = false;
+
+const syncFullscreenIcon = () => {
+    const icon = document.querySelector('#btn-fullscreen i');
+
+    if (icon) {
+        icon.className = document.fullscreenElement ? 'bi bi-fullscreen-exit' : 'bi bi-arrows-fullscreen';
+    }
+};
+
 const initFullscreen = () => {
     const button = document.querySelector('#btn-fullscreen');
 
@@ -107,13 +120,7 @@ const initFullscreen = () => {
         return;
     }
 
-    const icon = button.querySelector('i');
-
-    const syncIcon = (isFullscreen) => {
-        if (icon) {
-            icon.className = isFullscreen ? 'bi bi-fullscreen-exit' : 'bi bi-arrows-fullscreen';
-        }
-    };
+    syncFullscreenIcon();
 
     button.addEventListener('click', async () => {
         try {
@@ -127,7 +134,10 @@ const initFullscreen = () => {
         }
     });
 
-    document.addEventListener('fullscreenchange', () => syncIcon(Boolean(document.fullscreenElement)));
+    if (!fullscreenListenerBound) {
+        fullscreenListenerBound = true;
+        document.addEventListener('fullscreenchange', syncFullscreenIcon);
+    }
 };
 
 const initConfirmations = (useNativeConfirm) => {
@@ -172,7 +182,15 @@ const revealAllAnimatedContent = () => {
     });
 };
 
-onDomReady(() => {
+let initializedBody = null;
+
+export const initPage = () => {
+    if (initializedBody === document.body) {
+        return;
+    }
+
+    initializedBody = document.body;
+
     initPasswordToggles();
     initFormValidation();
     initMobileSidebar();
@@ -198,4 +216,12 @@ onDomReady(() => {
     }
 
     initInteractiveEnhancements();
-});
+};
+
+onDomReady(initPage);
+
+if (document.querySelector('meta[name="staff-turbo"]')) {
+    import('./staff-turbo')
+        .then(({ setupTurbo }) => setupTurbo(initPage))
+        .catch((error) => console.error('Turbo admin gagal dimuat.', error));
+}

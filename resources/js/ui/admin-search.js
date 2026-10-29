@@ -72,6 +72,13 @@ const navigate = (form) => {
     }
 
     setBusy(true);
+
+    if (window.Turbo?.visit) {
+        window.Turbo.visit(url, { action: 'replace' });
+
+        return;
+    }
+
     window.location.replace(url);
 };
 

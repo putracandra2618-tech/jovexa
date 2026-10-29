@@ -51,7 +51,10 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
 
     Route::middleware(['role:'.UserRole::SuperAdmin->value])->group(function (): void {
         Route::get('pengguna', [UserController::class, 'index'])->name('users.index');
-        Route::patch('pengguna/{user}/peran', [UserController::class, 'updateRole'])->name('users.role');
+        Route::get('pengguna/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('pengguna', [UserController::class, 'store'])->name('users.store');
+        Route::get('pengguna/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('pengguna/{user}', [UserController::class, 'update'])->name('users.update');
         Route::post('pengguna/{user}/login-sebagai', [ImpersonationController::class, 'store'])->name('users.impersonate');
         Route::delete('pengguna/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });

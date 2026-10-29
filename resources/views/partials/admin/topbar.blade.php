@@ -51,7 +51,7 @@
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-profile" aria-labelledby="profile-dropdown">
                     <li class="dropdown-header">{{ auth()->user()->email }}</li>
                     <li>
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}" data-turbo="false">
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">
                                 <i class="bi bi-box-arrow-right"></i> Keluar

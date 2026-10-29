@@ -38,7 +38,7 @@
                                 </div>
 
                                 <a href="{{ route('admin.orders.file', [$order, $file]) }}"
-                                   class="btn-custom btn-custom-light btn-custom-sm">
+                                   class="btn-custom btn-custom-light btn-custom-sm" data-turbo="false">
                                     <i class="bi bi-download me-1"></i> Unduh
                                 </a>
                             </li>

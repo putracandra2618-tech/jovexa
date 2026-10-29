@@ -4,11 +4,13 @@
 @section('page-title', 'Kelola Pengguna')
 @section('page-subtitle', 'Kelola peran, status worker, dan akses akun pengguna.')
 
-@section('content')
-    @php
-        $assignableRoles = collect($roles)->reject(fn ($role) => $role === \App\Enums\UserRole::SuperAdmin);
-    @endphp
+@section('page-actions')
+    <a href="{{ route('admin.users.create') }}" class="btn-custom btn-custom-primary">
+        <i class="bi bi-person-plus me-1"></i> Tambah Pengguna
+    </a>
+@endsection
 
+@section('content')
     <x-card data-admin-search-results>
         <div class="row g-2 align-items-center mb-3">
             <div class="col-md-4">
@@ -71,7 +73,6 @@
                             <th>Nama</th>
                             <th>Email</th>
                             <th>Peran</th>
-                            <th>Pesanan</th>
                             <th>Terdaftar</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -97,12 +98,6 @@
                                 <td class="text-nowrap">
                                     <x-badge :variant="$user->role->badgeClass()">{{ $user->role->label() }}</x-badge>
                                 </td>
-                                <td>
-                                    <div>{{ $user->orders_count }} sebagai customer</div>
-                                    @if ($user->isWorker())
-                                        <small class="text-muted">{{ $user->assigned_orders_count }} sebagai worker</small>
-                                    @endif
-                                </td>
                                 <td class="text-nowrap">{{ $user->created_at?->format('d M Y') }}</td>
                                 <td class="text-end">
                                     @if ($isSelf)
@@ -111,27 +106,13 @@
                                         <span class="text-muted small">Super Admin</span>
                                     @else
                                         <div class="table-actions-stack">
-                                            <form method="POST" action="{{ route('admin.users.role', $user) }}"
-                                                  class="table-role-form">
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <select name="role" class="form-select-custom form-select-sm"
-                                                        aria-label="Peran {{ $user->name }}">
-                                                    @foreach ($assignableRoles as $role)
-                                                        <option value="{{ $role->value }}" @selected($user->role === $role)>
-                                                            {{ $role->label() }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-
-                                                <button type="submit" class="btn-custom btn-custom-save btn-custom-sm">
-                                                    <i class="bi bi-check-lg me-1"></i> Simpan
-                                                </button>
-                                            </form>
-
                                             <div class="table-actions">
-                                                <form method="POST" action="{{ route('admin.users.impersonate', $user) }}"
+                                                <a href="{{ route('admin.users.edit', $user) }}"
+                                                   class="btn-custom btn-custom-edit btn-custom-sm">
+                                                    <i class="bi bi-pencil-square me-1"></i> Ubah
+                                                </a>
+
+                                                <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" data-turbo="false"
                                                       data-confirm="Masuk sebagai {{ $user->name }}? Anda dapat kembali ke akun Super Admin kapan saja.">
                                                     @csrf
                                                     <button type="submit" class="btn-custom btn-custom-light btn-custom-sm">
