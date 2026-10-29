@@ -1,0 +1,1 @@
+buatkan halaman detail profil yang berfungsi utuk user yang sudah login untuk dapat mengubah password, terapkan juga di admin super admin dan worker. untuk photo propil gunakan alfabet huruf awal aja jangan pake foto asli

@@ -129,6 +129,41 @@ class UserController extends Controller
     }
 
     /**
+     * Show the form for editing the user's profile.
+     */
+    public function editProfile(): View
+    {
+        return view('admin.profile.edit', [
+            'user' => auth()->user(),
+        ]);
+    }
+
+    /**
+     * Update the user's profile password.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updateProfile(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $user = auth()->user();
+
+        if ($request->password) {
+            if (!Hash::check($request->old_password, $user->password)) {
+                return back()->with('error', 'Password lama salah.');
+            }
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return redirect()
+                ->route('profile.edit')
+                ->with('success', 'Password berhasil diubah.');
+        }
+
+        return back()->with('info', 'Password tidak diubah.');
+    }
+
+    /**
      * Roles that can be assigned from the management screens.
      *
      * @return array<int, UserRole>

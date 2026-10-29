@@ -140,7 +140,7 @@ Payment Gateway digunakan untuk:
 1. Customer memilih untuk membayar.
 2. Sistem membuat transaksi pembayaran.
 3. Customer melakukan pembayaran melalui Payment Gateway.
-4. Payment Gateway mengirimkan status pembayaran ke sistem.
+4. Payment Gateway mengirimkan status pembayaran ke sistem. 
 
 ### Pembayaran berhasil
 - Payment status: `paid`

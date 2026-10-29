@@ -57,6 +57,11 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
         Route::put('pengguna/{user}', [UserController::class, 'update'])->name('users.update');
         Route::post('pengguna/{user}/login-sebagai', [ImpersonationController::class, 'store'])->name('users.impersonate');
         Route::delete('pengguna/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+});
+
+    Route::middleware(['auth'])->group(function () {
+        Route::get('profil', [UserController::class, 'editProfile'])->name('profile.edit');
+        Route::patch('profil', [UserController::class, 'updateProfile'])->name('profile.update');
     });
 });
 
