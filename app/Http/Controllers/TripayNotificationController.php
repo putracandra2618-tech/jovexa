@@ -43,7 +43,10 @@ class TripayNotificationController extends Controller
 
         $payload = $request->json()->all();
 
-        if (! $this->tripay->matchesMerchantCode($payload['merchant_code'] ?? null)) {
+        // The gateway does not echo the merchant code back in every
+        // notification, so it is only compared when it is actually present.
+        // The signature check above already authenticates the payload.
+        if (isset($payload['merchant_code']) && ! $this->tripay->matchesMerchantCode($payload['merchant_code'])) {
             return $this->reject('Kode merchant tidak cocok.');
         }
 

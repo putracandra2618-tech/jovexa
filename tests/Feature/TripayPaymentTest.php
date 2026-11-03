@@ -72,7 +72,6 @@ class TripayPaymentTest extends TestCase
         return array_merge([
             'reference' => $payment->tripay_reference,
             'merchant_ref' => $order->order_number,
-            'merchant_code' => 'T00000',
             'status' => 'PAID',
             'total_amount' => $payment->amount,
             'payment_method_code' => 'QRIS',
