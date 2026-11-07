@@ -21,11 +21,39 @@
 </head>
 <body>
 
+<div class="impersonation-loading-overlay" data-impersonation-loading-overlay hidden aria-live="polite" aria-busy="true">
+    <div class="impersonation-loading-card" role="status">
+        <span class="impersonation-loading-status" aria-hidden="true">
+            <span class="impersonation-loading-spinner"></span>
+            <svg class="impersonation-loading-check" viewBox="0 0 48 48" focusable="false">
+                <circle cx="24" cy="24" r="21"></circle>
+                <path d="m14 25 6.5 6.5L34.5 17"></path>
+            </svg>
+        </span>
+        <strong>Menyiapkan akses akun</strong>
+        <span data-impersonation-loading-message>Mohon tunggu sebentar...</span>
+    </div>
+</div>
+
+<div class="logout-loading-overlay" data-logout-loading-overlay hidden aria-live="polite" aria-busy="true">
+    <div class="logout-loading-card" role="status">
+        <span class="logout-loading-status" aria-hidden="true">
+            <span class="logout-loading-spinner"></span>
+            <svg class="logout-loading-check" viewBox="0 0 48 48" focusable="false">
+                <circle cx="24" cy="24" r="21"></circle>
+                <path d="m14 25 6.5 6.5L34.5 17"></path>
+            </svg>
+        </span>
+        <strong>Sampai jumpa</strong>
+        <span data-logout-loading-message>Menutup sesi...</span>
+        <small>Semoga harimu menyenangkan.</small>
+    </div>
+</div>
+
 @include('partials.admin.sidebar')
 
 <div class="main-wrapper">
     @include('partials.admin.topbar')
-    @include('partials.impersonation-banner')
 
     @hasSection('page-title')
         <div class="page-header">

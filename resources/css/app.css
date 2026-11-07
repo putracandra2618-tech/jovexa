@@ -2331,6 +2331,349 @@
     background-color: var(--jx-mint-soft);
 }
 
+.playful .jx-login-loading-overlay {
+    position: fixed;
+    z-index: 3000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(22, 48, 42, 0.42);
+    backdrop-filter: blur(3px);
+}
+
+.playful .jx-login-loading-overlay[hidden] {
+    display: none;
+}
+
+.playful .jx-logout-loading-overlay {
+    position: fixed;
+    z-index: 3000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(22, 48, 42, 0.42);
+    backdrop-filter: blur(3px);
+}
+
+.playful .jx-logout-loading-overlay[hidden] {
+    display: none;
+}
+
+.playful .jx-logout-loading-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    width: min(100%, 20rem);
+    padding: 2rem;
+    text-align: center;
+    background: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-lg);
+}
+
+.playful .jx-logout-loading-card strong {
+    color: var(--jx-ink);
+    font-size: 1rem;
+}
+
+.playful .jx-logout-loading-card > span:last-of-type {
+    color: var(--jx-muted);
+    font-size: 0.8125rem;
+}
+
+.playful .jx-logout-loading-card small {
+    margin-top: 0.25rem;
+    color: var(--jx-ink-soft);
+    font-size: 0.75rem;
+}
+
+.playful .jx-logout-loading-status {
+    position: relative;
+    width: 2.75rem;
+    aspect-ratio: 1;
+}
+
+.playful .jx-logout-loading-spinner {
+    position: absolute;
+    inset: 0;
+    border: 0.3rem solid var(--jx-mint-soft);
+    border-top-color: var(--jx-green);
+    border-radius: 50%;
+    animation: jxLogoutSpinner 0.8s linear infinite;
+}
+
+.playful .jx-logout-loading-check {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+}
+
+.playful .jx-logout-loading-check circle,
+.playful .jx-logout-loading-check path {
+    fill: none;
+    stroke: var(--jx-green);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.playful .jx-logout-loading-check circle {
+    stroke-width: 3;
+    stroke-dasharray: 132;
+    stroke-dashoffset: 132;
+}
+
+.playful .jx-logout-loading-check path {
+    stroke-width: 4;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+}
+
+.playful .jx-logout-loading-overlay[data-state='success'] .jx-logout-loading-spinner {
+    animation: jxLogoutSpinnerExit 0.2s ease forwards;
+}
+
+.playful .jx-logout-loading-overlay[data-state='success'] .jx-logout-loading-check {
+    opacity: 1;
+}
+
+.playful .jx-logout-loading-overlay[data-state='success'] .jx-logout-loading-check circle {
+    animation: jxLogoutCheckCircle 0.32s ease-out forwards;
+}
+
+.playful .jx-logout-loading-overlay[data-state='success'] .jx-logout-loading-check path {
+    animation: jxLogoutCheckPath 0.22s 0.22s ease-out forwards;
+}
+
+@keyframes jxLogoutSpinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes jxLogoutSpinnerExit {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes jxLogoutCheckCircle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes jxLogoutCheckPath {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .playful .jx-logout-loading-spinner {
+        animation: none;
+    }
+
+    .playful .jx-logout-loading-overlay[data-state='success'] .jx-logout-loading-check circle,
+    .playful .jx-logout-loading-overlay[data-state='success'] .jx-logout-loading-check path {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+.playful .jx-login-loading-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    width: min(100%, 20rem);
+    padding: 2rem;
+    text-align: center;
+    background: var(--jx-surface);
+    border: 1px solid var(--jx-line);
+    border-radius: var(--jx-radius-lg);
+    box-shadow: var(--jx-shadow-lg);
+}
+
+.playful .jx-login-loading-card strong {
+    color: var(--jx-ink);
+    font-size: 1rem;
+}
+
+.playful .jx-login-loading-card > span:last-of-type {
+    color: var(--jx-muted);
+    font-size: 0.8125rem;
+}
+
+.playful .jx-login-loading-card small {
+    margin-top: 0.25rem;
+    color: var(--jx-ink-soft);
+    font-size: 0.75rem;
+}
+
+.playful .jx-login-loading-status {
+    position: relative;
+    width: 2.75rem;
+    aspect-ratio: 1;
+}
+
+.playful .jx-login-loading-spinner {
+    position: absolute;
+    inset: 0;
+    border: 0.3rem solid var(--jx-mint-soft);
+    border-top-color: var(--jx-green);
+    border-radius: 50%;
+    animation: jxLoginSpinner 0.8s linear infinite;
+}
+
+.playful .jx-login-loading-check {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+}
+
+.playful .jx-login-loading-error {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+}
+
+.playful .jx-login-loading-check circle,
+.playful .jx-login-loading-check path {
+    fill: none;
+    stroke: var(--jx-green);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.playful .jx-login-loading-check circle {
+    stroke-width: 3;
+    stroke-dasharray: 132;
+    stroke-dashoffset: 132;
+}
+
+.playful .jx-login-loading-check path {
+    stroke-width: 4;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+}
+
+.playful .jx-login-loading-error circle,
+.playful .jx-login-loading-error path {
+    fill: none;
+    stroke: var(--jx-rose);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.playful .jx-login-loading-error circle {
+    stroke-width: 3;
+    stroke-dasharray: 132;
+    stroke-dashoffset: 132;
+}
+
+.playful .jx-login-loading-error path {
+    stroke-width: 4;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+}
+
+.playful .jx-login-loading-overlay[data-state='success'] .jx-login-loading-spinner {
+    animation: jxLoginSpinnerExit 0.2s ease forwards;
+}
+
+.playful .jx-login-loading-overlay[data-state='success'] .jx-login-loading-check {
+    opacity: 1;
+}
+
+.playful .jx-login-loading-overlay[data-state='success'] .jx-login-loading-check circle {
+    animation: jxLoginCheckCircle 0.32s ease-out forwards;
+}
+
+.playful .jx-login-loading-overlay[data-state='success'] .jx-login-loading-check path {
+    animation: jxLoginCheckPath 0.22s 0.22s ease-out forwards;
+}
+
+.playful .jx-login-loading-overlay[data-state='error'] .jx-login-loading-spinner {
+    animation: jxLoginSpinnerExit 0.2s ease forwards;
+}
+
+.playful .jx-login-loading-overlay[data-state='error'] .jx-login-loading-error {
+    opacity: 1;
+}
+
+.playful .jx-login-loading-overlay[data-state='error'] .jx-login-loading-error circle {
+    animation: jxLoginCheckCircle 0.32s ease-out forwards;
+}
+
+.playful .jx-login-loading-overlay[data-state='error'] .jx-login-loading-error path {
+    animation: jxLoginErrorPath 0.22s 0.22s ease-out forwards;
+}
+
+@keyframes jxLoginSpinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes jxLoginSpinnerExit {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes jxLoginCheckCircle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes jxLoginCheckPath {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes jxLoginErrorPath {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .playful .jx-login-loading-spinner {
+        animation: none;
+    }
+
+    .playful .jx-login-loading-overlay[data-state='success'] .jx-login-loading-check circle,
+    .playful .jx-login-loading-overlay[data-state='success'] .jx-login-loading-check path,
+    .playful .jx-login-loading-overlay[data-state='error'] .jx-login-loading-error circle,
+    .playful .jx-login-loading-overlay[data-state='error'] .jx-login-loading-error path {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+.playful .login-request-error {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0 0 1rem;
+    color: var(--jx-rose);
+}
+
 .jx-auth-card {
     position: relative;
     overflow: hidden;

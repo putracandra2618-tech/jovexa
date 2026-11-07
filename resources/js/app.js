@@ -48,6 +48,216 @@ const initFormValidation = () => {
     });
 };
 
+const initSuccessLoading = ({
+    overlaySelector,
+    formSelector,
+    messageSelector,
+    loadingMessage,
+    successMessage,
+    rootClass,
+}) => {
+    const overlay = document.querySelector(overlaySelector);
+
+    if (!overlay) {
+        return;
+    }
+
+    const message = overlay.querySelector(messageSelector);
+    const forms = document.querySelectorAll(formSelector);
+    const timers = [];
+
+    const reset = () => {
+        timers.splice(0).forEach((timer) => window.clearTimeout(timer));
+        overlay.hidden = true;
+        delete overlay.dataset.state;
+        overlay.setAttribute('aria-busy', 'true');
+        document.documentElement.classList.remove(rootClass);
+
+        forms.forEach((form) => {
+            delete form.dataset.successLoading;
+            form.querySelector('[type="submit"]')?.removeAttribute('disabled');
+        });
+    };
+
+    forms.forEach((form) => {
+        form.addEventListener('submit', (event) => {
+            if (event.defaultPrevented || form.dataset.successLoading === 'true') {
+                return;
+            }
+
+            event.preventDefault();
+            form.dataset.successLoading = 'true';
+            form.querySelector('[type="submit"]')?.setAttribute('disabled', 'disabled');
+
+            if (message) {
+                message.textContent = loadingMessage(form);
+            }
+
+            overlay.hidden = false;
+            overlay.dataset.state = 'loading';
+            document.documentElement.classList.add(rootClass);
+
+            timers.push(window.setTimeout(() => {
+                overlay.dataset.state = 'success';
+                overlay.setAttribute('aria-busy', 'false');
+
+                if (message) {
+                    message.textContent = successMessage;
+                }
+
+                timers.push(window.setTimeout(() => form.submit(), 350));
+            }, 550));
+        });
+    });
+
+    window.addEventListener('pageshow', reset);
+};
+
+const initImpersonationLoading = () => {
+    initSuccessLoading({
+        overlaySelector: '[data-impersonation-loading-overlay]',
+        formSelector: 'form[data-impersonation-loading]',
+        messageSelector: '[data-impersonation-loading-message]',
+        loadingMessage: (form) => `Masuk sebagai ${form.dataset.impersonationTarget}...`,
+        successMessage: 'Akses siap. Mengalihkan dashboard...',
+        rootClass: 'is-impersonating',
+    });
+};
+
+const initLoginLoading = () => {
+    const overlay = document.querySelector('[data-login-loading-overlay]');
+    const form = document.querySelector('form[data-login-loading]');
+
+    if (!overlay || !form) {
+        return;
+    }
+
+    const title = overlay.querySelector('[data-login-loading-title]');
+    const message = overlay.querySelector('[data-login-loading-message]');
+    const note = overlay.querySelector('[data-login-loading-note]');
+    const feedback = form.querySelector('[data-login-request-error]');
+    const feedbackMessage = form.querySelector('[data-login-request-error-message]');
+    const submitButton = form.querySelector('[type="submit"]');
+    const defaultTitle = title?.textContent ?? '';
+    const defaultMessage = message?.textContent ?? '';
+    const defaultNote = note?.textContent ?? '';
+
+    const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+    const reset = () => {
+        overlay.hidden = true;
+        delete overlay.dataset.state;
+        overlay.setAttribute('aria-busy', 'true');
+        document.documentElement.classList.remove('is-logging-in');
+        delete form.dataset.loginLoading;
+        submitButton?.removeAttribute('disabled');
+
+        if (title) {
+            title.textContent = defaultTitle;
+        }
+
+        if (message) {
+            message.textContent = defaultMessage;
+        }
+
+        if (note) {
+            note.textContent = defaultNote;
+        }
+    };
+
+    const showFailure = async (errorMessage) => {
+        overlay.dataset.state = 'error';
+        overlay.setAttribute('aria-busy', 'false');
+
+        if (title) {
+            title.textContent = 'Login gagal';
+        }
+
+        if (message) {
+            message.textContent = errorMessage;
+        }
+
+        if (note) {
+            note.textContent = 'Periksa kembali email dan password Anda.';
+        }
+
+        if (feedback && feedbackMessage) {
+            feedbackMessage.textContent = errorMessage;
+            feedback.hidden = false;
+        }
+
+        await delay(1000);
+        reset();
+    };
+
+    form.addEventListener('submit', async (event) => {
+        if (event.defaultPrevented || form.dataset.loginLoading === 'true') {
+            return;
+        }
+
+        event.preventDefault();
+        form.dataset.loginLoading = 'true';
+        feedback && (feedback.hidden = true);
+        submitButton?.setAttribute('disabled', 'disabled');
+        overlay.hidden = false;
+        overlay.dataset.state = 'loading';
+        document.documentElement.classList.add('is-logging-in');
+
+        try {
+            const response = await fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+                credentials: 'same-origin',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (!response.ok) {
+                const payload = await response.json().catch(() => null);
+                const errors = payload?.errors ? Object.values(payload.errors).flat() : [];
+                const errorMessage = errors[0] || payload?.message || 'Login tidak dapat diproses. Coba lagi.';
+
+                await showFailure(errorMessage);
+
+                return;
+            }
+
+            overlay.dataset.state = 'success';
+            overlay.setAttribute('aria-busy', 'false');
+
+            if (title) {
+                title.textContent = 'Login berhasil';
+            }
+
+            if (message) {
+                message.textContent = 'Mengalihkan dashboard...';
+            }
+
+            await delay(550);
+            window.location.assign(response.url);
+        } catch {
+            await showFailure('Koneksi bermasalah. Periksa internetmu lalu coba lagi.');
+        }
+    });
+
+    window.addEventListener('pageshow', reset);
+};
+
+const initLogoutLoading = () => {
+    const isPlayful = document.body.classList.contains('playful');
+
+    initSuccessLoading({
+        overlaySelector: isPlayful ? '[data-jx-logout-loading-overlay]' : '[data-logout-loading-overlay]',
+        formSelector: 'form[data-logout-loading]',
+        messageSelector: isPlayful ? '[data-jx-logout-loading-message]' : '[data-logout-loading-message]',
+        loadingMessage: () => 'Menutup sesi...',
+        successMessage: 'Sampai jumpa!',
+        rootClass: 'is-logging-out',
+    });
+};
+
 const initMobileSidebar = () => {
     const sidebar = document.querySelector('.sidebar-wrapper');
     const toggle = document.querySelector('.sidebar-toggle-btn');
@@ -205,6 +415,9 @@ export const initPage = () => {
     // defaultPrevented ketika pengguna belum menekan tombol konfirmasi.
     const modalHandled = initConfirmModal();
     initConfirmations(!modalHandled);
+    initImpersonationLoading();
+    initLoginLoading();
+    initLogoutLoading();
 
     // Kalau initAnimate() gagal di tengah jalan, lepas penanda siapnya supaya
     // CSS tidak lagi menyembunyikan elemen yang observer tidak sempat tangani.

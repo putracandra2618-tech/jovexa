@@ -3,6 +3,25 @@
 <x-layouts.head />
 <body class="playful @yield('body_class')">
 
+<div class="jx-login-loading-overlay" data-login-loading-overlay hidden aria-live="polite" aria-busy="true">
+    <div class="jx-login-loading-card" role="status">
+        <span class="jx-login-loading-status" aria-hidden="true">
+            <span class="jx-login-loading-spinner"></span>
+            <svg class="jx-login-loading-check" viewBox="0 0 48 48" focusable="false">
+                <circle cx="24" cy="24" r="21"></circle>
+                <path d="m14 25 6.5 6.5L34.5 17"></path>
+            </svg>
+            <svg class="jx-login-loading-error" viewBox="0 0 48 48" focusable="false">
+                <circle cx="24" cy="24" r="21"></circle>
+                <path d="m17 17 14 14M31 17 17 31"></path>
+            </svg>
+        </span>
+        <strong data-login-loading-title>Menyiapkan dashboard</strong>
+        <span data-login-loading-message>Memverifikasi akun...</span>
+        <small data-login-loading-note>Silakan gunakan akun dengan baik.</small>
+    </div>
+</div>
+
 <div class="jx-auth">
     <span class="jx-blob jx-blob-mint jx-auth-blob jx-auth-blob-a" aria-hidden="true"></span>
     <span class="jx-blob jx-blob-sky jx-auth-blob jx-auth-blob-b" aria-hidden="true"></span>

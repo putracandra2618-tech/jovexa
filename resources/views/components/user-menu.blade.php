@@ -10,7 +10,16 @@
             </span>
         </div>
 
-        <form method="POST" action="{{ route('logout') }}">
+        @if (session()->has('impersonator_id'))
+            <form method="POST" action="{{ route('impersonation.stop') }}" class="mb-2">
+                @csrf
+                <button type="submit" class="btn-custom btn-custom-light w-100">
+                    <i class="bi bi-arrow-return-left me-2"></i> Kembali ke Super Admin
+                </button>
+            </form>
+        @endif
+
+        <form method="POST" action="{{ route('logout') }}" data-logout-loading>
             @csrf
             <button type="submit" class="btn-custom btn-custom-light w-100"
                     data-bs-dismiss="offcanvas" @if ($drawerId) data-bs-target="#{{ $drawerId }}" @endif>
@@ -32,8 +41,19 @@
                     </span>
                 </li>
                 <li><hr class="dropdown-divider"></li>
+                @if (session()->has('impersonator_id'))
+                    <li>
+                        <form method="POST" action="{{ route('impersonation.stop') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-arrow-return-left me-2"></i> Kembali ke Super Admin
+                            </button>
+                        </form>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                @endif
                 <li>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" data-logout-loading>
                         @csrf
                         <button type="submit" class="dropdown-item">
                             <i class="bi bi-box-arrow-right me-2"></i> Keluar

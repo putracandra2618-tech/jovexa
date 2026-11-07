@@ -50,8 +50,19 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-profile" aria-labelledby="profile-dropdown">
                     <li class="dropdown-header">{{ auth()->user()->email }}</li>
+                    @if (session()->has('impersonator_id'))
+                        <li>
+                            <form method="POST" action="{{ route('impersonation.stop') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-arrow-return-left"></i> Kembali ke Super Admin
+                                </button>
+                            </form>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                    @endif
                     <li>
-                        <form method="POST" action="{{ route('logout') }}" data-turbo="false">
+                        <form method="POST" action="{{ route('logout') }}" data-turbo="false" data-logout-loading>
                             @csrf
                             <button type="submit" class="dropdown-item text-danger">
                                 <i class="bi bi-box-arrow-right"></i> Keluar

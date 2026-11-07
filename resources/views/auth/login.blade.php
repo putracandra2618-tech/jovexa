@@ -4,8 +4,13 @@
 @section('subtitle', 'Masuk untuk melanjutkan pesananmu.')
 
 @section('content')
-    <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate data-loading>
+    <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate data-loading data-login-loading>
         @csrf
+
+        <div class="form-feedback-custom invalid-custom login-request-error" data-login-request-error role="alert" hidden>
+            <i class="bi bi-x-circle-fill"></i>
+            <span data-login-request-error-message></span>
+        </div>
 
         <div class="login-form-group">
             <label for="email" class="login-form-label">Alamat Email</label>

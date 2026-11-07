@@ -3,6 +3,21 @@
 <x-layouts.head />
 <body class="playful @yield('body_class')">
 
+<div class="jx-logout-loading-overlay" data-jx-logout-loading-overlay hidden aria-live="polite" aria-busy="true">
+    <div class="jx-logout-loading-card" role="status">
+        <span class="jx-logout-loading-status" aria-hidden="true">
+            <span class="jx-logout-loading-spinner"></span>
+            <svg class="jx-logout-loading-check" viewBox="0 0 48 48" focusable="false">
+                <circle cx="24" cy="24" r="21"></circle>
+                <path d="m14 25 6.5 6.5L34.5 17"></path>
+            </svg>
+        </span>
+        <strong>Sampai jumpa</strong>
+        <span data-jx-logout-loading-message>Menutup sesi...</span>
+        <small>Semoga harimu menyenangkan.</small>
+    </div>
+</div>
+
 <div class="jx-app">
     <header class="jx-header jx-header-customer">
         <div class="jx-container jx-header-inner">
@@ -40,8 +55,6 @@
             <x-user-menu variant="drawer" drawer-id="customerNavDrawer" />
         </div>
     </div>
-
-    @include('partials.impersonation-banner')
 
     <main class="jx-app-main">
         <div class="jx-container">

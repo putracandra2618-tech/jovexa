@@ -113,6 +113,7 @@
                                                 </a>
 
                                                 <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" data-turbo="false"
+                                                      data-impersonation-loading data-impersonation-target="{{ $user->name }}"
                                                       data-confirm="Masuk sebagai {{ $user->name }}? Anda dapat kembali ke akun Super Admin kapan saja.">
                                                     @csrf
                                                     <button type="submit" class="btn-custom btn-custom-light btn-custom-sm">

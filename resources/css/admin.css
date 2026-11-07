@@ -1377,3 +1377,279 @@ body.sidebar-minimized .sidebar-profile {
     background-color: var(--mt-primary) !important;
     z-index: 2000;
 }
+
+/* Login-sebagai loading overlay */
+.impersonation-loading-overlay {
+    position: fixed;
+    z-index: 3000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(24, 28, 50, 0.48);
+    backdrop-filter: blur(3px);
+}
+
+.impersonation-loading-overlay[hidden] {
+    display: none;
+}
+
+.impersonation-loading-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    width: min(100%, 20rem);
+    padding: 2rem;
+    color: var(--mt-gray-800);
+    text-align: center;
+    background: #ffffff;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.impersonation-loading-card strong {
+    font-size: 1rem;
+}
+
+.impersonation-loading-card span:last-child {
+    color: var(--mt-gray-500);
+    font-size: 0.8125rem;
+}
+
+.impersonation-loading-status {
+    position: relative;
+    width: 2.75rem;
+    aspect-ratio: 1;
+}
+
+.impersonation-loading-spinner {
+    position: absolute;
+    inset: 0;
+    border: 0.3rem solid var(--mt-primary-soft);
+    border-top-color: var(--mt-primary);
+    border-radius: 50%;
+    animation: impersonation-spinner 0.8s linear infinite;
+}
+
+.impersonation-loading-check {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+}
+
+.impersonation-loading-check circle,
+.impersonation-loading-check path {
+    fill: none;
+    stroke: var(--mt-success);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.impersonation-loading-check circle {
+    stroke-width: 3;
+    stroke-dasharray: 132;
+    stroke-dashoffset: 132;
+}
+
+.impersonation-loading-check path {
+    stroke-width: 4;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+}
+
+.impersonation-loading-overlay[data-state='success'] .impersonation-loading-spinner {
+    animation: impersonation-spinner-exit 0.2s ease forwards;
+}
+
+.impersonation-loading-overlay[data-state='success'] .impersonation-loading-check {
+    opacity: 1;
+}
+
+.impersonation-loading-overlay[data-state='success'] .impersonation-loading-check circle {
+    animation: impersonation-check-circle 0.32s ease-out forwards;
+}
+
+.impersonation-loading-overlay[data-state='success'] .impersonation-loading-check path {
+    animation: impersonation-check-path 0.22s 0.22s ease-out forwards;
+}
+
+@keyframes impersonation-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes impersonation-spinner-exit {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes impersonation-check-circle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes impersonation-check-path {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .impersonation-loading-spinner {
+        animation: none;
+    }
+
+    .impersonation-loading-overlay[data-state='success'] .impersonation-loading-check circle,
+    .impersonation-loading-overlay[data-state='success'] .impersonation-loading-check path {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Logout loading overlay */
+.logout-loading-overlay {
+    position: fixed;
+    z-index: 3000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(24, 28, 50, 0.48);
+    backdrop-filter: blur(3px);
+}
+
+.logout-loading-overlay[hidden] {
+    display: none;
+}
+
+.logout-loading-card {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    width: min(100%, 20rem);
+    padding: 2rem;
+    color: var(--mt-gray-800);
+    text-align: center;
+    background: #ffffff;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.logout-loading-card strong {
+    font-size: 1rem;
+}
+
+.logout-loading-card > span:last-of-type {
+    color: var(--mt-gray-500);
+    font-size: 0.8125rem;
+}
+
+.logout-loading-card small {
+    margin-top: 0.25rem;
+    color: var(--mt-gray-600);
+    font-size: 0.75rem;
+}
+
+.logout-loading-status {
+    position: relative;
+    width: 2.75rem;
+    aspect-ratio: 1;
+}
+
+.logout-loading-spinner {
+    position: absolute;
+    inset: 0;
+    border: 0.3rem solid var(--mt-primary-soft);
+    border-top-color: var(--mt-primary);
+    border-radius: 50%;
+    animation: logout-spinner 0.8s linear infinite;
+}
+
+.logout-loading-check {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    opacity: 0;
+}
+
+.logout-loading-check circle,
+.logout-loading-check path {
+    fill: none;
+    stroke: var(--mt-success);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.logout-loading-check circle {
+    stroke-width: 3;
+    stroke-dasharray: 132;
+    stroke-dashoffset: 132;
+}
+
+.logout-loading-check path {
+    stroke-width: 4;
+    stroke-dasharray: 32;
+    stroke-dashoffset: 32;
+}
+
+.logout-loading-overlay[data-state='success'] .logout-loading-spinner {
+    animation: logout-spinner-exit 0.2s ease forwards;
+}
+
+.logout-loading-overlay[data-state='success'] .logout-loading-check {
+    opacity: 1;
+}
+
+.logout-loading-overlay[data-state='success'] .logout-loading-check circle {
+    animation: logout-check-circle 0.32s ease-out forwards;
+}
+
+.logout-loading-overlay[data-state='success'] .logout-loading-check path {
+    animation: logout-check-path 0.22s 0.22s ease-out forwards;
+}
+
+@keyframes logout-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes logout-spinner-exit {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+@keyframes logout-check-circle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes logout-check-path {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .logout-loading-spinner {
+        animation: none;
+    }
+
+    .logout-loading-overlay[data-state='success'] .logout-loading-check circle,
+    .logout-loading-overlay[data-state='success'] .logout-loading-check path {
+        animation: none;
+        stroke-dashoffset: 0;
+    }
+}
