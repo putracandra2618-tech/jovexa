@@ -179,6 +179,7 @@ class AuthTest extends TestCase
         ])->assertRedirect(route('worker.dashboard'));
 
         $this->assertAuthenticatedAs($user);
+        $this->assertTrue($user->fresh()->is_online);
     }
 
     public function test_users_can_not_authenticate_with_wrong_password(): void
@@ -200,6 +201,17 @@ class AuthTest extends TestCase
         $this->actingAs($user)->post(route('logout'))->assertRedirect(route('home'));
 
         $this->assertGuest();
+    }
+
+    public function test_workers_are_marked_offline_when_they_log_out(): void
+    {
+        $worker = User::factory()->worker()->online()->create();
+
+        $this->actingAs($worker)
+            ->post(route('logout'))
+            ->assertRedirect(route('home'));
+
+        $this->assertFalse($worker->fresh()->is_online);
     }
 
     public function test_guests_are_redirected_to_the_login_screen(): void

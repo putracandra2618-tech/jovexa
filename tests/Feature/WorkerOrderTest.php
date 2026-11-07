@@ -43,23 +43,6 @@ class WorkerOrderTest extends TestCase
             ->assertSee('1/'.WorkerOrderService::MAX_ACTIVE_ORDERS);
     }
 
-    public function test_worker_can_toggle_online_status(): void
-    {
-        $worker = User::factory()->worker()->create(['is_online' => false]);
-
-        $this->actingAs($worker)
-            ->patch(route('worker.availability'), ['is_online' => true])
-            ->assertSessionHas('success');
-
-        $this->assertTrue($worker->fresh()->is_online);
-
-        $this->actingAs($worker)
-            ->patch(route('worker.availability'), ['is_online' => false])
-            ->assertSessionHas('success');
-
-        $this->assertFalse($worker->fresh()->is_online);
-    }
-
     public function test_queue_only_lists_unclaimed_queued_orders(): void
     {
         $worker = User::factory()->worker()->online()->create();

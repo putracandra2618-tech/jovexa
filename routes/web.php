@@ -12,7 +12,6 @@ use App\Http\Controllers\OrderController as CustomerOrderController;
 use App\Http\Controllers\OrderPaymentController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TripayNotificationController;
-use App\Http\Controllers\Worker\AvailabilityController as WorkerAvailabilityController;
 use App\Http\Controllers\Worker\DashboardController as WorkerDashboardController;
 use App\Http\Controllers\Worker\OrderController as WorkerOrderController;
 use Illuminate\Support\Facades\Route;
@@ -57,7 +56,7 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
         Route::put('pengguna/{user}', [UserController::class, 'update'])->name('users.update');
         Route::post('pengguna/{user}/login-sebagai', [ImpersonationController::class, 'store'])->name('users.impersonate');
         Route::delete('pengguna/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-});
+    });
 
     Route::middleware(['auth'])->group(function () {
         Route::get('profil', [UserController::class, 'editProfile'])->name('profile.edit');
@@ -67,7 +66,6 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
 
 Route::middleware(['auth', 'role:'.UserRole::Worker->value])->prefix('worker')->name('worker.')->group(function (): void {
     Route::get('/', WorkerDashboardController::class)->name('dashboard');
-    Route::patch('status-online', WorkerAvailabilityController::class)->name('availability');
 
     Route::get('antrean', [WorkerOrderController::class, 'queue'])->name('queue.index');
     Route::get('pesanan', [WorkerOrderController::class, 'index'])->name('orders.index');

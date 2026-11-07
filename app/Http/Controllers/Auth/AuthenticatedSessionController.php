@@ -28,7 +28,13 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route($request->user()->role->homeRoute()));
+        $user = $request->user();
+
+        if ($user->isWorker()) {
+            $user->forceFill(['is_online' => true])->save();
+        }
+
+        return redirect()->intended(route($user->role->homeRoute()));
     }
 
     /**
@@ -36,6 +42,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        if ($user?->isWorker()) {
+            $user->forceFill(['is_online' => false])->save();
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

@@ -47,6 +47,20 @@ class ImpersonationTest extends TestCase
             ->assertRedirect(route('worker.dashboard'));
 
         $this->assertAuthenticatedAs($worker);
+        $this->assertTrue($worker->fresh()->is_online);
+    }
+
+    public function test_stopping_a_worker_impersonation_marks_the_worker_offline(): void
+    {
+        $superAdmin = User::factory()->superAdmin()->create();
+        $worker = User::factory()->worker()->create();
+
+        $this->actingAs($superAdmin)
+            ->post(route('admin.users.impersonate', $worker));
+
+        $this->post(route('impersonation.stop'));
+
+        $this->assertFalse($worker->fresh()->is_online);
     }
 
     public function test_regular_admin_cannot_impersonate_users(): void

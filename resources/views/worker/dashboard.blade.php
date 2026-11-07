@@ -36,27 +36,9 @@
                 </x-slot:actions>
 
                 @if (auth()->user()->is_online)
-                    <p class="status-card-copy">Kamu bisa mengambil pesanan baru dari antrean.</p>
-
-                    <form method="POST" action="{{ route('worker.availability') }}">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="is_online" value="0">
-                        <button type="submit" class="btn-custom btn-custom-light w-100">
-                            <i class="bi bi-pause-circle me-1"></i> Ubah ke Offline
-                        </button>
-                    </form>
+                    <p class="status-card-copy">Kamu bisa mengambil pesanan baru dari antrean. Status diperbarui otomatis saat masuk atau keluar akun.</p>
                 @else
-                    <p class="status-card-copy">Aktifkan online untuk mengambil pesanan baru.</p>
-
-                    <form method="POST" action="{{ route('worker.availability') }}">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="is_online" value="1">
-                        <button type="submit" class="btn-custom btn-custom-primary w-100">
-                            <i class="bi bi-play-circle me-1"></i> Ubah ke Online
-                        </button>
-                    </form>
+                    <p class="status-card-copy">Status kerja diperbarui otomatis berdasarkan sesi akun.</p>
                 @endif
             </x-card>
         </div>

@@ -40,6 +40,10 @@ class ImpersonationController extends Controller
             'started_at' => now(),
         ]);
 
+        if ($user->isWorker()) {
+            $user->forceFill(['is_online' => true])->save();
+        }
+
         Auth::login($user);
 
         $request->session()->put([
@@ -59,6 +63,12 @@ class ImpersonationController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $impersonatedUser = $request->user();
+
+        if ($impersonatedUser?->isWorker()) {
+            $impersonatedUser->forceFill(['is_online' => false])->save();
+        }
+
         $impersonatorId = $request->session()->get('impersonator_id');
 
         abort_unless($impersonatorId !== null, 403);
