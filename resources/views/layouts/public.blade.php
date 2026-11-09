@@ -142,6 +142,12 @@
                 </div>
             </div>
 
+            @if (request()->routeIs('home'))
+                <div class="jx-footer-wordmark" aria-hidden="true">
+                    <span>ENCHANT</span>
+                </div>
+            @endif
+
             <div class="jx-footer-bottom">
                 <span>&copy; {{ now()->year }} {{ config('app.name') }}. Seluruh hak dilindungi.</span>
                 <span>Pembayaran aman lewat Tripay.</span>

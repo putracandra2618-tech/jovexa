@@ -949,6 +949,27 @@
     font-weight: 500;
 }
 
+.playful .jx-footer-wordmark {
+    margin-top: 2.5rem;
+    overflow: hidden;
+    color: transparent;
+    font-size: clamp(4rem, 17vw, 17rem);
+    font-weight: 900;
+    letter-spacing: -0.1em;
+    line-height: 0.72;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.playful .jx-footer-wordmark span {
+    display: inline-block;
+    transform: translateY(0.12em);
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: clamp(1px, 0.16vw, 2px) var(--jx-line-strong);
+}
+
 .jx-footer-bottom {
     display: flex;
     flex-wrap: wrap;
@@ -966,6 +987,11 @@
     .jx-footer-grid {
         grid-template-columns: 1fr;
         gap: 1.75rem;
+    }
+
+    .playful .jx-footer-wordmark {
+        margin-top: 1.75rem;
+        font-size: clamp(3.5rem, 21vw, 7rem);
     }
 }
 
