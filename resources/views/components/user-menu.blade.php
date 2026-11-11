@@ -41,6 +41,14 @@
                     </span>
                 </li>
                 <li><hr class="dropdown-divider"></li>
+                @if (auth()->user()->isCustomer())
+                    <li>
+                        <a href="{{ route('customer.profile.edit') }}" class="dropdown-item">
+                            <i class="bi bi-person-gear me-2"></i> Profil Saya
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                @endif
                 @if (session()->has('impersonator_id'))
                     <li>
                         <form method="POST" action="{{ route('impersonation.stop') }}">

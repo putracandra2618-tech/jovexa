@@ -101,6 +101,9 @@ Route::middleware(['auth', 'role:'.UserRole::Customer->value])->prefix('dashboar
         ->middleware('throttle:uploads')
         ->name('orders.revision');
     Route::delete('pesanan/{order}', [CustomerOrderController::class, 'destroy'])->name('orders.destroy');
+    
+    Route::get('profil', [\App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profil', [\App\Http\Controllers\Customer\ProfileController::class, 'update'])->name('profile.update');
 });
 
 Route::middleware(['auth', 'role:'.UserRole::Customer->value])

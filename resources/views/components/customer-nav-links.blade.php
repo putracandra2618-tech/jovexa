@@ -5,6 +5,7 @@
         ['route' => 'customer.dashboard', 'pattern' => 'customer.dashboard', 'label' => 'Dashboard'],
         ['route' => 'customer.orders.index', 'pattern' => 'customer.orders.*', 'label' => 'Pesanan Saya'],
         ['route' => 'services.index', 'pattern' => 'services.*', 'label' => 'Katalog Jasa'],
+        ['route' => 'customer.profile.edit', 'pattern' => 'customer.profile.*', 'label' => 'Profil Saya'],
     ];
 
     $customerNavigation = array_values(array_filter(
