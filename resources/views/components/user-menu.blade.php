@@ -29,7 +29,7 @@
     @else
         <div class="dropdown">
             <button class="jx-user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                    aria-expanded="false" data-bs-offset="0,12">
                 <span class="jx-user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                 <span class="jx-user-name">{{ auth()->user()->name }}</span>
             </button>
