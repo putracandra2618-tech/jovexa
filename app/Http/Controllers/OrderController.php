@@ -160,6 +160,40 @@ class OrderController extends Controller
     }
 
     /**
+     * Let the customer request a revision after the work has been delivered.
+     *
+     * Allowed from Completed and Delivered statuses so the customer may push
+     * back before or after the final delivery step.
+     */
+    public function requestRevision(Request $request, Order $order): RedirectResponse
+    {
+        $this->authorizeOrderOwner($request, $order);
+
+        abort_unless(
+            $order->status->canTransitionTo(OrderStatus::Revision),
+            403,
+            'Revisi hanya bisa diminta saat hasil pengerjaan sudah dikirim.'
+        );
+
+        $request->validate([
+            'revision_note' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'revision_note.max' => 'Catatan revisi maksimal 1000 karakter.',
+        ]);
+
+        $note = $request->string('revision_note')->trim()->value();
+
+        $this->workflow->transitionTo(
+            $order,
+            OrderStatus::Revision,
+            $request->user(),
+            $note !== '' ? "Revisi diminta oleh customer: {$note}" : 'Revisi diminta oleh customer.',
+        );
+
+        return back()->with('success', 'Permintaan revisi berhasil dikirim. Tim kami akan segera menghubungi kamu.');
+    }
+
+    /**
      * Cancel an order that has not been delivered yet.
      */
     public function destroy(Request $request, Order $order): RedirectResponse

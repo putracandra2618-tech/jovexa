@@ -96,6 +96,39 @@
                             <p class="mb-0">Unduh file hasil pengerjaan di daftar lampiran di bawah.</p>
                         </div>
                     </div>
+
+                    @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Revision))
+                        <div class="mt-4 pt-3" style="border-top: 1.5px dashed var(--jx-line-strong);">
+                            <p class="page-subtitle mb-3">
+                                <i class="bi bi-pencil-square me-1"></i>
+                                Ada yang perlu diperbaiki? Ajukan permintaan revisi beserta catatanmu.
+                            </p>
+
+                            <form method="POST" action="{{ route('customer.orders.revision', $order) }}"
+                                  data-loading
+                                  data-confirm="Ajukan permintaan revisi untuk pesanan ini?">
+                                @csrf
+
+                                <div class="mb-3">
+                                    <label class="form-label-custom" for="revision_note">
+                                        Catatan Revisi <span class="text-muted fw-normal">(opsional)</span>
+                                    </label>
+                                    <textarea id="revision_note" name="revision_note" rows="3"
+                                              class="form-control-custom w-100"
+                                              placeholder="Jelaskan bagian mana yang perlu direvisi..."
+                                              maxlength="1000"
+                                              data-char-counter="1000">{{ old('revision_note') }}</textarea>
+                                    @error('revision_note')
+                                        <div class="form-feedback-custom text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <button type="submit" class="btn-custom btn-custom-warning">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Minta Revisi
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 @else
                     <p class="page-subtitle mb-0">
                         Kamu akan mendapat pembaruan status di halaman ini setiap ada progres.

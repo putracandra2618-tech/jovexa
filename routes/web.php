@@ -97,6 +97,9 @@ Route::middleware(['auth', 'role:'.UserRole::Customer->value])->prefix('dashboar
     Route::post('pesanan/{order}/lampiran', [CustomerOrderController::class, 'addRequirements'])
         ->middleware('throttle:uploads')
         ->name('orders.requirements');
+    Route::post('pesanan/{order}/revisi', [CustomerOrderController::class, 'requestRevision'])
+        ->middleware('throttle:uploads')
+        ->name('orders.revision');
     Route::delete('pesanan/{order}', [CustomerOrderController::class, 'destroy'])->name('orders.destroy');
 });
 

@@ -224,6 +224,70 @@ class CustomerOrderTest extends TestCase
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
     }
 
+    public function test_customer_can_request_revision_on_a_completed_order(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->completed()->create();
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Tolong perbaiki bagian kesimpulan dan tambahkan referensi.',
+            ])
+            ->assertRedirect();
+
+        $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
+
+        $history = $order->statusHistory()->latest()->first();
+        $this->assertStringContainsString('Tolong perbaiki bagian kesimpulan', $history->note);
+    }
+
+    public function test_customer_can_request_revision_on_a_delivered_order(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.revision', $order), [])
+            ->assertRedirect();
+
+        $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
+    }
+
+    public function test_customer_cannot_request_revision_while_order_is_in_progress(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.revision', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+    }
+
+    public function test_another_customer_cannot_request_revision_on_someone_elses_order(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+        $other = User::factory()->customer()->create();
+
+        $this->actingAs($other)
+            ->post(route('customer.orders.revision', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_revision_note_must_not_exceed_1000_characters(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+
+        $this->actingAs($order->user)
+            ->from(route('customer.orders.show', $order))
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => str_repeat('a', 1001),
+            ])
+            ->assertSessionHasErrors('revision_note');
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
     public function test_customer_can_upload_extra_files_only_while_waiting_for_response(): void
     {
         Storage::fake('local');

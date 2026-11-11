@@ -160,7 +160,7 @@ enum OrderStatus: string
         }
 
         if ($target === self::Revision) {
-            return in_array($this, [self::InProgress, self::Completed], strict: true);
+            return in_array($this, [self::InProgress, self::Completed, self::Delivered], strict: true);
         }
 
         return $this->next() === $target;
