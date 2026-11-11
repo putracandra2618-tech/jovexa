@@ -405,7 +405,7 @@ body.sidebar-minimized .sidebar-profile {
 .navbar-custom {
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 1040;
     background-color: rgba(244, 246, 245, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -636,6 +636,46 @@ body.sidebar-minimized .sidebar-profile {
     to {
         opacity: 1;
     }
+}
+
+@keyframes drawerSlideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes drawerSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+.offcanvas.jx-drawer.show {
+    animation: drawerSlideIn 0.3s ease forwards;
+}
+
+.offcanvas.jx-drawer.hiding {
+    animation: drawerSlideOut 0.3s ease forwards;
+}
+
+/* Fix user dropdown position and prevent closing issues for customer/public layout */
+.dropdown-menu[aria-labelledby*="jx-user-btn"] {
+    margin-top: 1rem !important;
+    transform: none !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 1050 !important;
 }
 
 
@@ -2141,9 +2181,14 @@ span.flatpickr-weekday {
     border-radius: var(--radius-xl) !important;
     box-shadow: var(--shadow-lg) !important;
     padding: 0.5rem 0 !important;
-    margin-top: 0.5rem !important;
+    margin-top: 1rem !important;
     border: none !important;
     animation: dropdownFadeIn 0.2s ease;
+    z-index: 1050 !important;
+    transform: none !important;
+    top: 100% !important;
+    right: 0 !important;
+    left: auto !important;
 }
 
 
@@ -3182,6 +3227,3 @@ span.flatpickr-weekday {
 .text-lime {
     color: var(--brand-lime) !important;
 }
-
-
-

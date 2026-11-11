@@ -157,6 +157,34 @@
 </div>
 
 <script src="{{ asset('vendor/spark/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        // Initialize all dropdowns to prevent unexpected closing for public layout
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cari semua dropdown yang ada di halaman
+            const allDropdowns = document.querySelectorAll('.dropdown');
+            allDropdowns.forEach(function(dropdown) {
+                const toggleBtn = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+                const dropdownMenu = dropdown.querySelector('.dropdown-menu');
+                
+                if (toggleBtn && dropdownMenu) {
+                    // Inisialisasi Bootstrap dropdown
+                    new bootstrap.Dropdown(toggleBtn);
+                    
+                    // Hentikan propagasi hanya pada dropdown itu sendiri
+                    toggleBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                    });
+                    
+                    dropdownMenu.addEventListener('click', function(e) {
+                        // Jangan hentikan propagasi untuk tombol yang seharusnya menutup dropdown (seperti logout)
+                        if (!e.target.closest('button[type="submit"]')) {
+                            e.stopPropagation();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 @stack('scripts')
 
 </body>
