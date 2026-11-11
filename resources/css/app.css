@@ -106,6 +106,17 @@
     color: var(--jx-green-hover);
 }
 
+.playful a .bi-arrow-right,
+.playful a .bi-chevron-right {
+    display: inline-block;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.playful a:hover .bi-arrow-right,
+.playful a:hover .bi-chevron-right {
+    transform: translateX(3px);
+}
+
 .playful ::selection {
     background-color: var(--jx-mint);
     color: var(--jx-ink);
@@ -146,7 +157,7 @@
     padding: 0.7rem 1.5rem;
     font-weight: 800;
     box-shadow: none;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .playful .btn-custom:hover {
@@ -154,7 +165,26 @@
 }
 
 .playful .btn-custom:active {
-    transform: scale(0.97);
+    transform: scale(0.96);
+}
+
+.playful .btn-custom i {
+    display: inline-block;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.playful .btn-custom:hover i {
+    transform: scale(1.12);
+}
+
+.playful .btn-custom:hover .bi-arrow-right,
+.playful .btn-custom:hover .bi-chevron-right {
+    transform: translateX(3px);
+}
+
+.playful .btn-custom:hover .bi-arrow-left,
+.playful .btn-custom:hover .bi-chevron-left {
+    transform: translateX(-3px);
 }
 
 .playful .btn-custom:focus-visible {
@@ -394,10 +424,26 @@
    6. Lencana status
 --------------------------------------------------------------------- */
 .playful .badge-table {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 0.3rem 0.75rem;
     font-size: 0.78rem;
     font-weight: 800;
     letter-spacing: 0;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.playful .badge-table:hover {
+    transform: scale(1.05);
+}
+
+.playful .badge-table::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
 }
 
 .playful .badge-table.success {
@@ -416,6 +462,7 @@
 
 .playful .badge-table.pending::before {
     background-color: var(--jx-mango);
+    animation: jxBadgeDotPulse 1.8s ease-in-out infinite;
 }
 
 .playful .badge-table.failed {
@@ -425,6 +472,17 @@
 
 .playful .badge-table.failed::before {
     background-color: var(--jx-coral);
+}
+
+@keyframes jxBadgeDotPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.45;
+    }
 }
 
 /* ---------------------------------------------------------------------
@@ -487,7 +545,7 @@
     font-size: 0.95rem;
     background-color: var(--jx-surface);
     color: var(--jx-ink);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1), transform 0.15s ease;
 }
 
 .playful .form-control-custom::placeholder {
@@ -497,7 +555,7 @@
 .playful .form-control-custom:focus,
 .playful .form-select-custom:focus {
     border-color: var(--jx-mint-strong);
-    box-shadow: 0 0 0 4px rgba(191, 246, 195, 0.5);
+    box-shadow: 0 0 0 4px rgba(191, 246, 195, 0.55);
     outline: 0;
 }
 
@@ -519,20 +577,30 @@
 .playful .form-check-input-custom[type="checkbox"] {
     border-radius: 7px;
     border-width: 1.5px;
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .playful .form-check-input-custom[type="checkbox"]:checked {
     background-color: var(--jx-mint);
     border-color: var(--jx-green);
+    animation: jxCheckPop 0.22s var(--jx-ease-bounce);
 }
 
 .playful .form-check-input-custom[type="radio"] {
     border-width: 1.5px;
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .playful .form-check-input-custom[type="radio"]:checked {
     background-color: var(--jx-mint);
     border-color: var(--jx-green);
+    animation: jxCheckPop 0.22s var(--jx-ease-bounce);
+}
+
+@keyframes jxCheckPop {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
 }
 
 .playful .form-switch-input-custom {
@@ -1542,6 +1610,11 @@
     font-size: 1.35rem;
     color: var(--jx-ink);
     border-radius: 20px 14px 18px 12px;
+    transition: transform 0.25s var(--jx-ease-bounce);
+}
+
+.jx-service-card:hover .jx-service-icon {
+    transform: scale(1.1) rotate(-4deg);
 }
 
 .jx-service-duration {
@@ -1851,11 +1924,57 @@
     border: 1.5px solid var(--jx-line-strong);
     border-radius: var(--jx-radius-pill);
     text-decoration: none;
+    transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .playful .jx-user-btn:hover {
     color: var(--jx-ink);
     border-color: var(--jx-mint);
+    transform: translateY(-1px);
+    box-shadow: var(--jx-shadow-sm);
+}
+
+.playful .jx-user-btn:active {
+    transform: scale(0.97);
+}
+
+.playful .dropdown-menu {
+    border-radius: var(--jx-radius-md);
+    border: 1.5px solid var(--jx-line-strong);
+    box-shadow: var(--jx-shadow);
+    padding: 0.5rem;
+    background-color: var(--jx-surface);
+}
+
+.playful .dropdown-menu.show {
+    animation: jxDropdownPop 0.22s var(--jx-ease-bounce) both;
+    transform-origin: top right;
+}
+
+@keyframes jxDropdownPop {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.playful .dropdown-item {
+    border-radius: var(--jx-radius-sm);
+    padding: 0.55rem 0.9rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--jx-ink);
+    transition: background-color 0.15s ease, padding-left 0.15s ease, color 0.15s ease;
+}
+
+.playful .dropdown-item:hover {
+    background-color: var(--jx-mint-soft);
+    color: var(--jx-green);
+    padding-left: 1.15rem;
 }
 
 .jx-avatar {
@@ -2282,16 +2401,24 @@
     border: 2px solid var(--jx-line);
     border-radius: var(--jx-radius-md);
     cursor: pointer;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s var(--jx-ease-bounce), box-shadow 0.2s ease;
 }
 
 .jx-pay-option:hover {
+    transform: translateY(-2px);
     border-color: var(--jx-mint-strong);
+    box-shadow: var(--jx-shadow-sm);
+}
+
+.jx-pay-option:active {
+    transform: scale(0.98);
 }
 
 .jx-pay-option:has(input:checked) {
     background-color: var(--jx-mint-soft);
     border-color: var(--jx-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(31, 122, 77, 0.12);
 }
 
 .jx-pay-option input {
