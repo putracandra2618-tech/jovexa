@@ -168,14 +168,6 @@ class OrderController extends Controller
     }
 
     /**
-     * Show the form to deliver the finished work.
-     */
-    public function deliver(Order $order): View
-    {
-        return $this->showDeliverForm($order);
-    }
-
-    /**
      * Attach a result file to an order.
      */
     public function storeResult(Request $request, Order $order): RedirectResponse
@@ -189,6 +181,26 @@ class OrderController extends Controller
     public function sendToCustomer(Request $request, Order $order): RedirectResponse
     {
         return $this->sendOrderToCustomer($request, $order);
+    }
+
+    /**
+     * Delete a result file from an order.
+     */
+    public function destroyFile(Request $request, Order $order, OrderFile $file): RedirectResponse
+    {
+        $this->ensureCanManageOrder($order);
+        
+        // Pastikan file yang dihapus adalah file hasil (result) dan bukan file dari customer
+        if ($file->order_id !== $order->id || !$file->isResult()) {
+            abort(403, 'Anda tidak memiliki izin untuk menghapus file ini.');
+        }
+        
+        // Hapus file dari storage dan database
+        $file->delete();
+        
+        return redirect()
+            ->route('worker.orders.show', $order)
+            ->with('success', 'File berhasil dihapus. Anda dapat mengunggah file baru jika diperlukan.');
     }
 
     /**

@@ -74,10 +74,10 @@ Route::middleware(['auth', 'role:'.UserRole::Worker->value])->prefix('worker')->
     Route::post('pesanan/{order}/klaim', [WorkerOrderController::class, 'claim'])->name('orders.claim');
     Route::patch('pesanan/{order}/status', [WorkerOrderController::class, 'updateStatus'])->name('orders.status');
     Route::post('pesanan/{order}/minta-informasi', [WorkerOrderController::class, 'requestInformation'])->name('orders.information');
-    Route::get('pesanan/{order}/selesai', [WorkerOrderController::class, 'deliver'])->name('orders.deliver');
     Route::post('pesanan/{order}/hasil', [WorkerOrderController::class, 'storeResult'])->name('orders.result.store');
     Route::post('pesanan/{order}/kirim', [WorkerOrderController::class, 'sendToCustomer'])->name('orders.send');
     Route::get('pesanan/{order}/file/{file}', [WorkerOrderController::class, 'download'])->name('orders.file');
+    Route::delete('pesanan/{order}/file/{file}', [WorkerOrderController::class, 'destroyFile'])->name('orders.file.destroy');
 });
 
 Route::middleware('auth')

@@ -37,14 +37,39 @@
                                         </small>
                                     </div>
                                 </div>
-
-                                <a href="{{ route('worker.orders.file', [$order, $file]) }}"
-                                   class="btn-custom btn-custom-light btn-custom-sm">
-                                    <i class="bi bi-download me-1"></i> Unduh
-                                </a>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ route('worker.orders.file', [$order, $file]) }}"
+                                       class="btn-custom btn-custom-light btn-custom-sm">
+                                        <i class="bi bi-download me-1"></i> Unduh
+                                    </a>
+                                    @if($file->isResult() && in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], strict: true))
+                                        <form method="POST" action="{{ route('worker.orders.file.destroy', [$order, $file]) }}"
+                                              data-confirm="Yakin ingin menghapus file ini? File yang dihapus tidak dapat dikembalikan.">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-custom btn-custom-danger btn-custom-sm">
+                                                <i class="bi bi-trash me-1"></i> Hapus
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </li>
                         @endforeach
                     </ul>
+                @endif
+
+                @if(in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], strict: true))
+                    <hr class="my-4">
+                    <h5 class="mb-3">Unggah File Hasil</h5>
+                    <form method="POST" action="{{ route('worker.orders.result.store', $order) }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <input type="file" name="result" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn-custom btn-custom-primary">
+                            <i class="bi bi-cloud-arrow-up me-1"></i> Unggah
+                        </button>
+                    </form>
                 @endif
             </x-card>
 
@@ -118,11 +143,6 @@
                 @endif
 
                 @if ($order->status === OrderStatus::Completed)
-                    <a href="{{ route('worker.orders.deliver', $order) }}"
-                       class="btn-custom btn-custom-primary w-100 mt-2">
-                        <i class="bi bi-cloud-arrow-up me-1"></i> Unggah Hasil
-                    </a>
-
                     <form method="POST" action="{{ route('worker.orders.send', $order) }}" class="mt-2"
                           data-confirm="Kirim hasil pekerjaan ke customer?">
                         @csrf
