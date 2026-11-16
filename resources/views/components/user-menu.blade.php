@@ -10,6 +10,13 @@
             </span>
         </div>
 
+        @if (auth()->user()->isCustomer())
+            <a href="{{ route('customer.profile.edit') }}" class="btn-custom btn-custom-light w-100 mb-2"
+               data-bs-dismiss="offcanvas" @if ($drawerId) data-bs-target="#{{ $drawerId }}" @endif>
+                <i class="bi bi-person-gear me-2"></i> Profil Saya
+            </a>
+        @endif
+
         @if (session()->has('impersonator_id'))
             <form method="POST" action="{{ route('impersonation.stop') }}" class="mb-2">
                 @csrf
