@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('checkout', fn (Request $request): Limit => Limit::perMinute(10)
             ->by((string) $request->user()?->getKey() ?: $request->ip()));
 
-        RateLimiter::for('register', fn (Request $request): Limit => Limit::perHour(5)
+        RateLimiter::for('register', fn (Request $request): Limit => Limit::perMinute(5)
             ->by($request->ip()));
 
         RateLimiter::for('password-email', fn (Request $request): Limit => Limit::perMinute(5)

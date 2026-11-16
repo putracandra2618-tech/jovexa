@@ -14,8 +14,8 @@
                 <input type="text" id="name" name="name"
                        value="{{ old('name') }}"
                        class="login-input @error('name') is-invalid-custom @enderror"
-                       placeholder="Nama sesuai identitas"
-                       autocomplete="name" autofocus required>
+                       placeholder="Nama lengkap sesuai identitas"
+                       autocomplete="name" autofocus required minlength="2" maxlength="255">
             </div>
             @error('name')
                 <div class="form-feedback-custom invalid-custom">
@@ -34,6 +34,9 @@
                        placeholder="nama@email.com"
                        autocomplete="username" required>
             </div>
+            <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">
+                Gunakan email aktif untuk verifikasi dan informasi pesanan Anda.
+            </small>
             @error('email')
                 <div class="form-feedback-custom invalid-custom">
                     <i class="bi bi-exclamation-circle-fill"></i> {{ $message }}
@@ -42,7 +45,7 @@
         </div>
 
         <div class="login-form-group">
-            <label for="phone" class="login-form-label">Nomor WhatsApp <span class="text-muted">(opsional)</span></label>
+            <label for="phone" class="login-form-label">Nomor WhatsApp <span class="text-muted fw-normal">(opsional)</span></label>
             <div class="login-input-group">
                 <i class="bi bi-phone input-icon"></i>
                 <input type="tel" id="phone" name="phone"
@@ -51,6 +54,9 @@
                        placeholder="08123456789"
                        autocomplete="tel">
             </div>
+            <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">
+                Format angka (min. 8 digit). Mempermudah komunikasi update pengerjaan.
+            </small>
             @error('phone')
                 <div class="form-feedback-custom invalid-custom">
                     <i class="bi bi-exclamation-circle-fill"></i> {{ $message }}
@@ -65,12 +71,15 @@
                 <input type="password" id="password" name="password"
                        class="login-input login-input-password @error('password') is-invalid-custom @enderror"
                        placeholder="Minimal 8 karakter"
-                       autocomplete="new-password" required>
+                       autocomplete="new-password" required minlength="8">
                 <button type="button" class="password-toggle-btn" data-password-toggle="password"
                         aria-label="Tampilkan password">
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
+            <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">
+                Minimal 8 karakter (disarankan kombinasi huruf & angka).
+            </small>
             @error('password')
                 <div class="form-feedback-custom invalid-custom">
                     <i class="bi bi-exclamation-circle-fill"></i> {{ $message }}
@@ -92,10 +101,17 @@
             <div class="login-input-group">
                 <i class="bi bi-shield-check input-icon"></i>
                 <input type="password" id="password_confirmation" name="password_confirmation"
-                       class="login-input"
-                       placeholder="Ulangi password"
-                       autocomplete="new-password" required>
+                       class="login-input login-input-password"
+                       placeholder="Ketik ulang password yang sama"
+                       autocomplete="new-password" required minlength="8">
+                <button type="button" class="password-toggle-btn" data-password-toggle="password_confirmation"
+                        aria-label="Tampilkan konfirmasi password">
+                    <i class="bi bi-eye"></i>
+                </button>
             </div>
+            <small class="text-muted d-block mt-1" style="font-size: 0.78rem;">
+                Ketik ulang password untuk memastikan tidak ada salah ketik.
+            </small>
         </div>
 
         <button type="submit" class="btn-login">

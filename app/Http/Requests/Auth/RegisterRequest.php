@@ -25,7 +25,7 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'min:2', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'min:8', 'max:20', 'regex:/^[0-9+\-\s]+$/'],
             'password' => ['required', 'confirmed', Password::min(8)],
@@ -37,12 +37,17 @@ class RegisterRequest extends FormRequest
      *
      * A browser submits an untouched optional input as an empty string, which
      * would otherwise fail the length rules instead of being treated as absent.
+     * Trimming prevents accidental trailing/leading whitespace errors.
      */
     protected function prepareForValidation(): void
     {
-        if ($this->input('phone') === '') {
-            $this->merge(['phone' => null]);
-        }
+        $phone = trim((string) $this->input('phone', ''));
+
+        $this->merge([
+            'name' => trim((string) $this->input('name', '')),
+            'email' => trim((string) $this->input('email', '')),
+            'phone' => $phone === '' ? null : $phone,
+        ]);
     }
 
     /**
@@ -61,12 +66,19 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
-            'email.unique' => 'Email ini sudah terdaftar. Silakan masuk.',
-            'phone.regex' => 'Nomor telepon hanya boleh berisi angka, spasi, tanda + atau -.',
-            'phone.min' => 'Nomor telepon minimal 8 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'name.min' => 'Nama minimal 2 karakter.',
+            'name.max' => 'Nama maksimal 255 karakter.',
+            'email.required' => 'Alamat email wajib diisi.',
+            'email.email' => 'Format email tidak valid (contoh: nama@email.com).',
+            'email.max' => 'Alamat email maksimal 255 karakter.',
+            'email.unique' => 'Email ini sudah terdaftar. Silakan gunakan email lain atau masuk.',
+            'phone.regex' => 'Nomor WhatsApp hanya boleh berisi angka, spasi, tanda + atau -.',
+            'phone.min' => 'Nomor WhatsApp minimal 8 digit.',
+            'phone.max' => 'Nomor WhatsApp maksimal 20 digit.',
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok dengan password di atas.',
         ];
     }
 }
