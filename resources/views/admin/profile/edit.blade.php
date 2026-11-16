@@ -6,7 +6,7 @@
 
 @section('content')
     <x-card>
-        <form method="POST" action="{{ route('profile.update') }}" class="needs-validation">
+        <form method="POST" action="{{ route('admin.profile.update') }}" class="needs-validation">
             @csrf
             @method('PATCH')
 
@@ -29,20 +29,18 @@
                 />
             </div>
 
-            {{-- Field password lama hanya muncul jika user ingin mengganti password --}}
-            @if (request()->filled('password'))
-                <div class="mb-3">
-                    <x-form.input
-                        label="Password Lama"
-                        name="old_password"
-                        type="password"
-                        autocomplete="current-password"
-                    />
-                </div>
-            @endif
+            <div class="mb-3">
+                <x-form.input
+                    label="Password Lama"
+                    name="old_password"
+                    type="password"
+                    :hint="'Wajib diisi jika ingin mengganti password.'"
+                    autocomplete="current-password"
+                />
+            </div>
 
             <div class="d-flex justify-content-end gap-2">
-                <a href="{{ route('dashboard') }}" class="btn-custom btn-custom-light">Batal</a>
+                <a href="{{ route('admin.dashboard') }}" class="btn-custom btn-custom-light">Batal</a>
                 <button type="submit" class="btn-custom btn-custom-save">
                     <i class="bi bi-check-lg me-1"></i> Simpan Perubahan
                 </button>

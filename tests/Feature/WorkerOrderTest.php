@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\OrderStatus;
 use App\Models\Order;
+use App\Models\OrderFile;
 use App\Models\User;
 use App\Services\WorkerOrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -202,10 +203,6 @@ class WorkerOrderTest extends TestCase
         $completed = Order::factory()->completed()->assignedTo($worker)->create();
 
         $this->actingAs($worker)
-            ->get(route('worker.orders.deliver', $completed))
-            ->assertOk();
-
-        $this->actingAs($worker)
             ->post(route('worker.orders.result.store', $completed), [
                 'result' => UploadedFile::fake()->create('hasil.pdf', 100, 'application/pdf'),
             ])
@@ -249,5 +246,39 @@ class WorkerOrderTest extends TestCase
             ->assertSee($delivered->order_number)
             ->assertDontSee($active->order_number)
             ->assertDontSee($other->order_number);
+    }
+
+    public function test_worker_can_delete_a_result_file_and_remove_it_from_storage(): void
+    {
+        Storage::fake('local');
+
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->completed()->assignedTo($worker)->create();
+        $file = OrderFile::factory()->result()->stored()->for($order)->create();
+
+        Storage::disk('local')->assertExists($file->file_path);
+
+        $this->actingAs($worker)
+            ->delete(route('worker.orders.file.destroy', [$order, $file]))
+            ->assertRedirect(route('worker.orders.show', $order));
+
+        $this->assertDatabaseMissing('order_files', ['id' => $file->getKey()]);
+        Storage::disk('local')->assertMissing($file->file_path);
+    }
+
+    public function test_worker_cannot_delete_a_result_file_after_delivery(): void
+    {
+        Storage::fake('local');
+
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->delivered()->assignedTo($worker)->create();
+        $file = OrderFile::factory()->result()->stored()->for($order)->create();
+
+        $this->actingAs($worker)
+            ->delete(route('worker.orders.file.destroy', [$order, $file]))
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('order_files', ['id' => $file->getKey()]);
+        Storage::disk('local')->assertExists($file->file_path);
     }
 }

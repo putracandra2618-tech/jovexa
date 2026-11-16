@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Order files are streamed through authorized controllers, so the
+            // framework's signed /storage/{path} GET/PUT routes stay disabled.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

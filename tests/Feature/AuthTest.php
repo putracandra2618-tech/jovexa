@@ -232,6 +232,17 @@ class AuthTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class);
     }
 
+    public function test_password_reset_request_does_not_reveal_unknown_emails(): void
+    {
+        Notification::fake();
+
+        $this->post(route('password.email'), ['email' => 'tidak-ada@example.test'])
+            ->assertSessionHas('success')
+            ->assertSessionHasNoErrors();
+
+        Notification::assertNothingSent();
+    }
+
     public function test_password_can_be_reset_with_a_valid_token(): void
     {
         $user = User::factory()->create();

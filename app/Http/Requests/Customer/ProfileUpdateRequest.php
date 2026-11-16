@@ -22,13 +22,24 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $userId = auth()->id();
-        
+        $user = $this->user();
+        $userId = $user?->getKey();
+
+        $emailChanged = $user !== null
+            && strcasecmp((string) $this->input('email'), (string) $user->email) !== 0;
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'old_password' => ['nullable', 'string', 'min:8', 'required_with:password'],
+            'old_password' => [
+                'nullable',
+                'string',
+                'min:8',
+                // Changing the email is just as sensitive as changing the
+                // password: both require proof of the current password.
+                Rule::requiredIf($emailChanged || filled($this->input('password'))),
+            ],
         ];
     }
 
@@ -61,7 +72,7 @@ class ProfileUpdateRequest extends FormRequest
             'email.unique' => 'Email sudah digunakan oleh akun lain.',
             'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'old_password.required' => 'Password lama wajib diisi saat mengganti password.',
+            'old_password.required' => 'Password lama wajib diisi saat mengganti email atau password.',
         ];
     }
 }

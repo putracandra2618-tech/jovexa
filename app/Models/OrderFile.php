@@ -21,6 +21,14 @@ class OrderFile extends Model
     public const KIND_RESULT = 'result';
 
     /**
+     * The total number of requirement files one order may hold.
+     *
+     * Customers may add files over several requests while the order waits, so
+     * the per-request limit alone would still allow unlimited uploads.
+     */
+    public const MAX_REQUIREMENT_FILES = 20;
+
+    /**
      * Extensions accepted for both requirement and result uploads.
      *
      * @var list<string>

@@ -41,7 +41,7 @@
                     label="Password Lama"
                     name="old_password"
                     type="password"
-                    :hint="'Wajib diisi jika ingin mengubah password.'"
+                    :hint="'Wajib diisi jika ingin mengubah email atau password.'"
                     autocomplete="current-password"
                 />
             </div>

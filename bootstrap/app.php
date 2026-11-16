@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\SecureHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,7 +17,27 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->trustProxies(at: '*');
+        // TrustProxies reads config('trustedproxy.proxies') itself, so the
+        // TRUSTED_PROXIES allow-list is the single source of truth.
+        $middleware->trustHosts(at: static function (): array {
+            $hosts = [
+                '^localhost$',
+                '^127\.0\.0\.1$',
+                '^\[::1\]$',
+                '^jovexa\.test$',
+                '^(.+\.)?ngrok-free\.(dev|app)$',
+            ];
+
+            $configuredHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+
+            if (is_string($configuredHost) && $configuredHost !== '') {
+                $hosts[] = '^(.+\.)?'.preg_quote($configuredHost, '/').'$';
+            }
+
+            return $hosts;
+        }, subdomains: false);
+
+        $middleware->append(SecureHeaders::class);
 
         $middleware->alias([
             'role' => EnsureUserHasRole::class,

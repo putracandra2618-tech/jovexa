@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
@@ -24,7 +23,7 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'old_password' => ['nullable', 'string', 'min:8'],
+            'old_password' => ['nullable', 'string', 'min:8', 'required_with:password'],
         ];
     }
 

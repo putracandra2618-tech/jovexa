@@ -251,15 +251,15 @@ class CustomerOrderTest extends TestCase
         $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
     }
 
-    public function test_customer_cannot_request_revision_while_order_is_in_progress(): void
+    public function test_customer_can_request_revision_while_order_is_in_progress(): void
     {
         $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
 
         $this->actingAs($order->user)
             ->post(route('customer.orders.revision', $order))
-            ->assertForbidden();
+            ->assertRedirect();
 
-        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+        $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
     }
 
     public function test_another_customer_cannot_request_revision_on_someone_elses_order(): void
@@ -426,5 +426,30 @@ class CustomerOrderTest extends TestCase
             ->get(route('customer.dashboard'))
             ->assertOk()
             ->assertSee('Pesanan Aktif');
+    }
+
+    public function test_customer_cannot_exceed_the_requirement_attachment_quota(): void
+    {
+        Storage::fake('local');
+
+        $customer = User::factory()->customer()->create();
+        $order = Order::factory()->for($customer)->waitingCustomer()->create();
+
+        OrderFile::factory()
+            ->requirement()
+            ->count(OrderFile::MAX_REQUIREMENT_FILES)
+            ->for($order)
+            ->create(['uploaded_by' => $customer->getKey()]);
+
+        $this->actingAs($customer)
+            ->post(route('customer.orders.requirements', $order), [
+                'requirements' => [UploadedFile::fake()->create('tambahan.pdf', 50, 'application/pdf')],
+            ])
+            ->assertSessionHasErrors('requirements');
+
+        $this->assertSame(
+            OrderFile::MAX_REQUIREMENT_FILES,
+            $order->requirements()->count(),
+        );
     }
 }

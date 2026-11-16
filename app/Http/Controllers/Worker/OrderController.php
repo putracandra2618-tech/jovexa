@@ -14,6 +14,7 @@ use App\Services\OrderWorkflow;
 use App\Services\WorkerOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -189,15 +190,25 @@ class OrderController extends Controller
     public function destroyFile(Request $request, Order $order, OrderFile $file): RedirectResponse
     {
         $this->ensureCanManageOrder($order);
-        
+
         // Pastikan file yang dihapus adalah file hasil (result) dan bukan file dari customer
-        if ($file->order_id !== $order->id || !$file->isResult()) {
+        if ($file->order_id !== $order->id || ! $file->isResult()) {
             abort(403, 'Anda tidak memiliki izin untuk menghapus file ini.');
         }
-        
-        // Hapus file dari storage dan database
+
+        // Hasil yang sudah dikirim ke customer adalah arsip serah-terima.
+        abort_if(
+            $order->status === OrderStatus::Delivered,
+            403,
+            'File hasil tidak bisa dihapus setelah pesanan dikirim ke customer.',
+        );
+
+        $path = $file->file_path;
+
         $file->delete();
-        
+
+        Storage::disk('local')->delete($path);
+
         return redirect()
             ->route('worker.orders.show', $order)
             ->with('success', 'File berhasil dihapus. Anda dapat mengunggah file baru jika diperlukan.');

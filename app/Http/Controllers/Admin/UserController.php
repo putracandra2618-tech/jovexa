@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -143,14 +144,14 @@ class UserController extends Controller
     /**
      * Update the user's profile password.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function updateProfile(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = auth()->user();
 
         if ($request->password) {
-            if (!Hash::check($request->old_password, $user->password)) {
+            if (! Hash::check($request->old_password, $user->password)) {
                 return back()->with('error', 'Password lama salah.');
             }
 
@@ -158,7 +159,7 @@ class UserController extends Controller
             $user->save();
 
             return redirect()
-                ->route('profile.edit')
+                ->route('admin.profile.edit')
                 ->with('success', 'Password berhasil diubah.');
         }
 

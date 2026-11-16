@@ -27,10 +27,13 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        $status = Password::sendResetLink($request->only('email'));
+        Password::sendResetLink($request->only('email'));
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', __($status))
-            : back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
+        // Always answer with the same message so the endpoint cannot be used to
+        // discover which email addresses have an account.
+        return back()->with(
+            'success',
+            'Jika email tersebut terdaftar, tautan reset password sudah dikirim.',
+        );
     }
 }

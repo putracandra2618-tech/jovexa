@@ -18,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -146,6 +147,14 @@ class OrderController extends Controller
             'requirements.*.max' => 'Setiap file maksimal 10 MB.',
             'requirements.*.mimes' => 'Format lampiran tidak didukung. Gunakan dokumen, gambar, atau arsip.',
         ]);
+
+        $incoming = count($request->file('requirements', []));
+
+        if ($order->requirements()->count() + $incoming > OrderFile::MAX_REQUIREMENT_FILES) {
+            throw ValidationException::withMessages([
+                'requirements' => 'Jumlah lampiran per pesanan maksimal '.OrderFile::MAX_REQUIREMENT_FILES.' file.',
+            ]);
+        }
 
         $this->storeRequirements($order, $request);
 
