@@ -139,14 +139,14 @@ DB_DATABASE=jovexa
 DB_USERNAME=root
 DB_PASSWORD=
 
-# Kredensial Akun Bawaan (Diperlukan untuk seeding awal)
+# Kredensial Akun Awal (Wajib diisi di .env lokal sebelum seeding)
 ADMIN_NAME="Admin Jovexa"
 ADMIN_EMAIL=admin@jovexa.test
-ADMIN_PASSWORD=password_admin_kuat
+ADMIN_PASSWORD=
 
 SUPER_ADMIN_NAME="Putra Candra"
-SUPER_ADMIN_EMAIL=superadmin@jovexa.test
-SUPER_ADMIN_PASSWORD=password_superadmin_kuat
+SUPER_ADMIN_EMAIL=
+SUPER_ADMIN_PASSWORD=
 
 # Integrasi Payment Gateway Tripay
 TRIPAY_API_KEY=your_tripay_api_key
