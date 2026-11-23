@@ -20,9 +20,16 @@
                 'items' => array_values(array_filter([
                     ['route' => 'admin.dashboard', 'pattern' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'bi-grid-fill'],
                     ['route' => 'admin.services.index', 'pattern' => 'admin.services.*', 'label' => 'Kelola Jasa', 'icon' => 'bi-box-seam'],
-                    ['route' => 'admin.orders.index', 'pattern' => 'admin.orders.*', 'label' => 'Daftar Pesanan', 'icon' => 'bi-briefcase'],
-                    ['route' => 'admin.orders.revision', 'pattern' => 'admin.orders.revision', 'label' => 'Pesanan Revisi', 'icon' => 'bi-arrow-repeat'],
-                    ['route' => 'admin.orders.history', 'pattern' => 'admin.orders.history', 'label' => 'Riwayat Pesanan', 'icon' => 'bi-clock-history'],
+                    [
+                        'route' => 'admin.orders.index',
+                        'label' => 'Pesanan',
+                        'icon' => 'bi-briefcase',
+                        'children' => array_values(array_filter([
+                            ['route' => 'admin.orders.index', 'pattern' => 'admin.orders.index', 'label' => 'Daftar Pesanan', 'icon' => 'bi-list-ul'],
+                            ['route' => 'admin.orders.revision', 'pattern' => 'admin.orders.revision', 'label' => 'Pesanan Revisi', 'icon' => 'bi-arrow-repeat'],
+                            ['route' => 'admin.orders.history', 'pattern' => 'admin.orders.history', 'label' => 'Riwayat Pesanan', 'icon' => 'bi-clock-history'],
+                        ])),
+                    ],
                     $user?->isSuperAdmin()
                         ? ['route' => 'admin.users.index', 'pattern' => 'admin.users.*', 'label' => 'Kelola Pengguna', 'icon' => 'bi-people']
                         : null,
@@ -52,14 +59,45 @@
                 <div class="sidebar-menu-title">{{ $group['label'] }}</div>
                 <ul class="sidebar-menu-list">
                     @foreach ($group['items'] as $item)
-                        <li class="sidebar-menu-item">
-                            <a href="{{ route($item['route']) }}"
-                               class="sidebar-menu-link {{ request()->routeIs($item['pattern']) ? 'active' : '' }}"
-                               title="{{ $item['label'] }}">
-                                <i class="bi {{ $item['icon'] }}"></i>
-                                <span>{{ $item['label'] }}</span>
-                            </a>
-                        </li>
+                        @if (isset($item['children']) && $item['children'] !== [])
+                            @php
+                                $submenuId = 'submenu-' . str_replace('.', '-', $item['route']);
+                                $hasActiveChild = collect($item['children'])
+                                    ->contains(fn (array $child): bool => request()->routeIs($child['pattern']));
+                            @endphp
+                            <li class="sidebar-menu-item">
+                                <a href="#"
+                                   class="sidebar-menu-link {{ $hasActiveChild ? 'active' : '' }}"
+                                   data-bs-toggle="collapse"
+                                   data-bs-target="#{{ $submenuId }}"
+                                   aria-expanded="{{ $hasActiveChild ? 'true' : 'false' }}">
+                                    <i class="bi {{ $item['icon'] }}"></i>
+                                    <span>{{ $item['label'] }}</span>
+                                    <i class="bi bi-chevron-down dropdown-caret"></i>
+                                </a>
+                                <ul class="sidebar-submenu collapse {{ $hasActiveChild ? 'show' : '' }}" id="{{ $submenuId }}">
+                                    @foreach ($item['children'] as $child)
+                                        <li>
+                                            <a href="{{ route($child['route']) }}"
+                                               class="sidebar-menu-link {{ request()->routeIs($child['pattern']) ? 'active' : '' }}"
+                                               title="{{ $child['label'] }}">
+                                                <i class="bi {{ $child['icon'] }}"></i>
+                                                <span>{{ $child['label'] }}</span>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            <li class="sidebar-menu-item">
+                                <a href="{{ route($item['route']) }}"
+                                   class="sidebar-menu-link {{ request()->routeIs($item['pattern']) ? 'active' : '' }}"
+                                   title="{{ $item['label'] }}">
+                                    <i class="bi {{ $item['icon'] }}"></i>
+                                    <span>{{ $item['label'] }}</span>
+                                </a>
+                            </li>
+                        @endif
                     @endforeach
                 </ul>
             </div>
