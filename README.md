@@ -139,15 +139,6 @@ DB_DATABASE=jovexa
 DB_USERNAME=root
 DB_PASSWORD=
 
-# Kredensial Akun Awal (Wajib diisi di .env lokal sebelum seeding)
-ADMIN_NAME="Admin Jovexa"
-ADMIN_EMAIL=admin@jovexa.test
-ADMIN_PASSWORD=
-
-SUPER_ADMIN_NAME="Putra Candra"
-SUPER_ADMIN_EMAIL=
-SUPER_ADMIN_PASSWORD=
-
 # Integrasi Payment Gateway Tripay
 TRIPAY_API_KEY=your_tripay_api_key
 TRIPAY_MERCHANT_CODE=your_merchant_code
@@ -161,7 +152,19 @@ TRIPAY_EXPIRY_MINUTES=1440
 php artisan key:generate
 php artisan migrate --seed
 ```
-*Perintah di atas akan mengeksekusi migrasi tabel dan seeding data awal (Lookup data, Service katalog, Akun Admin, dan Akun Super Admin).*
+*Perintah di atas mengeksekusi migrasi tabel dan seeding data awal (lookup data dan katalog jasa). Seeder Admin/Super Admin sengaja dilewati agar tidak ada password default yang tersimpan di `.env`.*
+
+Pada instalasi baru, buat akun privileged sekali saja dengan kredensial sementara yang diberikan langsung ke proses — **jangan ditulis ke `.env`**:
+
+```bash
+ADMIN_EMAIL=admin@jovexa.test ADMIN_PASSWORD='password-kuat' \
+  php artisan db:seed --class=AdminSeeder
+
+SUPER_ADMIN_EMAIL=superadmin@jovexa.test SUPER_ADMIN_PASSWORD='password-kuat' \
+  php artisan db:seed --class=SuperAdminSeeder
+```
+
+Gunakan `--class` agar `ServiceSeeder` tidak dijalankan ulang dan menimpa perubahan katalog oleh admin. `ADMIN_NAME` dan `SUPER_ADMIN_NAME` opsional (memiliki nilai default di seeder). Setelah login, ganti password melalui halaman profil. Jangan menjalankan seeder ini dengan kredensial lama lagi: `AdminSeeder` dan `SuperAdminSeeder` akan menimpa password yang sudah diganti.
 
 ### 5. Kompilasi Aset Frontend
 Untuk mode pengembangan:

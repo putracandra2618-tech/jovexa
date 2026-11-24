@@ -8,7 +8,11 @@
                 "php",
                 "artisan",
                 "boost:mcp"
-            ]
+            ],
+            "environment": {
+                "APP_ENV": "local",
+                "BOOST_BROWSER_LOGS_WATCHER": "false"
+            }
         }
     }
 }
