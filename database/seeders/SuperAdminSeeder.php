@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
-use App\Models\Role;
-use App\Models\User;
+use App\Services\AdminBootstrapService;
 use Illuminate\Database\Seeder;
 
 class SuperAdminSeeder extends Seeder
@@ -12,7 +11,7 @@ class SuperAdminSeeder extends Seeder
     /**
      * Create the initial super admin account from the environment credentials.
      */
-    public function run(): void
+    public function run(AdminBootstrapService $admins): void
     {
         $email = env('SUPER_ADMIN_EMAIL');
         $password = env('SUPER_ADMIN_PASSWORD');
@@ -23,15 +22,13 @@ class SuperAdminSeeder extends Seeder
             return;
         }
 
-        $superAdmin = User::query()->firstOrNew(['email' => $email]);
+        $admins->create(
+            name: (string) env('SUPER_ADMIN_NAME', 'Putra Candra'),
+            email: (string) $email,
+            password: (string) $password,
+            role: UserRole::SuperAdmin,
+        );
 
-        $superAdmin->forceFill([
-            'name' => env('SUPER_ADMIN_NAME', 'Putra Candra'),
-            'password' => $password,
-            'email_verified_at' => $superAdmin->email_verified_at ?? now(),
-            'role_id' => Role::ensureIdFor(UserRole::SuperAdmin->value, UserRole::SuperAdmin->label()),
-        ])->save();
-
-        $this->command?->info("Super admin siap login: {$superAdmin->email}");
+        $this->command?->info("Super admin siap login: {$email}");
     }
 }

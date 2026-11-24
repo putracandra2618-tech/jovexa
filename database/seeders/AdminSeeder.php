@@ -3,8 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\UserRole;
-use App\Models\Role;
-use App\Models\User;
+use App\Services\AdminBootstrapService;
 use Illuminate\Database\Seeder;
 
 class AdminSeeder extends Seeder
@@ -12,7 +11,7 @@ class AdminSeeder extends Seeder
     /**
      * Create the initial admin account from the environment credentials.
      */
-    public function run(): void
+    public function run(AdminBootstrapService $admins): void
     {
         $email = env('ADMIN_EMAIL');
         $password = env('ADMIN_PASSWORD');
@@ -23,15 +22,13 @@ class AdminSeeder extends Seeder
             return;
         }
 
-        $admin = User::query()->firstOrNew(['email' => $email]);
+        $admins->create(
+            name: (string) env('ADMIN_NAME', 'Admin Jovexa'),
+            email: (string) $email,
+            password: (string) $password,
+            role: UserRole::Admin,
+        );
 
-        $admin->forceFill([
-            'name' => env('ADMIN_NAME', 'Admin Jovexa'),
-            'password' => $password,
-            'email_verified_at' => $admin->email_verified_at ?? now(),
-            'role_id' => Role::ensureIdFor(UserRole::Admin->value, UserRole::Admin->label()),
-        ])->save();
-
-        $this->command?->info("Admin siap login: {$admin->email}");
+        $this->command?->info("Admin siap login: {$email}");
     }
 }
