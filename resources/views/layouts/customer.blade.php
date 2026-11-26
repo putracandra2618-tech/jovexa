@@ -85,7 +85,7 @@
 
         <div class="jx-container">
             <span class="jx-footer-copy">
-                &copy; {{ now()->year }} {{ config('app.name') }}. Semua hak dilindungi.
+                &copy; {{ now()->year }} {{ config('app.name') }}.
             </span>
         </div>
     </footer>
