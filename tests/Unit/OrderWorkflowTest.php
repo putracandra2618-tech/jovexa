@@ -39,9 +39,10 @@ class OrderWorkflowTest extends TestCase
         $this->assertSame(OrderStatus::Paid, OrderStatus::PendingPayment->next());
         $this->assertSame(OrderStatus::Queued, OrderStatus::Paid->next());
         $this->assertSame(OrderStatus::InProgress, OrderStatus::Queued->next());
-        $this->assertSame(OrderStatus::Completed, OrderStatus::InProgress->next());
-        $this->assertSame(OrderStatus::Delivered, OrderStatus::Completed->next());
-        $this->assertNull(OrderStatus::Delivered->next());
+        $this->assertSame(OrderStatus::ReadyForDelivery, OrderStatus::InProgress->next());
+        $this->assertSame(OrderStatus::Delivered, OrderStatus::ReadyForDelivery->next());
+        $this->assertSame(OrderStatus::Completed, OrderStatus::Delivered->next());
+        $this->assertNull(OrderStatus::Completed->next());
     }
 
     public function test_clarification_returns_the_order_to_the_verification_queue(): void
@@ -84,10 +85,12 @@ class OrderWorkflowTest extends TestCase
         $this->assertFalse(OrderStatus::Cancelled->canTransitionTo(OrderStatus::WaitingCustomer));
     }
 
-    public function test_revision_is_only_allowed_from_working_or_completed_orders(): void
+    public function test_revision_is_only_allowed_before_the_order_is_accepted(): void
     {
         $this->assertTrue(OrderStatus::InProgress->canTransitionTo(OrderStatus::Revision));
-        $this->assertTrue(OrderStatus::Completed->canTransitionTo(OrderStatus::Revision));
+        $this->assertTrue(OrderStatus::ReadyForDelivery->canTransitionTo(OrderStatus::Revision));
+        $this->assertTrue(OrderStatus::Delivered->canTransitionTo(OrderStatus::Revision));
+        $this->assertFalse(OrderStatus::Completed->canTransitionTo(OrderStatus::Revision));
         $this->assertFalse(OrderStatus::PendingPayment->canTransitionTo(OrderStatus::Revision));
         $this->assertFalse(OrderStatus::WaitingVerification->canTransitionTo(OrderStatus::Revision));
     }
@@ -119,15 +122,16 @@ class OrderWorkflowTest extends TestCase
     {
         $this->assertFalse(OrderStatus::InProgress->hasDeliverables());
         $this->assertFalse(OrderStatus::Revision->hasDeliverables());
-        $this->assertTrue(OrderStatus::Completed->hasDeliverables());
+        $this->assertFalse(OrderStatus::ReadyForDelivery->hasDeliverables());
         $this->assertTrue(OrderStatus::Delivered->hasDeliverables());
+        $this->assertTrue(OrderStatus::Completed->hasDeliverables());
     }
 
     public function test_final_states_are_terminal(): void
     {
-        $this->assertTrue(OrderStatus::Delivered->isFinal());
+        $this->assertFalse(OrderStatus::Delivered->isFinal());
+        $this->assertTrue(OrderStatus::Completed->isFinal());
         $this->assertTrue(OrderStatus::Cancelled->isFinal());
-        $this->assertFalse(OrderStatus::Completed->isFinal());
     }
 
     public function test_generated_order_numbers_are_prefixed_and_unique(): void
@@ -152,11 +156,16 @@ class OrderWorkflowTest extends TestCase
         $this->assertContains(OrderStatus::Expired, $steps[1]['statuses']);
         $this->assertSame('Dikerjakan', $steps[3]['label']);
         $this->assertContains(OrderStatus::Revision, $steps[3]['statuses']);
+        $this->assertContains(OrderStatus::ReadyForDelivery, $steps[3]['statuses']);
+        $this->assertContains(OrderStatus::Delivered, $steps[4]['statuses']);
+        $this->assertContains(OrderStatus::Completed, $steps[5]['statuses']);
 
         $this->assertSame(0, OrderStatus::WaitingVerification->customerStepIndex());
         $this->assertSame(1, OrderStatus::PendingPayment->customerStepIndex());
         $this->assertSame(1, OrderStatus::Expired->customerStepIndex());
         $this->assertSame(3, OrderStatus::Revision->customerStepIndex());
+        $this->assertSame(4, OrderStatus::Delivered->customerStepIndex());
+        $this->assertSame(5, OrderStatus::Completed->customerStepIndex());
         $this->assertSame(-1, OrderStatus::Cancelled->customerStepIndex());
     }
 
@@ -199,20 +208,20 @@ class OrderWorkflowTest extends TestCase
 
     public function test_an_order_cannot_be_delivered_before_a_result_file_exists(): void
     {
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
 
         $this->expectException(InvalidArgumentException::class);
 
         try {
             app(OrderWorkflow::class)->transitionTo($order, OrderStatus::Delivered);
         } finally {
-            $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+            $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
         }
     }
 
     public function test_a_requirement_file_does_not_count_as_a_deliverable(): void
     {
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
         OrderFile::factory()->requirement()->for($order)->create();
 
         $this->expectException(InvalidArgumentException::class);
@@ -222,7 +231,7 @@ class OrderWorkflowTest extends TestCase
 
     public function test_an_order_with_a_result_file_can_be_delivered(): void
     {
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
         OrderFile::factory()->result()->for($order)->create();
 
         app(OrderWorkflow::class)->transitionTo($order, OrderStatus::Delivered);
@@ -232,7 +241,7 @@ class OrderWorkflowTest extends TestCase
 
     public function test_an_order_with_a_revision_file_can_be_delivered(): void
     {
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
         OrderFile::factory()->revision()->for($order)->create();
 
         app(OrderWorkflow::class)->transitionTo($order, OrderStatus::Delivered);

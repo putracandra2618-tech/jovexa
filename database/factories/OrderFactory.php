@@ -108,10 +108,10 @@ class OrderFactory extends Factory
     /**
      * The work is finished but not yet delivered.
      */
-    public function completed(): static
+    public function readyForDelivery(): static
     {
         return $this->state(fn (): array => [
-            'order_status_id' => $this->statusId(OrderStatus::Completed),
+            'order_status_id' => $this->statusId(OrderStatus::ReadyForDelivery),
         ]);
     }
 
@@ -122,6 +122,16 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (): array => [
             'order_status_id' => $this->statusId(OrderStatus::Delivered),
+        ]);
+    }
+
+    /**
+     * The customer accepted the delivered work.
+     */
+    public function completed(): static
+    {
+        return $this->state(fn (): array => [
+            'order_status_id' => $this->statusId(OrderStatus::Completed),
         ]);
     }
 

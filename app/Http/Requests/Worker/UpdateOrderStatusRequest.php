@@ -29,7 +29,7 @@ class UpdateOrderStatusRequest extends FormRequest
             'status' => [
                 'required',
                 Rule::in([
-                    OrderStatus::Completed->value,
+                    OrderStatus::ReadyForDelivery->value,
                     OrderStatus::WaitingCustomer->value,
                 ]),
             ],

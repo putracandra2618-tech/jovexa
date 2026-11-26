@@ -23,7 +23,7 @@
         </div>
 
         <div class="col">
-            <x-stat-card label="Sudah Dikirim" :value="$completedCount" icon="bi-send-check"
+            <x-stat-card label="Pesanan Selesai" :value="$completedCount" icon="bi-check2-circle"
                          :href="route('worker.orders.history')" />
         </div>
 
@@ -46,12 +46,12 @@
 
     @if (! auth()->user()->is_online)
         <x-alert variant="info" class="mt-4">
-            Status kamu sedang offline. Kamu tetap bisa menyelesaikan pesanan aktif, tetapi belum bisa
+            Status kamu sedang offline. Kamu tetap bisa menyiapkan pesanan aktif, tetapi belum bisa
             mengambil pesanan baru dari antrean.
         </x-alert>
     @elseif ($activeCount >= $maxActiveOrders)
         <x-alert variant="warning" class="mt-4">
-            Kuota pesanan aktif sudah penuh ({{ $maxActiveOrders }}). Selesaikan atau kirim salah satu
+            Kuota pesanan aktif sudah penuh ({{ $maxActiveOrders }}). Tandai siap dikirim atau kirim salah satu
             pesanan sebelum mengambil yang baru.
         </x-alert>
     @endif

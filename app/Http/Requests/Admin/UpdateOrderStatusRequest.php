@@ -101,6 +101,10 @@ class UpdateOrderStatusRequest extends FormRequest
             return 'Status pembayaran hanya bisa diubah oleh webhook Tripay.';
         }
 
+        if ($target === OrderStatus::Completed) {
+            return 'Pesanan hanya bisa diselesaikan oleh customer lewat tombol Terima & Selesai.';
+        }
+
         if (in_array($target, OrderStatus::ACTION_ONLY, strict: true)) {
             return 'Pengiriman harus lewat tombol kirim dan wajib menyertakan file hasil.';
         }

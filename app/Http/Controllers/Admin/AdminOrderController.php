@@ -113,7 +113,7 @@ class AdminOrderController extends Controller
             'orders' => Order::query()
                 ->with(['service', 'user', 'worker', 'statusRecord'])
                 ->withCount('revisionRequests')
-                ->withStatus([OrderStatus::Delivered, OrderStatus::Cancelled])
+                ->withStatus([OrderStatus::Delivered, OrderStatus::Completed, OrderStatus::Cancelled])
                 ->when($search !== '', fn ($query) => $query->search($search))
                 ->latest()
                 ->paginate(10)

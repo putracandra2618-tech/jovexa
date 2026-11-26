@@ -74,8 +74,8 @@ class OrderActions
                 $order,
                 'admin.orders.status',
                 'approve-revision',
-                OrderStatus::Completed,
-                'Setujui Revisi & Selesai',
+                OrderStatus::ReadyForDelivery,
+                'Setujui Revisi & Siap Dikirim',
                 'primary',
                 'Catatan Persetujuan (opsional)',
                 false,
@@ -89,7 +89,7 @@ class OrderActions
 
         array_push($actions, ...$this->deliveryActions($order, 'admin'));
 
-        if (! $status->isFinal()) {
+        if ($status->canTransitionTo(OrderStatus::Cancelled)) {
             $actions[] = $this->cancelAction($order, 'admin.orders.cancel');
         }
 
@@ -109,12 +109,12 @@ class OrderActions
                 $order,
                 'worker.orders.status',
                 'complete',
-                OrderStatus::Completed,
-                'Tandai Selesai',
+                OrderStatus::ReadyForDelivery,
+                'Tandai Siap Dikirim',
                 'primary',
                 'Catatan (opsional)',
                 false,
-                'Contoh: Pekerjaan sudah selesai dan siap dikirim.',
+                'Contoh: Pekerjaan sudah siap dikirim ke customer.',
             );
         }
 
@@ -164,6 +164,19 @@ class OrderActions
             ];
         }
 
+        if ($status === OrderStatus::Delivered) {
+            $actions[] = [
+                'key' => 'accept',
+                'type' => 'form',
+                'label' => 'Terima & Selesai',
+                'icon' => 'bi-check2-circle',
+                'variant' => 'primary',
+                'route' => route('customer.orders.accept', $order),
+                'method' => 'POST',
+                'confirm' => 'Terima hasil pekerjaan dan selesaikan pesanan? Revisi tidak bisa diajukan lagi.',
+            ];
+        }
+
         if ($this->revisions->canCustomerRequest($order)) {
             $actions[] = $this->revisionAction($order, 'customer.orders.revision');
         }
@@ -187,15 +200,15 @@ class OrderActions
     private function deliveryActions(Order $order, string $prefix): array
     {
         $isRevision = $order->status === OrderStatus::Revision;
-        $isCompleted = $order->status === OrderStatus::Completed;
+        $isReadyForDelivery = $order->status === OrderStatus::ReadyForDelivery;
 
-        if (! $isRevision && ! $isCompleted) {
+        if (! $isRevision && ! $isReadyForDelivery) {
             return [];
         }
 
         $actions = [];
 
-        if ($isCompleted || $prefix === 'worker') {
+        if ($isReadyForDelivery || $prefix === 'worker') {
             $actions[] = [
                 'key' => 'upload-result',
                 'type' => 'link',
@@ -208,7 +221,7 @@ class OrderActions
             ];
         }
 
-        if ($isCompleted && $order->deliverables()->exists()) {
+        if ($isReadyForDelivery && $order->deliverables()->exists()) {
             $actions[] = [
                 'key' => 'send',
                 'type' => 'form',
@@ -317,29 +330,17 @@ class OrderActions
      */
     private function refundAction(Order $order): ?array
     {
-        $whatsapp = config('jovexa.contact.whatsapp');
-
-        if (blank($whatsapp)) {
-            return null;
-        }
-
-        $digits = (string) preg_replace('/\D+/', '', (string) $whatsapp);
-
-        if ($digits === '') {
-            return null;
-        }
-
-        if (str_starts_with($digits, '0')) {
-            $digits = '62'.substr($digits, 1);
-        } elseif (! str_starts_with($digits, '62')) {
-            $digits = '62'.$digits;
-        }
-
         $message = sprintf(
             'Halo Admin Jovexa, saya ingin mengajukan refund untuk pesanan %s (%s). Mohon ditindaklanjuti.',
             $order->order_number,
             $order->service->name,
         );
+
+        $route = WhatsappContact::link(config('jovexa.contact.whatsapp'), $message);
+
+        if ($route === null) {
+            return null;
+        }
 
         return [
             'key' => 'refund',
@@ -347,7 +348,7 @@ class OrderActions
             'label' => 'Request Refund',
             'icon' => 'bi-whatsapp',
             'variant' => 'warning',
-            'route' => 'https://wa.me/'.$digits.'?text='.rawurlencode($message),
+            'route' => $route,
             'target' => '_blank',
             'rel' => 'noopener',
         ];

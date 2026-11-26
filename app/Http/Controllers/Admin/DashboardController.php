@@ -30,7 +30,7 @@ class DashboardController extends Controller
             'revisionCount' => $revision,
             'newOrders' => Order::query()
                 ->with(['service', 'user', 'worker', 'statusRecord'])
-                ->withStatus([OrderStatus::WaitingVerification, OrderStatus::Queued, OrderStatus::WaitingCustomer, OrderStatus::InProgress, OrderStatus::Revision])
+                ->withStatus([OrderStatus::WaitingVerification, OrderStatus::Queued, OrderStatus::WaitingCustomer, OrderStatus::InProgress, OrderStatus::Revision, OrderStatus::ReadyForDelivery])
                 ->latest()
                 ->take(8)
                 ->get(),

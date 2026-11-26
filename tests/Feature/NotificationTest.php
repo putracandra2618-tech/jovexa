@@ -76,7 +76,7 @@ class NotificationTest extends TestCase
 
         $customer = User::factory()->customer()->create();
         $worker = User::factory()->worker()->create();
-        $order = Order::factory()->for($customer)->completed()->assignedTo($worker)->create();
+        $order = Order::factory()->for($customer)->readyForDelivery()->assignedTo($worker)->create();
         OrderFile::factory()->for($order)->result()->stored()->create();
 
         $this->actingAs($worker)

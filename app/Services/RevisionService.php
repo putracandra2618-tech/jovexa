@@ -36,6 +36,12 @@ class RevisionService
             ]);
         }
 
+        if (! $order->status?->canTransitionTo(OrderStatus::Revision)) {
+            throw ValidationException::withMessages([
+                $errorField => 'Pesanan ini sudah selesai dan tidak bisa direvisi lagi.',
+            ]);
+        }
+
         return DB::transaction(function () use ($order, $requester, $note, $errorField): Order {
             $used = $order->revisionRequests()->count();
 
@@ -76,7 +82,7 @@ class RevisionService
     /**
      * Whether a customer may request a revision for this order.
      *
-     * Customers only revise work that has actually been delivered by a worker;
+     * Customers only revise work that has actually been handed over;
      * answering an information request must not expose the revision action.
      */
     public function canCustomerRequest(Order $order): bool

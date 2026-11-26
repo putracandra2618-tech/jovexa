@@ -11,8 +11,9 @@ enum OrderStatus: string
     case WaitingCustomer = 'waiting_customer';
     case InProgress = 'in_progress';
     case Revision = 'revision';
-    case Completed = 'completed';
+    case ReadyForDelivery = 'ready_for_delivery';
     case Delivered = 'delivered';
+    case Completed = 'completed';
     case Expired = 'expired';
     case Cancelled = 'cancelled';
 
@@ -29,9 +30,10 @@ enum OrderStatus: string
      * Statuses that may only be reached through a dedicated action.
      *
      * Delivering has to go through the send endpoint, which refuses to run unless
-     * at least one result file is attached to the order.
+     * at least one result file is attached to the order. Customer acceptance is
+     * the dedicated final action that closes the order.
      */
-    public const ACTION_ONLY = [self::Delivered];
+    public const ACTION_ONLY = [self::Delivered, self::Completed];
 
     /**
      * The human readable label used across the interface.
@@ -46,8 +48,9 @@ enum OrderStatus: string
             self::WaitingCustomer => 'Menunggu Info Customer',
             self::InProgress => 'Sedang Dikerjakan',
             self::Revision => 'Perlu Revisi',
-            self::Completed => 'Selesai',
+            self::ReadyForDelivery => 'Siap Dikirim',
             self::Delivered => 'Sudah Dikirim',
+            self::Completed => 'Selesai',
             self::Expired => 'Kedaluwarsa',
             self::Cancelled => 'Dibatalkan',
         };
@@ -59,9 +62,9 @@ enum OrderStatus: string
     public function badgeClass(): string
     {
         return match ($this) {
-            self::PendingPayment, self::Paid, self::WaitingVerification, self::Queued, self::InProgress => 'pending',
+            self::PendingPayment, self::Paid, self::WaitingVerification, self::Queued, self::InProgress, self::ReadyForDelivery => 'pending',
             self::WaitingCustomer, self::Revision, self::Expired => 'failed',
-            self::Completed, self::Delivered => 'success',
+            self::Delivered, self::Completed => 'success',
             self::Cancelled => 'failed',
         };
     }
@@ -78,10 +81,11 @@ enum OrderStatus: string
             self::Paid => self::Queued,
             self::Queued => self::InProgress,
             self::WaitingCustomer => self::WaitingVerification,
-            self::InProgress => self::Completed,
-            self::Revision => self::Completed,
-            self::Completed => self::Delivered,
-            self::Delivered, self::Cancelled => null,
+            self::InProgress => self::ReadyForDelivery,
+            self::Revision => self::ReadyForDelivery,
+            self::ReadyForDelivery => self::Delivered,
+            self::Delivered => self::Completed,
+            self::Completed, self::Cancelled => null,
         };
     }
 
@@ -99,9 +103,9 @@ enum OrderStatus: string
             ['label' => 'Ditinjau Admin', 'icon' => 'bi-shield-check', 'statuses' => [self::WaitingVerification, self::WaitingCustomer]],
             ['label' => 'Bayar', 'icon' => 'bi-wallet2', 'statuses' => [self::PendingPayment, self::Expired]],
             ['label' => 'Terkonfirmasi', 'icon' => 'bi-receipt', 'statuses' => [self::Paid]],
-            ['label' => 'Dikerjakan', 'icon' => 'bi-hammer', 'statuses' => [self::Queued, self::InProgress, self::Revision]],
-            ['label' => 'Selesai', 'icon' => 'bi-stars', 'statuses' => [self::Completed]],
+            ['label' => 'Dikerjakan', 'icon' => 'bi-hammer', 'statuses' => [self::Queued, self::InProgress, self::Revision, self::ReadyForDelivery]],
             ['label' => 'Dikirim', 'icon' => 'bi-send-check', 'statuses' => [self::Delivered]],
+            ['label' => 'Selesai', 'icon' => 'bi-stars', 'statuses' => [self::Completed]],
         ];
     }
 
@@ -126,8 +130,8 @@ enum OrderStatus: string
      * Determine whether the order may move to the given status.
      *
      * Staff may ask the customer a question while the order is being handled,
-     * may send work back for revision, and any order that has not been delivered
-     * yet may be cancelled.
+     * may send work back for revision, and any order that has not been handed
+     * over to the customer may be cancelled.
      */
     public function canTransitionTo(self $target): bool
     {
@@ -136,7 +140,7 @@ enum OrderStatus: string
         }
 
         if ($target === self::Cancelled) {
-            return ! in_array($this, [self::Delivered, self::Cancelled], strict: true);
+            return ! in_array($this, [self::Delivered, self::Completed, self::Cancelled], strict: true);
         }
 
         // A pending payment may run out of time. An expired order may be retried,
@@ -160,7 +164,7 @@ enum OrderStatus: string
         }
 
         if ($target === self::Revision) {
-            return in_array($this, [self::InProgress, self::Completed, self::Delivered], strict: true);
+            return in_array($this, [self::InProgress, self::ReadyForDelivery, self::Delivered], strict: true);
         }
 
         return $this->next() === $target;
@@ -171,7 +175,7 @@ enum OrderStatus: string
      */
     public function isFinal(): bool
     {
-        return in_array($this, [self::Delivered, self::Cancelled], strict: true);
+        return in_array($this, [self::Completed, self::Cancelled], strict: true);
     }
 
     /**
@@ -187,7 +191,7 @@ enum OrderStatus: string
      */
     public function hasDeliverables(): bool
     {
-        return in_array($this, [self::Completed, self::Delivered], strict: true);
+        return in_array($this, [self::Delivered, self::Completed], strict: true);
     }
 
     /**
@@ -198,8 +202,8 @@ enum OrderStatus: string
         return match ($this) {
             self::WaitingVerification, self::PendingPayment, self::Expired => 'payment',
             self::Paid, self::Queued, self::WaitingCustomer => 'queue',
-            self::InProgress, self::Revision, self::Completed => 'work',
-            self::Delivered, self::Cancelled => 'done',
+            self::InProgress, self::Revision, self::ReadyForDelivery, self::Delivered => 'work',
+            self::Completed, self::Cancelled => 'done',
         };
     }
 

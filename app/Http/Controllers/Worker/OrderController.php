@@ -91,7 +91,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Orders the worker has completed or cancelled.
+     * Orders the worker has handed over, accepted, or cancelled.
      */
     public function history(Request $request): View
     {
@@ -101,7 +101,7 @@ class OrderController extends Controller
             'orders' => Order::query()
                 ->assignedTo($request->user())
                 ->with(['service', 'user', 'statusRecord'])
-                ->withStatus([OrderStatus::Delivered, OrderStatus::Cancelled])
+                ->withStatus([OrderStatus::Delivered, OrderStatus::Completed, OrderStatus::Cancelled])
                 ->when($search !== '', fn ($query) => $query->search($search))
                 ->latest()
                 ->paginate(10)
@@ -206,7 +206,7 @@ class OrderController extends Controller
 
         // Hasil yang sudah dikirim ke customer adalah arsip serah-terima.
         abort_if(
-            $order->status === OrderStatus::Delivered,
+            in_array($order->status, [OrderStatus::Delivered, OrderStatus::Completed], true),
             403,
             'File hasil tidak bisa dihapus setelah pesanan dikirim ke customer.',
         );

@@ -1,0 +1,29 @@
+- generic [ref=e3]:
+  - link "Skip to main content" [ref=e4] [cursor=pointer]:
+    - /url: "#main"
+  - main [ref=e5]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - heading "ERR_NGROK_3200" [level=1] [ref=e9]
+        - generic [ref=e11]:
+          - paragraph [ref=e13]: The endpoint repurpose-emote-haphazard.ngrok-free.dev is offline.
+          - link "Get help with this error" [ref=e15] [cursor=pointer]:
+            - /url: https://ngrok.com/docs/errors/err_ngrok_3200/?endpoint_url=https%3A%2F%2Frepurpose-emote-haphazard.ngrok-free.dev
+      - generic [ref=e16]:
+        - heading "If you're the developer of this page" [level=2] [ref=e17]
+        - paragraph [ref=e18]:
+          - text: Check out the docs to get
+          - link "help with this error" [ref=e19] [cursor=pointer]:
+            - /url: https://ngrok.com/docs/errors/err_ngrok_3200/?endpoint_url=https%3A%2F%2Frepurpose-emote-haphazard.ngrok-free.dev
+          - text: .
+      - generic [ref=e20]:
+        - heading "If you're a visitor of this page" [level=2] [ref=e21]
+        - paragraph [ref=e22]:
+          - text: Wait a few minutes and
+          - button "refresh the page" [ref=e23] [cursor=pointer]
+          - text: . If that still doesn't work, please contact the developer of this page for more information.
+  - contentinfo [ref=e24]:
+    - generic [ref=e26]:
+      - text: Powered by
+      - link "ngrok" [ref=e27] [cursor=pointer]:
+        - /url: https://ngrok.com

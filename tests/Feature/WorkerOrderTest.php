@@ -145,18 +145,32 @@ class WorkerOrderTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_worker_can_mark_their_order_as_completed(): void
+    public function test_worker_can_mark_their_order_as_ready_for_delivery(): void
     {
         $worker = User::factory()->worker()->create();
         $order = Order::factory()->inProgress()->assignedTo($worker)->create();
 
         $this->actingAs($worker)
             ->patch(route('worker.orders.status', $order), [
-                'status' => OrderStatus::Completed->value,
+                'status' => OrderStatus::ReadyForDelivery->value,
             ])
             ->assertSessionHas('success');
 
-        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
+    }
+
+    public function test_worker_cannot_mark_an_order_as_completed(): void
+    {
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->readyForDelivery()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->patch(route('worker.orders.status', $order), [
+                'status' => OrderStatus::Completed->value,
+            ])
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
     }
 
     public function test_worker_cannot_set_a_status_reserved_for_the_queue_or_customer(): void
@@ -203,7 +217,7 @@ class WorkerOrderTest extends TestCase
         $this->assertDatabaseCount('order_revision_requests', 0);
     }
 
-    public function test_worker_can_upload_a_result_only_when_the_order_is_completed(): void
+    public function test_worker_can_upload_a_result_only_when_the_order_is_ready_for_delivery(): void
     {
         Storage::fake('local');
 
@@ -216,15 +230,15 @@ class WorkerOrderTest extends TestCase
             ])
             ->assertNotFound();
 
-        $completed = Order::factory()->completed()->assignedTo($worker)->create();
+        $readyForDelivery = Order::factory()->readyForDelivery()->assignedTo($worker)->create();
 
         $this->actingAs($worker)
-            ->post(route('worker.orders.result.store', $completed), [
+            ->post(route('worker.orders.result.store', $readyForDelivery), [
                 'result' => UploadedFile::fake()->create('hasil.pdf', 100, 'application/pdf'),
             ])
             ->assertRedirect();
 
-        $file = $completed->results()->sole();
+        $file = $readyForDelivery->results()->sole();
 
         $this->assertTrue($file->isResult());
         Storage::disk('local')->assertExists($file->file_path);
@@ -261,7 +275,7 @@ class WorkerOrderTest extends TestCase
         Storage::fake('local');
 
         $worker = User::factory()->worker()->create();
-        $order = Order::factory()->completed()->assignedTo($worker)->create();
+        $order = Order::factory()->readyForDelivery()->assignedTo($worker)->create();
 
         $this->actingAs($worker)
             ->post(route('worker.orders.result.store', $order), [
@@ -280,7 +294,7 @@ class WorkerOrderTest extends TestCase
         Storage::fake('local');
 
         $worker = User::factory()->worker()->create();
-        $order = Order::factory()->completed()->assignedTo($worker)->create();
+        $order = Order::factory()->readyForDelivery()->assignedTo($worker)->create();
         OrderFile::factory()->result()->stored()->for($order)->create();
 
         $response = $this->actingAs($worker)
@@ -310,7 +324,7 @@ class WorkerOrderTest extends TestCase
         Storage::fake('local');
 
         $worker = User::factory()->worker()->create();
-        $order = Order::factory()->completed()->assignedTo($worker)->create();
+        $order = Order::factory()->readyForDelivery()->assignedTo($worker)->create();
         $file = OrderFile::factory()->result()->stored()->for($order)->create();
 
         Storage::disk('local')->assertExists($file->file_path);

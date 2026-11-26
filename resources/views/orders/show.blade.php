@@ -1,5 +1,11 @@
 @php
+    use App\Support\WhatsappContact;
+
     $actions = app(\App\Support\OrderActions::class)->for($order, auth()->user());
+    $customerServiceLink = WhatsappContact::link(
+        config('jovexa.contact.whatsapp'),
+        'Halo Admin Jovexa, saya ingin menanyakan status pesanan '.$order->order_number.'.',
+    );
 @endphp
 
 @extends('layouts.customer')
@@ -71,6 +77,12 @@
                     <x-alert variant="warning">
                         Pesanan anda sedang di tinjau admin. Setelah disetujui, kamu bisa melanjutkan pembayaran. Kamu masih bisa membatalkan sebelum pembayaran; setelah dibayar, ajukan refund lewat WhatsApp sampai hasil dikirim.
                     </x-alert>
+
+                    @if ($customerServiceLink)
+                        <a href="{{ $customerServiceLink }}" class="btn-custom btn-custom-light btn-custom-sm mt-3" target="_blank" rel="noopener">
+                            <i class="bi bi-whatsapp me-1"></i> Hubungi CS Admin
+                        </a>
+                    @endif
                 @elseif ($order->isPayable())
                     <p class="page-subtitle mb-0">
                         Pesanan ini belum dibayar, jadi belum masuk ke antrean pengerjaan.
@@ -87,6 +99,10 @@
                             <span style="white-space: pre-line">{{ $informationRequest->note }}</span>
                         </x-alert>
                     @endif
+                @elseif ($order->status === \App\Enums\OrderStatus::Completed)
+                    <x-alert variant="success">
+                        Hasil pesanan sudah kamu terima. Pesanan dinyatakan selesai dan revisi tidak bisa diajukan lagi.
+                    </x-alert>
                 @elseif ($order->canDownloadResults())
                     <div class="jx-result-banner">
                         <span class="jx-result-icon">

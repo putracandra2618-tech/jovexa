@@ -113,8 +113,9 @@ Payment Gateway digunakan untuk:
 
 4. Worker mengambil pesanan dari antrean; status menjadi `in_progress`.
 5. Jika perlu revisi, Admin atau Worker memindahkan pesanan ke `revision`.
-6. Setelah selesai, Admin atau Worker mengunggah hasil dan mengirimkannya.
-7. Status akhir menjadi `delivered`.
+6. Setelah selesai, Admin atau Worker menandai pesanan `ready_for_delivery`, mengunggah hasil, lalu mengirimkannya.
+7. Status menjadi `delivered` dan menunggu penerimaan Customer.
+8. Customer menekan `Terima & Selesai`; status akhir menjadi `completed` dan revisi dikunci.
 
 ## 4A. Alur Worker
 
@@ -165,17 +166,18 @@ Gunakan status pesanan berikut:
 → `paid`
 → `queued`
 → `in_progress`
-→ `completed`
+→ `ready_for_delivery`
 → `delivered`
+→ `completed`
 
 Cabang: `waiting_customer`, `revision`, `expired`, dan `cancelled`.
 
-Request Refund customer tersedia untuk `paid`, `queued`, `in_progress`, `waiting_customer`, `revision`, dan `completed`; tidak tersedia sebelum pembayaran atau setelah `delivered`.
+Request Refund customer tersedia untuk `paid`, `queued`, `in_progress`, `waiting_customer`, `revision`, dan `ready_for_delivery` bila ada payment berstatus `paid`; tidak tersedia sebelum pembayaran, setelah `delivered`, atau setelah `completed`.
 
 Penjelasan:
 
 ### waiting_verification
-Pesanan baru menunggu pemeriksaan Admin sebelum pembayaran.
+Pesanan baru menunggu pemeriksaan Admin sebelum pembayaran. Customer dapat membatalkan atau membuka WhatsApp CS Admin lewat tombol `Hubungi CS Admin`; Request Refund belum tersedia.
 
 ### pending_payment
 Pesanan sudah disetujui Admin dan menunggu pembayaran.
@@ -195,11 +197,14 @@ Pesanan sedang dikerjakan. Worker sudah menerima pesanan; Customer tidak bisa me
 ### revision
 Pekerjaan perlu diperbaiki sebelum dikirim.
 
-### completed
-Pekerjaan sudah selesai dan hasil sudah tersedia. Request Refund masih tersedia.
+### ready_for_delivery
+Pekerjaan sudah selesai, hasil sudah bisa diunggah dan dikirim. Request Refund masih tersedia.
 
 ### delivered
-Hasil pekerjaan sudah dikirim dan dapat diakses Customer. Request Refund tidak tersedia.
+Hasil pekerjaan sudah dikirim dan dapat diakses Customer. Customer dapat mengajukan revisi atau menekan `Terima & Selesai`. Request Refund tidak tersedia.
+
+### completed
+Customer sudah menerima hasil lewat `Terima & Selesai`. Status ini final; revisi dan refund dikunci, dan Admin/Worker mendapat notifikasi penerimaan.
 
 ---
 

@@ -24,7 +24,7 @@ class DashboardController extends Controller
                 strict: true,
             ))->count(),
             'pendingPaymentCount' => $orders->filter(fn (Order $order): bool => $order->status === OrderStatus::PendingPayment)->count(),
-            'deliveredCount' => $orders->filter(fn (Order $order): bool => $order->status === OrderStatus::Delivered)->count(),
+            'deliveredCount' => $orders->filter(fn (Order $order): bool => $order->status === OrderStatus::Completed)->count(),
             'recentOrders' => $orders->take(5),
         ]);
     }

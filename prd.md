@@ -80,7 +80,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 | Verification latency | Waktu dari `waiting_verification` ke `pending_payment` | Belum diukur |
 | Payment-to-queue latency | Waktu dari pembayaran `paid` ke `queued` | Belum diukur |
 | Claim latency | Waktu dari `queued` sampai diklaim Worker | Belum diukur |
-| Delivery success | Persentase order `completed` yang berhasil menjadi `delivered` | Belum diukur |
+| Delivery success | Persentase order `ready_for_delivery` yang berhasil menjadi `delivered` dan diterima customer | Belum diukur |
 | Manual correction rate | Jumlah order yang statusnya harus dikoreksi manual | Belum diukur |
 | Callback failure rate | Jumlah callback gagal signature/merchant/amount | Hanya tercatat di log |
 
@@ -193,8 +193,9 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 13. Tripay mengirim callback.
 14. Jika pembayaran berhasil, order menjadi `paid` lalu `queued` otomatis.
 15. Worker yang online mengklaim order; order menjadi `in_progress` dan ter-assign ke Worker tersebut.
-16. Setelah selesai, order menjadi `completed`, file hasil diunggah, lalu dikirim menjadi `delivered`.
-17. Customer mengunduh hasil dari halaman detail pesanan.
+16. Setelah selesai, order menjadi `ready_for_delivery`, file hasil diunggah, lalu dikirim menjadi `delivered`.
+17. Customer mengunduh hasil, lalu menekan `Terima & Selesai` sehingga order menjadi `completed`.
+18. Setelah `completed`, revisi dikunci dan Admin/Worker mendapat notifikasi penerimaan.
 
 ### 6.2 Alur Admin
 
@@ -203,7 +204,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 3. Jika informasi kurang, Admin mengirim permintaan informasi (catatan minimal 10 karakter).
 4. Jika valid, Admin menyetujui order dari `waiting_verification` ke `pending_payment`.
 5. Setelah callback `paid`, order masuk `queued` otomatis; Admin tidak dapat memindahkan `queued` langsung ke `in_progress`.
-6. Admin dapat meminta revisi, menandai selesai, mengunggah hasil, dan mengirim hasil.
+6. Admin dapat meminta revisi, menandai pekerjaan siap dikirim, mengunggah hasil, dan mengirim hasil; Admin tidak dapat menyelesaikan order atas nama customer.
 7. Jika customer menjawab saat Worker sudah ditugaskan, order kembali ke `in_progress`.
 
 ### 6.3 Alur Worker
@@ -212,10 +213,11 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 2. Worker melihat antrean pesanan `queued` yang belum memiliki Worker.
 3. Worker mengklaim pesanan selama kuota aktif belum mencapai 5.
 4. Sistem mengunci baris order dan Worker, memastikan kuota, lalu mengubah status menjadi `in_progress`.
-5. Worker menyelesaikan pekerjaan dan mengubah status menjadi `completed`.
+5. Worker menyelesaikan pekerjaan dan mengubah status menjadi `ready_for_delivery`.
 6. Worker mengunggah file hasil (maksimal 20 MB).
 7. Worker mengirim hasil; sistem menolak jika belum ada file hasil.
-8. Worker hanya dapat mengakses pesanan yang ter-assign kepadanya.
+8. Status `completed` hanya tercapai setelah customer menekan `Terima & Selesai`.
+9. Worker hanya dapat mengakses pesanan yang ter-assign kepadanya.
 
 ### 6.4 Alur Super Admin
 
@@ -245,11 +247,13 @@ stateDiagram-v2
     revision --> waiting_customer: minta info
     waiting_customer --> waiting_verification: customer kirim info (tanpa Worker)
     waiting_customer --> in_progress: customer kirim info (dengan Worker)
-    in_progress --> completed: Admin atau Worker
+    in_progress --> ready_for_delivery: Admin atau Worker
     in_progress --> revision: minta revisi
-    completed --> revision: minta revisi
-    revision --> completed: revisi selesai
-    completed --> delivered: kirim hasil
+    ready_for_delivery --> revision: minta revisi
+    revision --> ready_for_delivery: revisi selesai
+    ready_for_delivery --> delivered: kirim hasil
+    delivered --> revision: minta revisi
+    delivered --> completed: customer terima
     pending_payment --> cancelled
     expired --> cancelled
     paid --> cancelled
@@ -258,8 +262,8 @@ stateDiagram-v2
     waiting_customer --> cancelled
     in_progress --> cancelled
     revision --> cancelled
-    completed --> cancelled
-    delivered --> [*]
+    ready_for_delivery --> cancelled
+    completed --> [*]
     cancelled --> [*]
 ```
 
@@ -270,8 +274,9 @@ Catatan:
 - `queued` hanya boleh dicapai otomatis dari `paid`.
 - `in_progress` dari `queued` hanya boleh dicapai lewat klaim Worker.
 - `delivered` hanya boleh dicapai lewat aksi kirim dan wajib sudah memiliki file hasil.
-- Order `delivered` dan `cancelled` adalah status final.
-- Transisi ke `cancelled` pada diagram berlaku penuh untuk Admin. Customer hanya membatalkan order yang belum dibayar dan belum diklaim Worker. Order yang sudah dibayar memakai alur Request Refund lewat WhatsApp sampai status `delivered`; klik refund tidak mengubah status order.
+- `completed` hanya boleh dicapai lewat aksi `Terima & Selesai` oleh customer pemilik order.
+- Order `completed` dan `cancelled` adalah status final; `delivered` masih menunggu penerimaan atau revisi.
+- Transisi ke `cancelled` pada diagram berlaku penuh untuk Admin sampai status `ready_for_delivery`. Customer hanya membatalkan order yang belum dibayar dan belum diklaim Worker. Order yang sudah dibayar memakai alur Request Refund lewat WhatsApp sampai status `delivered`; klik refund tidak mengubah status order.
 - `expired` masih dapat dibayar; pembayaran telat harus tetap diterima.
 
 ---
@@ -302,7 +307,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | PUB-01 | Landing page | Menampilkan hero, statistik jumlah jasa, fitur, 3 jasa termurah, cara pesan, CTA, FAQ, dan kontak | Sudah ada |
 | PUB-02 | Katalog jasa | Hanya jasa `published`; pencarian `q` pada nama/slug/deskripsi; urut harga termurah; 9 per halaman | Sudah ada |
 | PUB-03 | Detail jasa | Hanya jasa `published`; menampilkan harga, estimasi hari, deskripsi, persyaratan, 3 jasa lain, dan CTA pesan/login | Sudah ada |
-| PUB-04 | Kontak publik | WhatsApp dan email dari config `jovexa.contact`; disembunyikan bila kosong | Sudah ada |
+| PUB-04 | Kontak publik | WhatsApp dan email dari config `jovexa.contact`; disembunyikan bila kosong; nomor WhatsApp yang sama dipakai untuk tombol CS saat `waiting_verification` dan Request Refund | Sudah ada |
 | PUB-05 | Halaman error | Halaman 403 dan 404 khusus tersedia | Sudah ada |
 | PUB-06 | Kategori/tag jasa | Pengelompokan jasa | Belum |
 | PUB-07 | Gambar/thumbnail jasa | Upload gambar untuk katalog dan detail | Belum |
@@ -317,16 +322,17 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | ORD-03 | Upload requirement | Maksimal 5 file per request; maksimal 10 MB per file; ekstensi diizinkan; disimpan di disk privat | Sudah ada |
 | ORD-04 | Status awal order | Order baru `waiting_verification`; riwayat status awal dicatat | Sudah ada |
 | ORD-05 | Daftar pesanan customer | Hanya order milik sendiri; 10 per halaman; filter tab Semua/Berjalan/Selesai/Perlu tindakan di browser | Sudah ada |
-| ORD-06 | Detail pesanan | Menampilkan stepper progres, ringkasan, file dalam grup `File dari Kamu`, `File Hasil Kerja`, `File Hasil Revisi`, pembayaran terakhir, dan riwayat status | Sudah ada |
+| ORD-06 | Detail pesanan | Menampilkan stepper progres, ringkasan, file dalam grup `File dari Kamu`, `File Hasil Kerja`, `File Hasil Revisi`, pembayaran terakhir, dan riwayat status; `waiting_verification` menampilkan tombol `Hubungi CS Admin` bila WhatsApp dikonfigurasi | Sudah ada |
 | ORD-07 | File tambahan | Hanya saat status `waiting_customer`; maksimal 5 file; setelah upload order kembali ke `waiting_verification` bila belum ada Worker, atau `in_progress` bila sudah ter-assign | Sudah ada |
-| ORD-08 | Pembatalan & refund customer | Customer membatalkan order sebelum pembayaran; setelah pembayaran tombol batal diganti Request Refund lewat WhatsApp sampai hasil dikirim | Sudah ada |
+| ORD-08 | Pembatalan & refund customer | Customer membatalkan order sebelum pembayaran; Request Refund muncul hanya bila ada payment berstatus `paid`, menggantikan tombol batal sampai hasil dikirim | Sudah ada |
 | ORD-09 | Unduh requirement | Customer dapat mengunduh file requirement miliknya sepanjang order masih ada | Sudah ada |
-| ORD-10 | Unduh hasil | File hasil/revisi hanya bisa diunduh saat status `completed` atau `delivered` | Sudah ada |
-| ORD-11 | Larangan ubah status | Customer tidak dapat mengubah status order secara manual selain aksi tambah file dan pembatalan | Sudah ada |
+| ORD-10 | Unduh hasil | File hasil/revisi hanya bisa diunduh saat status `delivered` atau `completed` | Sudah ada |
+| ORD-11 | Larangan ubah status | Customer tidak dapat mengubah status order secara manual selain aksi tambah file, revisi, terima & selesai, dan pembatalan/refund | Sudah ada |
 | ORD-12 | Edit/hapus order | Customer tidak dapat mengedit atau menghapus order; hanya membatalkan | Sudah ada |
 | ORD-13 | Order oleh admin/guest checkout | Admin membuat order atas nama customer atau checkout tanpa akun | Belum |
 | ORD-14 | Simpan draft order | Customer dapat menyimpan order sebelum membayar sebagai draft terpisah | Di luar lingkup |
-| ORD-15 | Minta revisi customer | Tombol dan endpoint revisi hanya tersedia setelah ada file hasil/revisi; jawaban atas permintaan informasi tidak memunculkannya | Sudah ada |
+| ORD-15 | Minta revisi customer | Tombol dan endpoint revisi hanya tersedia setelah ada file hasil/revisi dan sebelum order diterima; jawaban atas permintaan informasi tidak memunculkannya | Sudah ada |
+| ORD-16 | Terima & selesai | Customer pemilik order yang berstatus `delivered` dapat menekan `Terima & Selesai`; order menjadi `completed`, revisi/refund dikunci, dan Admin/Worker mendapat notifikasi | Sudah ada |
 
 ### 7.4 Pembayaran Tripay
 
@@ -344,7 +350,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | PAY-10 | Expiry otomatis | Command `tripay:expire-stale-payments` dijalankan setiap 5 menit; payment pending yang punya `checkout_url` dan lewat `expires_at` di-expire | Sudah ada |
 | PAY-11 | Rekonsiliasi | Command `tripay:reconcile-payments` berjalan tiap jam; memeriksa pending > 60 menit dan expired dalam 7 hari terakhir; memakai `/transaction/detail` | Sudah ada |
 | PAY-12 | Sinkronisasi channel | Command manual `tripay:sync-channels` untuk menyegarkan cache channel | Sudah ada |
-| PAY-13 | Request refund | Customer membuka WhatsApp admin dengan pesan berisi nomor order dan jasa; tidak mengubah status order | Sudah ada |
+| PAY-13 | Request refund | Tersedia hanya bila minimal satu payment berstatus `paid` dan order belum `delivered`; customer membuka WhatsApp admin dengan pesan berisi nomor order dan jasa; tidak mengubah status order | Sudah ada |
 | PAY-14 | Invoice/receipt | Dokumen pembayaran yang bisa diunduh customer | Belum |
 | PAY-15 | Pembayaran parsial/DP | Pembayaran bertahap | Di luar lingkup |
 | PAY-16 | Multi-currency | Selain IDR | Di luar lingkup |
@@ -355,7 +361,7 @@ Catatan operasional: scheduler harus berjalan (`php artisan schedule:work` atau 
 
 | ID | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|
-| CUS-01 | Statistik dashboard | Menampilkan jumlah pesanan aktif, menunggu pembayaran, dan pesanan `delivered` | Sudah ada |
+| CUS-01 | Statistik dashboard | Menampilkan jumlah pesanan aktif, menunggu pembayaran, dan pesanan `completed` | Sudah ada |
 | CUS-02 | Pesanan terbaru | Menampilkan 5 pesanan terbaru customer | Sudah ada |
 | CUS-03 | Aksi cepat | Tombol membuat pesanan baru dan membuka detail pesanan | Sudah ada |
 | CUS-04 | Notifikasi status | Notifikasi email/WhatsApp saat status berubah | Belum |
@@ -365,18 +371,18 @@ Catatan operasional: scheduler harus berjalan (`php artisan schedule:work` atau 
 
 | ID | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|
-| ADM-01 | Dashboard admin | Menampilkan jumlah `waiting_verification`, `queued`, `in_progress`, `waiting_customer`, `revision`; pendapatan `completed`+`delivered`; jumlah jasa published; 8 order terbaru yang perlu perhatian | Sudah ada |
+| ADM-01 | Dashboard admin | Menampilkan jumlah `waiting_verification`, `queued`, `in_progress`, `waiting_customer`, `revision`, `ready_for_delivery`; pendapatan `completed`+`delivered`; jumlah jasa published; 8 order terbaru yang perlu perhatian | Sudah ada |
 | ADM-02 | Daftar pesanan | Semua order; filter status; pencarian nomor order/nama/email customer; 10 per halaman | Sudah ada |
 | ADM-03 | Daftar revisi | Hanya order `revision`; pencarian; 10 per halaman | Sudah ada |
-| ADM-04 | Riwayat pesanan | Hanya order `delivered` dan `cancelled`; pencarian; 10 per halaman | Sudah ada |
+| ADM-04 | Riwayat pesanan | Hanya order `delivered`, `completed`, dan `cancelled`; pencarian; 10 per halaman | Sudah ada |
 | ADM-05 | Detail pesanan | Menampilkan kebutuhan customer, file, riwayat status, data customer, dan total | Sudah ada |
-| ADM-06 | Transisi status | Perubahan status mengikuti aturan `OrderStatus::canTransitionTo()`; `paid`/`expired`/`delivered` tidak bisa diset manual; Admin tidak dapat melewati antrean Worker (`queued → in_progress`); catatan opsional | Sudah ada |
+| ADM-06 | Transisi status | Perubahan status mengikuti aturan `OrderStatus::canTransitionTo()`; `paid`/`expired`/`delivered`/`completed` tidak bisa diset manual; Admin tidak dapat melewati antrean Worker (`queued → in_progress`); catatan opsional | Sudah ada |
 | ADM-07 | Minta informasi | Catatan wajib 10–1.000 karakter; order menjadi `waiting_customer` | Sudah ada |
 | ADM-08 | Konfirmasi info diterima | Order `waiting_customer` tanpa Worker dikembalikan ke `waiting_verification`; bila sudah ter-assign, customer yang menjawab mengembalikannya ke `in_progress` | Sudah ada |
-| ADM-09 | Minta revisi | Dari `in_progress` atau `completed` ke `revision` | Sudah ada |
-| ADM-10 | Revisi selesai | Dari `revision` ke `completed` | Sudah ada |
-| ADM-11 | Upload hasil | Saat `completed` disimpan sebagai `result`, saat `revision` sebagai `revision`; satu file per submit; file maksimal 20 MB; upload berikutnya menambah file; disimpan privat | Sudah ada |
-| ADM-12 | Kirim hasil | Hanya saat `completed` dan minimal ada satu file deliverable (`result` atau `revision`); order menjadi `delivered` | Sudah ada |
+| ADM-09 | Minta revisi | Dari `in_progress`, `ready_for_delivery`, atau `delivered` ke `revision`; tidak tersedia setelah `completed` | Sudah ada |
+| ADM-10 | Revisi selesai | Dari `revision` ke `ready_for_delivery` | Sudah ada |
+| ADM-11 | Upload hasil | Saat `ready_for_delivery` disimpan sebagai `result`, saat `revision` sebagai `revision`; satu file per submit; file maksimal 20 MB; upload berikutnya menambah file; disimpan privat | Sudah ada |
+| ADM-12 | Kirim hasil | Hanya saat `ready_for_delivery` dan minimal ada satu file deliverable (`result` atau `revision`); order menjadi `delivered` | Sudah ada |
 | ADM-13 | Pembatalan admin | Admin dapat membatalkan order selama belum final | Sudah ada |
 | ADM-14 | Unduh file | Admin dapat mengunduh semua file order | Sudah ada |
 | ADM-15 | Persetujuan pesanan | Admin mengubah `waiting_verification` menjadi `pending_payment`; antrean `queued` tercapai otomatis setelah callback `paid` | Sudah ada |
@@ -387,9 +393,9 @@ Catatan operasional: scheduler harus berjalan (`php artisan schedule:work` atau 
 | WKR-01 | Antrean Worker | Worker hanya melihat order `queued` yang belum memiliki Worker | Sudah ada |
 | WKR-02 | Status online | Worker dapat mengubah status online/offline; klaim hanya saat online | Sudah ada |
 | WKR-03 | Klaim atomik | Order dan Worker dikunci dalam transaksi; order yang sama tidak dapat diklaim dua kali | Sudah ada |
-| WKR-04 | Kuota aktif | Maksimal 5 order aktif per Worker; order `completed` yang belum dikirim tetap dihitung | Sudah ada |
+| WKR-04 | Kuota aktif | Maksimal 5 order aktif per Worker; order `ready_for_delivery` dan `delivered` yang belum diterima tetap dihitung | Sudah ada |
 | WKR-05 | Isolasi akses | Worker hanya dapat melihat dan mengubah order miliknya | Sudah ada |
-| WKR-06 | Aksi Worker | Worker dapat minta info, menandai `completed`/`revision`, upload hasil, dan mengirim hasil | Sudah ada |
+| WKR-06 | Aksi Worker | Worker dapat minta info, menandai `ready_for_delivery`/`revision`, upload hasil, dan mengirim hasil; tidak dapat menyetel `completed` | Sudah ada |
 
 Catatan: UI detail admin terutama menampilkan langkah status berikutnya. Validasi request tetap mengizinkan transisi lain yang sah menurut state machine, misalnya `waiting_verification` → `waiting_customer` atau `in_progress` → `revision`.
 
@@ -468,7 +474,7 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 ### 8.1 Order dan Pembayaran
 
 1. Customer tidak boleh memulai pengerjaan sebelum pembayaran berhasil.
-2. Admin dan Worker tidak boleh mengubah order menjadi `paid`, `expired`, atau `delivered` secara manual.
+2. Admin dan Worker tidak boleh mengubah order menjadi `paid`, `expired`, `delivered`, atau `completed` secara manual.
 3. `paid` dan `expired` hanya boleh berasal dari callback gateway atau scheduler/rekonsiliasi dengan penanda `confirmedByGateway`.
 4. `delivered` hanya boleh lewat aksi kirim dan wajib memiliki minimal satu file hasil.
 5. Satu order boleh memiliki banyak percobaan pembayaran; yang ditampilkan sebagai pembayaran aktif adalah yang terbaru.
@@ -476,24 +482,25 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 7. Nominal callback harus sama dengan total tagihan order.
 8. Order `expired` tetap dapat dibayar; pembayaran telat harus diterima.
 9. Pembayaran `failed` tidak memindahkan order; customer dapat mencoba lagi.
-10. Pembatalan order tidak otomatis melakukan refund; Request Refund hanya membuka WhatsApp admin dan tidak mengubah status order.
+10. Pembatalan order tidak otomatis melakukan refund; Request Refund hanya muncul setelah ada payment berstatus `paid` dan sebelum order `delivered`, membuka WhatsApp admin, dan tidak mengubah status order.
 11. Total harga order adalah snapshot harga jasa saat order dibuat.
 12. Jasa yang diarsipkan tidak dapat dipesan baru; order lama tetap berjalan.
-13. Admin harus menyetujui pesanan sebelum customer dapat membayar; `waiting_verification` menampilkan pesan "Pesanan anda sedang di tinjau admin".
+13. Admin harus menyetujui pesanan sebelum customer dapat membayar; `waiting_verification` menampilkan pesan "Pesanan anda sedang di tinjau admin" dan tombol `Hubungi CS Admin` memakai nomor WhatsApp yang sama dengan kontak publik.
+14. `completed` hanya boleh dicapai customer pemilik order lewat `Terima & Selesai` setelah minimal satu file hasil dikirim.
 
 ### 8.2 Status & Hak Akses
 
 1. Admin menyetujui order tervalidasi dari `waiting_verification` ke `pending_payment`; pembayaran berhasil memindahkan order ke `queued` otomatis, dan hanya Worker yang dapat mengubahnya menjadi `in_progress` lewat klaim.
 2. Worker hanya dapat memproses order yang ter-assign kepadanya.
 3. Worker wajib online dan memiliki kuota kurang dari 5 untuk mengklaim order.
-4. Kuota aktif menghitung semua order ter-assign yang belum `delivered`/`cancelled`, termasuk `completed`.
-5. Customer hanya dapat menambah file saat `waiting_customer` dan membatalkan order sebelum `worker_id` terisi; Admin tetap dapat membatalkan order yang belum final.
-6. File hasil hanya dapat diakses customer pemilik order saat status `completed` atau `delivered`.
+4. Kuota aktif menghitung semua order ter-assign yang belum `completed`/`cancelled`, termasuk `delivered`.
+5. Customer hanya dapat menambah file saat `waiting_customer` dan membatalkan order sebelum `worker_id` terisi; Admin tetap dapat membatalkan order selama belum `delivered`, `completed`, atau `cancelled`.
+6. File hasil hanya dapat diakses customer pemilik order saat status `delivered` atau `completed`.
 7. File requirement dapat diakses customer pemilik sepanjang order ada.
 8. Admin dan Worker dapat mengunduh file order yang boleh mereka akses.
 9. Setiap perubahan status harus melalui `OrderWorkflow::transitionTo()` dan tercatat di riwayat.
 10. `OrderStatus` adalah satu-satunya sumber aturan transisi; jangan menulis status langsung ke database.
-11. Status akhir `delivered`/`cancelled` tidak dapat diubah lagi.
+11. Status akhir `completed`/`cancelled` tidak dapat diubah lagi; setelah `completed`, revisi dan refund dikunci untuk semua pihak dan Admin/Worker menerima notifikasi penerimaan.
 
 ### 8.3 Akun & Impersonation
 
@@ -852,7 +859,7 @@ Base URL ditentukan dari `TRIPAY_IS_PRODUCTION`:
 | `SUPER_ADMIN_EMAIL` | Email Super Admin awal |
 | `SUPER_ADMIN_PASSWORD` | Password Super Admin awal; seeder skip bila email/password kosong |
 | `TRIPAY_*` | Kredensial dan konfigurasi gateway |
-| `JOVEXA_WHATSAPP` | Nomor WhatsApp publik |
+| `JOVEXA_WHATSAPP` | Nomor WhatsApp publik untuk footer, CS `waiting_verification`, dan Request Refund |
 | `JOVEXA_CONTACT_EMAIL` | Email publik |
 | `TRUSTED_PROXIES` | Proxy TLS/load balancer |
 
@@ -942,7 +949,7 @@ vendor/bin/pint --dirty --format agent
 6. Belum ada monitoring/alerting; kegagalan hanya terlihat di log.
 7. Belum ada CI/CD dan E2E test.
 8. Kredensial Tripay di `.env` lokal perlu dirotasi bila pernah terekspos.
-9. Kuota Worker dihitung dari order aktif; Worker dengan banyak order `completed` yang belum dikirim tidak dapat mengambil order baru.
+9. Kuota Worker dihitung dari order aktif; Worker dengan banyak order `ready_for_delivery` atau `delivered` yang belum diterima customer tidak dapat mengambil order baru.
 10. Impersonation tidak memiliki batas durasi otomatis; sesi harus diakhiri manual.
 
 ---
@@ -963,7 +970,8 @@ Baseline MVP dianggap terpenuhi jika:
 - [x] Worker dapat online, mengklaim maksimal 5 order aktif, memproses, revisi, dan mengirim hasil.
 - [x] Super Admin dapat mengelola role/akun dan melakukan impersonation dengan audit trail.
 - [x] Pengiriman hasil ditolak jika belum ada file hasil.
-- [x] Customer dapat mengunduh hasil hanya setelah `completed`/`delivered`.
+- [x] Customer dapat mengunduh hasil hanya setelah `delivered`/`completed`.
+- [x] Customer dapat menerima hasil lewat `Terima & Selesai` sehingga order menjadi `completed` dan revisi dikunci.
 - [x] Setiap perubahan status tercatat di riwayat.
 - [x] Akses file dan order dibatasi berdasarkan kepemilikan/role.
 - [x] Admin dapat mengelola jasa; Super Admin dapat mengelola pengguna.

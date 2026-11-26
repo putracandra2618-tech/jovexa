@@ -36,7 +36,7 @@ class DashboardController extends Controller
             'maxActiveOrders' => WorkerOrderService::MAX_ACTIVE_ORDERS,
             'completedCount' => Order::query()
                 ->assignedTo($worker)
-                ->withStatus([OrderStatus::Delivered])
+                ->withStatus([OrderStatus::Completed])
                 ->count(),
         ]);
     }

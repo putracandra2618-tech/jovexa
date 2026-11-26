@@ -36,7 +36,7 @@ trait ManagesStaffOrders
         } else {
             $this->workflow->transitionTo($order, $target, $actor, $note);
 
-            if ($previousStatus === OrderStatus::Revision && $target === OrderStatus::Completed) {
+            if ($previousStatus === OrderStatus::Revision && $target === OrderStatus::ReadyForDelivery) {
                 $this->notifications->revisionApproved($order);
             }
         }
@@ -91,7 +91,7 @@ trait ManagesStaffOrders
     {
         $this->ensureCanManageOrder($order);
 
-        abort_unless($order->status === OrderStatus::Completed, 404);
+        abort_unless($order->status === OrderStatus::ReadyForDelivery, 404);
 
         return view($this->viewPrefix.'.deliver', [
             'order' => $order->load('service', 'deliverables.kindRecord'),
@@ -106,7 +106,7 @@ trait ManagesStaffOrders
         $this->ensureCanManageOrder($order);
 
         abort_unless(
-            in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], true),
+            in_array($order->status, [OrderStatus::ReadyForDelivery, OrderStatus::Revision], true),
             404,
             'Hasil hanya bisa diunggah saat pekerjaan selesai atau sedang direvisi.',
         );
@@ -147,7 +147,7 @@ trait ManagesStaffOrders
     {
         $this->ensureCanManageOrder($order);
 
-        abort_unless($order->status === OrderStatus::Completed, 404);
+        abort_unless($order->status === OrderStatus::ReadyForDelivery, 404);
 
         if (! $order->deliverables()->exists()) {
             throw ValidationException::withMessages([
@@ -178,10 +178,10 @@ trait ManagesStaffOrders
     {
         $this->ensureCanManageOrder($order);
 
-        abort_if(
-            $order->status->isFinal(),
+        abort_unless(
+            $order->status->canTransitionTo(OrderStatus::Cancelled),
             403,
-            'Pesanan yang sudah final tidak bisa dibatalkan.'
+            'Pesanan sudah dikirim, diterima customer, atau tidak bisa dibatalkan.'
         );
 
         $validated = $request->validate([

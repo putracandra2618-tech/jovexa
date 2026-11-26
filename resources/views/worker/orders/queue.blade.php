@@ -18,7 +18,7 @@
     @elseif ($activeCount >= $maxActiveOrders)
         <x-alert variant="warning">
             Kuota pesanan aktif sudah penuh ({{ $activeCount }}/{{ $maxActiveOrders }}).
-            Selesaikan salah satu pesanan terlebih dahulu.
+            Tandai salah satu pesanan siap dikirim terlebih dahulu.
         </x-alert>
     @else
         <x-alert variant="success">

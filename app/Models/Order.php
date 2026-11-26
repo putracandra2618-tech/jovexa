@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Lookup\OrderFileKind as OrderFileKindLookup;
 use App\Models\Lookup\OrderStatus as OrderStatusLookup;
+use App\Models\Lookup\PaymentStatus as PaymentStatusLookup;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -262,7 +264,8 @@ class Order extends Model
             OrderStatus::WaitingCustomer,
             OrderStatus::InProgress,
             OrderStatus::Revision,
-            OrderStatus::Completed,
+            OrderStatus::ReadyForDelivery,
+            OrderStatus::Delivered,
         ]);
     }
 
@@ -299,7 +302,7 @@ class Order extends Model
         return $query
             ->assignedTo($worker)
             ->whereNotIn('order_status_id', [
-                OrderStatusLookup::idFor(OrderStatus::Delivered->value),
+                OrderStatusLookup::idFor(OrderStatus::Completed->value),
                 OrderStatusLookup::idFor(OrderStatus::Cancelled->value),
             ]);
     }
@@ -320,7 +323,7 @@ class Order extends Model
      */
     public function isPaid(): bool
     {
-        return ! in_array($this->status, [OrderStatus::PendingPayment, OrderStatus::Expired, OrderStatus::Cancelled], strict: true);
+        return $this->hasBeenPaid();
     }
 
     /**
@@ -345,37 +348,53 @@ class Order extends Model
             && $this->status->canTransitionTo(OrderStatus::Cancelled);
     }
 
+    public function hasSuccessfulPayment(): bool
+    {
+        return $this->payments()
+            ->where('payment_status_id', PaymentStatusLookup::idFor(PaymentStatus::Paid->value))
+            ->exists();
+    }
+
     /**
      * Determine whether the order already went through a successful payment.
      */
     public function hasBeenPaid(): bool
     {
-        return in_array($this->status, [
+        if (in_array($this->status, [
             OrderStatus::Paid,
             OrderStatus::Queued,
             OrderStatus::InProgress,
             OrderStatus::Revision,
-            OrderStatus::Completed,
+            OrderStatus::ReadyForDelivery,
             OrderStatus::Delivered,
-        ], strict: true);
+            OrderStatus::Completed,
+        ], strict: true)) {
+            return true;
+        }
+
+        return $this->hasSuccessfulPayment();
     }
 
     /**
      * Determine whether the customer may request a refund for this order.
      *
-     * The request stays open until the worker sends the result, which moves the
-     * order to delivered. Clicking it does not change the order status itself.
+     * The request stays open until the result is delivered to the customer.
+     * Clicking it does not change the order status itself.
      */
     public function canRequestRefund(): bool
     {
-        return in_array($this->status, [
+        if (! in_array($this->status, [
             OrderStatus::Paid,
             OrderStatus::Queued,
             OrderStatus::InProgress,
             OrderStatus::WaitingCustomer,
             OrderStatus::Revision,
-            OrderStatus::Completed,
-        ], strict: true);
+            OrderStatus::ReadyForDelivery,
+        ], strict: true)) {
+            return false;
+        }
+
+        return $this->hasSuccessfulPayment();
     }
 
     /**

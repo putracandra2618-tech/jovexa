@@ -34,10 +34,14 @@
             </ul>
         @endif
 
-        @if ($used >= \App\Services\RevisionService::MAX_PER_ORDER)
+        @if ($order->status === \App\Enums\OrderStatus::Completed)
+            <x-alert variant="success" class="mt-3">
+                Pesanan sudah diterima customer dan dinyatakan selesai. Revisi tidak bisa diajukan lagi.
+            </x-alert>
+        @elseif ($used >= \App\Services\RevisionService::MAX_PER_ORDER)
             <x-alert variant="warning" class="mt-3">
                 Kuota revisi sudah habis ({{ $used }}/{{ \App\Services\RevisionService::MAX_PER_ORDER }}).
-                {{ $isCustomerView ? 'Silakan hubungi tim Jovexa jika masih ada kendala.' : 'Selesaikan pesanan ini atau hubungi customer untuk kesepakatan berikutnya.' }}
+                {{ $isCustomerView ? 'Silakan hubungi tim Jovexa jika masih ada kendala.' : 'Kirim pesanan ini atau hubungi customer untuk kesepakatan berikutnya.' }}
             </x-alert>
         @elseif ($order->status === \App\Enums\OrderStatus::Revision)
             <x-alert variant="info" class="mt-3">

@@ -56,7 +56,7 @@
                             </a>
                         @endif
 
-                        @if ($deletable && $file->isDeliverable() && $order->status === \App\Enums\OrderStatus::Completed)
+                        @if ($deletable && $file->isDeliverable() && in_array($order->status, [\App\Enums\OrderStatus::ReadyForDelivery, \App\Enums\OrderStatus::Revision], true))
                             <form method="POST" action="{{ route('worker.orders.file.destroy', [$order, $file]) }}"
                                   data-confirm="Yakin ingin menghapus file ini? File yang dihapus tidak dapat dikembalikan.">
                                 @csrf

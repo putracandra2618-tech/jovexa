@@ -286,7 +286,7 @@ class AdminOrderWorkflowTest extends TestCase
 
     public function test_admin_cannot_set_delivered_status_manually(): void
     {
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
 
         // Delivery must go through the dedicated send action, which refuses to
         // run unless a result file has been uploaded.
@@ -296,21 +296,50 @@ class AdminOrderWorkflowTest extends TestCase
             ])
             ->assertSessionHasErrors('status');
 
-        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
     }
 
-    public function test_revision_order_is_marked_completed_once_redone(): void
+    public function test_admin_cannot_set_completed_status_manually(): void
+    {
+        $order = Order::factory()->readyForDelivery()->create();
+        OrderFile::factory()->for($order)->result()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch(route('admin.orders.status', $order), [
+                'status' => OrderStatus::Completed->value,
+            ])
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
+    }
+
+    public function test_admin_cannot_request_a_revision_after_the_customer_accepts(): void
+    {
+        $order = Order::factory()->completed()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch(route('admin.orders.status', $order), [
+                'status' => OrderStatus::Revision->value,
+                'note' => 'Catatan setelah selesai.',
+            ])
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
+    }
+
+    public function test_revision_order_is_marked_ready_for_delivery_once_redone(): void
     {
         $order = Order::factory()->revision()->create();
 
         $this->actingAs(User::factory()->admin()->create())
             ->patch(route('admin.orders.status', $order), [
-                'status' => OrderStatus::Completed->value,
+                'status' => OrderStatus::ReadyForDelivery->value,
                 'note' => 'Revisi sudah incorporated.',
             ])
             ->assertRedirect();
 
-        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
     }
 
     public function test_approving_a_revision_notifies_the_customer(): void
@@ -320,7 +349,7 @@ class AdminOrderWorkflowTest extends TestCase
 
         $this->actingAs(User::factory()->admin()->create())
             ->patch(route('admin.orders.status', $order), [
-                'status' => OrderStatus::Completed->value,
+                'status' => OrderStatus::ReadyForDelivery->value,
                 'note' => 'Revisi sudah sesuai.',
             ])
             ->assertRedirect();
@@ -403,7 +432,7 @@ class AdminOrderWorkflowTest extends TestCase
     {
         Storage::fake('local');
 
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
         $admin = User::factory()->admin()->create();
 
         $this->actingAs($admin)
@@ -458,20 +487,20 @@ class AdminOrderWorkflowTest extends TestCase
 
     public function test_cannot_deliver_without_an_uploaded_result(): void
     {
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
 
         $this->actingAs(User::factory()->admin()->create())
             ->post(route('admin.orders.send', $order))
             ->assertSessionHasErrors();
 
-        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
     }
 
     public function test_admin_can_deliver_the_finished_work(): void
     {
         Storage::fake('local');
 
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
         OrderFile::factory()->for($order)->result()->stored()->create();
 
         $this->actingAs(User::factory()->admin()->create())
@@ -485,7 +514,7 @@ class AdminOrderWorkflowTest extends TestCase
     {
         Storage::fake('local');
 
-        $order = Order::factory()->completed()->create();
+        $order = Order::factory()->readyForDelivery()->create();
         OrderFile::factory()->for($order)->result()->stored()->create();
 
         $response = $this->actingAs(User::factory()->admin()->create())

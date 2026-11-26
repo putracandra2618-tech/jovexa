@@ -63,6 +63,28 @@ class UserNotificationService
     }
 
     /**
+     * Tell admins and the assigned worker that the customer accepted the result.
+     */
+    public function orderAccepted(Order $order, User $accepter): void
+    {
+        $staff = User::query()
+            ->whereIn('role_id', [
+                Role::idFor(UserRole::Admin->value),
+                Role::idFor(UserRole::SuperAdmin->value),
+            ])
+            ->get();
+
+        $this->notify(
+            $staff->concat([$order->worker])->filter(),
+            $order,
+            UserNotification::OrderAccepted,
+            'Pesanan diterima customer',
+            'Pesanan '.$order->order_number.' diterima oleh '.$accepter->name.' dan dinyatakan selesai.',
+            $accepter,
+        );
+    }
+
+    /**
      * Tell the customer what the staff member needs to continue.
      */
     public function informationRequested(Order $order, User $requester, string $note): void

@@ -102,6 +102,8 @@ Route::middleware(['auth', 'role:'.UserRole::Customer->value])->prefix('dashboar
     Route::post('pesanan/{order}/revisi', [CustomerOrderController::class, 'requestRevision'])
         ->middleware('throttle:uploads')
         ->name('orders.revision');
+    Route::post('pesanan/{order}/terima', [CustomerOrderController::class, 'acceptResult'])
+        ->name('orders.accept');
     Route::delete('pesanan/{order}', [CustomerOrderController::class, 'destroy'])->name('orders.destroy');
 
     Route::get('profil', [ProfileController::class, 'edit'])->name('profile.edit');

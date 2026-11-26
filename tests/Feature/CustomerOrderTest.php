@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderFile;
+use App\Models\Payment;
 use App\Models\RevisionRequest;
 use App\Models\Service;
 use App\Models\User;
@@ -195,14 +196,22 @@ class CustomerOrderTest extends TestCase
 
     public function test_an_unreviewed_order_shows_a_review_message_without_a_pay_button(): void
     {
+        config(['jovexa.contact.whatsapp' => '62895633852241']);
+
         $order = Order::factory()->for(User::factory()->customer())->waitingVerification()->create();
+        $message = 'Halo Admin Jovexa, saya ingin menanyakan status pesanan '.$order->order_number.'.';
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.show', $order))
             ->assertOk()
             ->assertSee('Pesanan anda sedang di tinjau admin. Setelah disetujui, kamu bisa melanjutkan pembayaran. Kamu masih bisa membatalkan sebelum pembayaran; setelah dibayar, ajukan refund lewat WhatsApp sampai hasil dikirim.')
+            ->assertSee('Hubungi CS Admin')
+            ->assertSee('https://wa.me/62895633852241?text='.rawurlencode($message), escape: false)
+            ->assertSee('target="_blank"', escape: false)
+            ->assertSee('rel="noopener"', escape: false)
             ->assertSee('Batalkan Pesanan')
-            ->assertDontSee('Bayar Sekarang');
+            ->assertDontSee('Bayar Sekarang')
+            ->assertDontSee('Request Refund');
     }
 
     public function test_an_approved_order_offers_the_pay_button(): void
@@ -224,6 +233,7 @@ class CustomerOrderTest extends TestCase
             ->inProgress()
             ->assignedTo(User::factory()->worker()->create())
             ->create();
+        Payment::factory()->for($order)->paid()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.show', $order))
@@ -254,6 +264,32 @@ class CustomerOrderTest extends TestCase
         $this->assertSame(OrderStatus::WaitingCustomer, $order->fresh()->status);
     }
 
+    public function test_unpaid_order_waiting_for_customer_information_shows_cancel_instead_of_refund(): void
+    {
+        config(['jovexa.contact.whatsapp' => '62895633852241']);
+
+        $order = Order::factory()->for(User::factory()->customer())->waitingCustomer()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Batalkan Pesanan')
+            ->assertDontSee('Request Refund')
+            ->assertDontSee('Hubungi CS Admin');
+    }
+
+    public function test_customer_service_button_is_hidden_when_whatsapp_is_not_configured(): void
+    {
+        config(['jovexa.contact.whatsapp' => null]);
+
+        $order = Order::factory()->for(User::factory()->customer())->waitingVerification()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Hubungi CS Admin');
+    }
+
     public function test_order_form_renders_the_dropzone_and_character_counter_hooks(): void
     {
         $service = Service::factory()->create();
@@ -281,6 +317,7 @@ class CustomerOrderTest extends TestCase
         config(['jovexa.contact.whatsapp' => '+62 895-6338-52241']);
 
         $order = Order::factory()->for(User::factory()->customer())->queued()->create();
+        Payment::factory()->for($order)->paid()->create();
         $message = sprintf(
             'Halo Admin Jovexa, saya ingin mengajukan refund untuk pesanan %s (%s). Mohon ditindaklanjuti.',
             $order->order_number,
@@ -308,6 +345,7 @@ class CustomerOrderTest extends TestCase
         config(['jovexa.contact.whatsapp' => '62895633852241']);
 
         $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+        Payment::factory()->for($order)->paid()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.show', $order))
@@ -320,12 +358,27 @@ class CustomerOrderTest extends TestCase
         config(['jovexa.contact.whatsapp' => null]);
 
         $order = Order::factory()->for(User::factory()->customer())->queued()->create();
+        Payment::factory()->for($order)->paid()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.show', $order))
             ->assertOk()
             ->assertDontSee('Request Refund')
             ->assertDontSee('Batalkan Pesanan');
+    }
+
+    public function test_refund_remains_visible_when_a_later_payment_attempt_fails(): void
+    {
+        config(['jovexa.contact.whatsapp' => '62895633852241']);
+
+        $order = Order::factory()->for(User::factory()->customer())->queued()->create();
+        Payment::factory()->for($order)->paid()->create();
+        Payment::factory()->for($order)->failed()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Request Refund');
     }
 
     public function test_delivered_order_cannot_be_cancelled(): void
@@ -339,9 +392,92 @@ class CustomerOrderTest extends TestCase
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
     }
 
-    public function test_customer_can_request_revision_on_a_completed_order(): void
+    public function test_customer_can_accept_the_delivered_result_and_notify_staff(): void
     {
+        $customer = User::factory()->customer()->create();
+        $admin = User::factory()->admin()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->delivered()->assignedTo($worker)->create();
+        $this->createDeliverable($order);
+
+        $this->actingAs($customer)
+            ->from(route('customer.orders.show', $order))
+            ->post(route('customer.orders.accept', $order))
+            ->assertRedirect(route('customer.orders.show', $order))
+            ->assertSessionHas('success');
+
+        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+
+        $entry = $order->statusHistory()->latest('id')->first();
+        $this->assertSame(OrderStatus::Delivered, $entry->from_status);
+        $this->assertSame(OrderStatus::Completed, $entry->to_status);
+        $this->assertSame('Customer menerima hasil pekerjaan.', $entry->note);
+
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $admin->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::OrderAccepted,
+        ]);
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $worker->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::OrderAccepted,
+        ]);
+        $this->assertDatabaseMissing('user_notifications', ['user_id' => $customer->getKey()]);
+    }
+
+    public function test_customer_cannot_accept_the_result_before_it_is_delivered(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->readyForDelivery()->create();
+        $this->createDeliverable($order);
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.accept', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
+    }
+
+    public function test_customer_cannot_accept_the_result_without_a_deliverable(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.accept', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_accepted_order_hides_revision_refund_and_accept_actions(): void
+    {
+        config(['jovexa.contact.whatsapp' => '62895633852241']);
+
         $order = Order::factory()->for(User::factory()->customer())->completed()->create();
+        Payment::factory()->for($order)->paid()->create();
+        $this->createDeliverable($order);
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Hasil pesanan sudah kamu terima')
+            ->assertDontSee('Terima & Selesai')
+            ->assertDontSee('Minta Revisi')
+            ->assertDontSee('Request Refund');
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Masih perlu diperbaiki.',
+            ])
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
+    }
+
+    public function test_customer_can_request_revision_on_a_ready_for_delivery_order(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->readyForDelivery()->create();
         $this->createDeliverable($order);
 
         $this->actingAs($order->user)
@@ -436,7 +572,7 @@ class CustomerOrderTest extends TestCase
         $customer = User::factory()->customer()->create();
         $admin = User::factory()->admin()->create();
         $worker = User::factory()->worker()->create();
-        $order = Order::factory()->for($customer)->completed()->assignedTo($worker)->create();
+        $order = Order::factory()->for($customer)->readyForDelivery()->assignedTo($worker)->create();
         $this->createDeliverable($order);
 
         $this->actingAs($customer)
@@ -461,7 +597,7 @@ class CustomerOrderTest extends TestCase
     public function test_revision_notes_are_visible_on_the_order_detail_page(): void
     {
         $customer = User::factory()->customer()->create();
-        $order = Order::factory()->for($customer)->completed()->create();
+        $order = Order::factory()->for($customer)->delivered()->create();
         $note = 'Tolong perbaiki bagian kesimpulan dan tambahkan referensi.';
 
         RevisionRequest::factory()->for($order)->create([
@@ -480,7 +616,7 @@ class CustomerOrderTest extends TestCase
     public function test_customer_cannot_request_a_fourth_revision(): void
     {
         $customer = User::factory()->customer()->create();
-        $order = Order::factory()->for($customer)->completed()->create();
+        $order = Order::factory()->for($customer)->readyForDelivery()->create();
         $this->createDeliverable($order);
 
         foreach (['Perbaikan pertama.', 'Perbaikan kedua.', 'Perbaikan ketiga.'] as $number => $note) {
@@ -498,7 +634,7 @@ class CustomerOrderTest extends TestCase
             ])
             ->assertSessionHasErrors('revision_note');
 
-        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
         $this->assertSame(3, $order->revisionRequests()->count());
 
         $this->actingAs($customer)

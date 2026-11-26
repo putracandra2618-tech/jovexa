@@ -88,7 +88,9 @@
                 @if ($actions === [] && ! in_array($order->status, [OrderStatus::Queued, OrderStatus::WaitingCustomer], true))
                     <x-alert variant="info" class="mt-4">
                         @if ($order->status === OrderStatus::Delivered)
-                            Hasil sudah dikirim ke customer dan pesanan selesai.
+                            Hasil sudah dikirim ke customer dan menunggu penerimaan.
+                        @elseif ($order->status === OrderStatus::Completed)
+                            Customer sudah menerima hasil. Pesanan dinyatakan selesai dan revisi dikunci.
                         @elseif ($order->status === OrderStatus::Cancelled)
                             Pesanan ini sudah dibatalkan.
                         @else

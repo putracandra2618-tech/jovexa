@@ -21,6 +21,8 @@ class UserNotification extends Model
 
     public const ResultDelivered = 'result_delivered';
 
+    public const OrderAccepted = 'order_accepted';
+
     public const InformationRequested = 'information_requested';
 
     /**

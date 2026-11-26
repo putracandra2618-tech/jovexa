@@ -49,7 +49,7 @@
                                :deletable="true"
                                empty-message="Belum ada file hasil revisi." />
 
-            @if (in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], true))
+            @if (in_array($order->status, [OrderStatus::ReadyForDelivery, OrderStatus::Revision], true))
                 <x-card title="{{ $order->status === OrderStatus::Revision ? 'Unggah Hasil Revisi' : 'Unggah File Hasil' }}" class="mt-4">
                     <div id="unggah-hasil">
                         <form method="POST" action="{{ route('worker.orders.result.store', $order) }}"
@@ -102,7 +102,9 @@
                 @if ($actions === [])
                     <x-alert variant="info" class="mt-4">
                         @if ($order->status === OrderStatus::Delivered)
-                            Pesanan sudah dikirim ke customer. Terima kasih.
+                            Pesanan sudah dikirim ke customer dan menunggu penerimaan.
+                        @elseif ($order->status === OrderStatus::Completed)
+                            Customer sudah menerima hasil. Pesanan dinyatakan selesai dan revisi dikunci.
                         @elseif ($order->status === OrderStatus::Cancelled)
                             Pesanan ini sudah dibatalkan.
                         @else

@@ -14,6 +14,7 @@ use App\Models\Service;
 use App\Services\OrderFileDownloader;
 use App\Services\OrderWorkflow;
 use App\Services\RevisionService;
+use App\Services\UserNotificationService;
 use App\Support\OrderNumberGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,6 +30,7 @@ class OrderController extends Controller
         private readonly OrderWorkflow $workflow,
         private readonly OrderFileDownloader $downloads,
         private readonly RevisionService $revisions,
+        private readonly UserNotificationService $notifications,
     ) {}
 
     /**
@@ -203,6 +205,37 @@ class OrderController extends Controller
         $this->revisions->request($order, $request->user(), $validated['revision_note']);
 
         return back()->with('success', 'Permintaan revisi berhasil dikirim. Tim kami akan segera menindaklanjuti.');
+    }
+
+    /**
+     * Let the customer accept the delivered result and close the order.
+     */
+    public function acceptResult(Request $request, Order $order): RedirectResponse
+    {
+        $this->authorizeOrderOwner($request, $order);
+
+        abort_unless(
+            $order->status === OrderStatus::Delivered,
+            403,
+            'Hasil pesanan belum dikirim ke customer.'
+        );
+
+        abort_unless(
+            $order->deliverables()->exists(),
+            403,
+            'Hasil pekerjaan belum tersedia.'
+        );
+
+        $this->workflow->transitionTo(
+            $order,
+            OrderStatus::Completed,
+            $request->user(),
+            'Customer menerima hasil pekerjaan.',
+        );
+
+        $this->notifications->orderAccepted($order->fresh(), $request->user());
+
+        return back()->with('success', 'Terima kasih. Pesanan ditandai selesai dan revisi sudah dikunci.');
     }
 
     /**
