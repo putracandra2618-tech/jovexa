@@ -168,7 +168,13 @@ class OrderActions
             $actions[] = $this->revisionAction($order, 'customer.orders.revision');
         }
 
-        if (! $status->isFinal()) {
+        if ($order->canRequestRefund()) {
+            $refundAction = $this->refundAction($order);
+
+            if ($refundAction !== null) {
+                $actions[] = $refundAction;
+            }
+        } elseif ($order->canBeCancelledByCustomer()) {
             $actions[] = $this->cancelAction($order, 'customer.orders.destroy', true);
         }
 
@@ -303,6 +309,47 @@ class OrderActions
                 'required' => true,
                 'placeholder' => 'Contoh: Mohon kirim data lengkap bab 1.',
             ],
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function refundAction(Order $order): ?array
+    {
+        $whatsapp = config('jovexa.contact.whatsapp');
+
+        if (blank($whatsapp)) {
+            return null;
+        }
+
+        $digits = (string) preg_replace('/\D+/', '', (string) $whatsapp);
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62'.substr($digits, 1);
+        } elseif (! str_starts_with($digits, '62')) {
+            $digits = '62'.$digits;
+        }
+
+        $message = sprintf(
+            'Halo Admin Jovexa, saya ingin mengajukan refund untuk pesanan %s (%s). Mohon ditindaklanjuti.',
+            $order->order_number,
+            $order->service->name,
+        );
+
+        return [
+            'key' => 'refund',
+            'type' => 'link',
+            'label' => 'Request Refund',
+            'icon' => 'bi-whatsapp',
+            'variant' => 'warning',
+            'route' => 'https://wa.me/'.$digits.'?text='.rawurlencode($message),
+            'target' => '_blank',
+            'rel' => 'noopener',
         ];
     }
 

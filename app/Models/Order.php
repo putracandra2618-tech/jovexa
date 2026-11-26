@@ -308,6 +308,53 @@ class Order extends Model
     }
 
     /**
+     * Determine whether the customer may still cancel this order.
+     *
+     * Cancellation is limited to unpaid orders that no worker has claimed.
+     * A paid order has to go through the refund request flow instead.
+     */
+    public function canBeCancelledByCustomer(): bool
+    {
+        return $this->status !== null
+            && ! $this->hasBeenPaid()
+            && $this->worker_id === null
+            && $this->status->canTransitionTo(OrderStatus::Cancelled);
+    }
+
+    /**
+     * Determine whether the order already went through a successful payment.
+     */
+    public function hasBeenPaid(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::Paid,
+            OrderStatus::Queued,
+            OrderStatus::InProgress,
+            OrderStatus::Revision,
+            OrderStatus::Completed,
+            OrderStatus::Delivered,
+        ], strict: true);
+    }
+
+    /**
+     * Determine whether the customer may request a refund for this order.
+     *
+     * The request stays open until the worker sends the result, which moves the
+     * order to delivered. Clicking it does not change the order status itself.
+     */
+    public function canRequestRefund(): bool
+    {
+        return in_array($this->status, [
+            OrderStatus::Paid,
+            OrderStatus::Queued,
+            OrderStatus::InProgress,
+            OrderStatus::WaitingCustomer,
+            OrderStatus::Revision,
+            OrderStatus::Completed,
+        ], strict: true);
+    }
+
+    /**
      * Determine whether the order results may be read by the customer.
      */
     public function canDownloadResults(): bool

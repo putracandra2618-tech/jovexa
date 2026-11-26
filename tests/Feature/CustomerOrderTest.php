@@ -183,7 +183,7 @@ class CustomerOrderTest extends TestCase
 
     public function test_order_show_renders_the_animated_stepper_and_cancel_hooks(): void
     {
-        $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.show', $order))
@@ -200,7 +200,8 @@ class CustomerOrderTest extends TestCase
         $this->actingAs($order->user)
             ->get(route('customer.orders.show', $order))
             ->assertOk()
-            ->assertSee('Pesanan anda sedang di tinjau admin.')
+            ->assertSee('Pesanan anda sedang di tinjau admin. Setelah disetujui, kamu bisa melanjutkan pembayaran. Kamu masih bisa membatalkan sebelum pembayaran; setelah dibayar, ajukan refund lewat WhatsApp sampai hasil dikirim.')
+            ->assertSee('Batalkan Pesanan')
             ->assertDontSee('Bayar Sekarang');
     }
 
@@ -214,6 +215,45 @@ class CustomerOrderTest extends TestCase
             ->assertSee('Bayar Sekarang');
     }
 
+    public function test_customer_cannot_cancel_after_a_worker_claims_the_order(): void
+    {
+        config(['jovexa.contact.whatsapp' => '62895633852241']);
+
+        $order = Order::factory()
+            ->for(User::factory()->customer())
+            ->inProgress()
+            ->assignedTo(User::factory()->worker()->create())
+            ->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Request Refund')
+            ->assertDontSee('Batalkan Pesanan');
+
+        $this->actingAs($order->user)
+            ->delete(route('customer.orders.destroy', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+        $this->assertSame(0, $order->statusHistory()->count());
+    }
+
+    public function test_customer_cannot_cancel_after_worker_requests_information(): void
+    {
+        $order = Order::factory()
+            ->for(User::factory()->customer())
+            ->waitingCustomer()
+            ->assignedTo(User::factory()->worker()->create())
+            ->create();
+
+        $this->actingAs($order->user)
+            ->delete(route('customer.orders.destroy', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::WaitingCustomer, $order->fresh()->status);
+    }
+
     public function test_order_form_renders_the_dropzone_and_character_counter_hooks(): void
     {
         $service = Service::factory()->create();
@@ -225,15 +265,67 @@ class CustomerOrderTest extends TestCase
             ->assertSee('data-char-counter="5000"', escape: false);
     }
 
-    public function test_customer_can_cancel_a_running_order(): void
+    public function test_customer_can_cancel_before_payment(): void
     {
-        $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->delete(route('customer.orders.destroy', $order))
             ->assertRedirect(route('customer.orders.index'));
 
         $this->assertSame(OrderStatus::Cancelled, $order->fresh()->status);
+    }
+
+    public function test_paid_order_offers_refund_instead_of_cancel(): void
+    {
+        config(['jovexa.contact.whatsapp' => '+62 895-6338-52241']);
+
+        $order = Order::factory()->for(User::factory()->customer())->queued()->create();
+        $message = sprintf(
+            'Halo Admin Jovexa, saya ingin mengajukan refund untuk pesanan %s (%s). Mohon ditindaklanjuti.',
+            $order->order_number,
+            $order->service->name,
+        );
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Request Refund')
+            ->assertSee('https://wa.me/62895633852241?text='.rawurlencode($message), escape: false)
+            ->assertSee('target="_blank"', escape: false)
+            ->assertSee('rel="noopener"', escape: false)
+            ->assertDontSee('Batalkan Pesanan');
+
+        $this->actingAs($order->user)
+            ->delete(route('customer.orders.destroy', $order))
+            ->assertForbidden();
+
+        $this->assertSame(OrderStatus::Queued, $order->fresh()->status);
+    }
+
+    public function test_refund_is_hidden_after_the_result_is_delivered(): void
+    {
+        config(['jovexa.contact.whatsapp' => '62895633852241']);
+
+        $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Request Refund');
+    }
+
+    public function test_refund_is_hidden_when_whatsapp_is_not_configured(): void
+    {
+        config(['jovexa.contact.whatsapp' => null]);
+
+        $order = Order::factory()->for(User::factory()->customer())->queued()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Request Refund')
+            ->assertDontSee('Batalkan Pesanan');
     }
 
     public function test_delivered_order_cannot_be_cancelled(): void

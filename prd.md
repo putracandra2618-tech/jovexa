@@ -103,7 +103,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 - Memantau status dan riwayat pesanan.
 - Mengunggah file tambahan saat diminta Admin atau Worker.
 - Mengunduh file hasil setelah pesanan selesai/dikirim.
-- Membatalkan pesanan selama status belum final.
+- Membatalkan pesanan hanya sebelum pembayaran; setelah dibayar, mengajukan refund lewat WhatsApp sampai hasil dikirim.
 
 ### 4.3 Admin
 
@@ -271,6 +271,7 @@ Catatan:
 - `in_progress` dari `queued` hanya boleh dicapai lewat klaim Worker.
 - `delivered` hanya boleh dicapai lewat aksi kirim dan wajib sudah memiliki file hasil.
 - Order `delivered` dan `cancelled` adalah status final.
+- Transisi ke `cancelled` pada diagram berlaku penuh untuk Admin. Customer hanya membatalkan order yang belum dibayar dan belum diklaim Worker. Order yang sudah dibayar memakai alur Request Refund lewat WhatsApp sampai status `delivered`; klik refund tidak mengubah status order.
 - `expired` masih dapat dibayar; pembayaran telat harus tetap diterima.
 
 ---
@@ -318,7 +319,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | ORD-05 | Daftar pesanan customer | Hanya order milik sendiri; 10 per halaman; filter tab Semua/Berjalan/Selesai/Perlu tindakan di browser | Sudah ada |
 | ORD-06 | Detail pesanan | Menampilkan stepper progres, ringkasan, file, pembayaran terakhir, dan riwayat status | Sudah ada |
 | ORD-07 | File tambahan | Hanya saat status `waiting_customer`; maksimal 5 file; setelah upload order kembali ke `waiting_verification` bila belum ada Worker, atau `in_progress` bila sudah ter-assign | Sudah ada |
-| ORD-08 | Pembatalan customer | Customer dapat membatalkan order selama status belum final; order menjadi `cancelled` | Sudah ada |
+| ORD-08 | Pembatalan & refund customer | Customer membatalkan order sebelum pembayaran; setelah pembayaran tombol batal diganti Request Refund lewat WhatsApp sampai hasil dikirim | Sudah ada |
 | ORD-09 | Unduh requirement | Customer dapat mengunduh file requirement miliknya sepanjang order masih ada | Sudah ada |
 | ORD-10 | Unduh hasil | File hasil hanya bisa diunduh saat status `completed` atau `delivered` | Sudah ada |
 | ORD-11 | Larangan ubah status | Customer tidak dapat mengubah status order secara manual selain aksi tambah file dan pembatalan | Sudah ada |
@@ -342,7 +343,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | PAY-10 | Expiry otomatis | Command `tripay:expire-stale-payments` dijalankan setiap 5 menit; payment pending yang punya `checkout_url` dan lewat `expires_at` di-expire | Sudah ada |
 | PAY-11 | Rekonsiliasi | Command `tripay:reconcile-payments` berjalan tiap jam; memeriksa pending > 60 menit dan expired dalam 7 hari terakhir; memakai `/transaction/detail` | Sudah ada |
 | PAY-12 | Sinkronisasi channel | Command manual `tripay:sync-channels` untuk menyegarkan cache channel | Sudah ada |
-| PAY-13 | Refund | Refund penuh/sebagian dari dashboard | Belum |
+| PAY-13 | Request refund | Customer membuka WhatsApp admin dengan pesan berisi nomor order dan jasa; tidak mengubah status order | Sudah ada |
 | PAY-14 | Invoice/receipt | Dokumen pembayaran yang bisa diunduh customer | Belum |
 | PAY-15 | Pembayaran parsial/DP | Pembayaran bertahap | Di luar lingkup |
 | PAY-16 | Multi-currency | Selain IDR | Di luar lingkup |
@@ -473,7 +474,7 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 7. Nominal callback harus sama dengan total tagihan order.
 8. Order `expired` tetap dapat dibayar; pembayaran telat harus diterima.
 9. Pembayaran `failed` tidak memindahkan order; customer dapat mencoba lagi.
-10. Pembatalan order tidak otomatis melakukan refund.
+10. Pembatalan order tidak otomatis melakukan refund; Request Refund hanya membuka WhatsApp admin dan tidak mengubah status order.
 11. Total harga order adalah snapshot harga jasa saat order dibuat.
 12. Jasa yang diarsipkan tidak dapat dipesan baru; order lama tetap berjalan.
 13. Admin harus menyetujui pesanan sebelum customer dapat membayar; `waiting_verification` menampilkan pesan "Pesanan anda sedang di tinjau admin".
@@ -484,7 +485,7 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 2. Worker hanya dapat memproses order yang ter-assign kepadanya.
 3. Worker wajib online dan memiliki kuota kurang dari 5 untuk mengklaim order.
 4. Kuota aktif menghitung semua order ter-assign yang belum `delivered`/`cancelled`, termasuk `completed`.
-5. Customer hanya dapat menambah file saat `waiting_customer` dan membatalkan order yang belum final.
+5. Customer hanya dapat menambah file saat `waiting_customer` dan membatalkan order sebelum `worker_id` terisi; Admin tetap dapat membatalkan order yang belum final.
 6. File hasil hanya dapat diakses customer pemilik order saat status `completed` atau `delivered`.
 7. File requirement dapat diakses customer pemilik sepanjang order ada.
 8. Admin dan Worker dapat mengunduh file order yang boleh mereka akses.

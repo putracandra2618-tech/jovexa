@@ -69,7 +69,7 @@
 
                 @if ($order->status === \App\Enums\OrderStatus::WaitingVerification)
                     <x-alert variant="warning">
-                        Pesanan anda sedang di tinjau admin. Setelah disetujui, kamu bisa melanjutkan pembayaran.
+                        Pesanan anda sedang di tinjau admin. Setelah disetujui, kamu bisa melanjutkan pembayaran. Kamu masih bisa membatalkan sebelum pembayaran; setelah dibayar, ajukan refund lewat WhatsApp sampai hasil dikirim.
                     </x-alert>
                 @elseif ($order->isPayable())
                     <p class="page-subtitle mb-0">

@@ -198,16 +198,16 @@ class OrderController extends Controller
     }
 
     /**
-     * Cancel an order that has not been delivered yet.
+     * Cancel an unpaid order before a worker has claimed it.
      */
     public function destroy(Request $request, Order $order): RedirectResponse
     {
         $this->authorizeOrderOwner($request, $order);
 
         abort_unless(
-            $order->status->canTransitionTo(OrderStatus::Cancelled),
+            $order->canBeCancelledByCustomer(),
             403,
-            'Pesanan yang sudah dikirim tidak bisa dibatalkan.'
+            'Pesanan tidak bisa dibatalkan karena sudah dibayar, sudah final, atau sudah diterima worker.'
         );
 
         $this->workflow->transitionTo(

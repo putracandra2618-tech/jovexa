@@ -3,6 +3,8 @@
 @foreach ($actions as $action)
     @if ($action['type'] === 'link')
         <a href="{{ $action['route'] }}" @if ($action['key'] === 'upload-result') id="unggah-hasil" @endif
+           @if (! empty($action['target'])) target="{{ $action['target'] }}" @endif
+           @if (! empty($action['rel'])) rel="{{ $action['rel'] }}" @endif
            class="btn-custom btn-custom-{{ $action['variant'] }} w-100 mt-2">
             @if (! empty($action['icon'])) <i class="bi {{ $action['icon'] }} me-1"></i> @endif
             {{ $action['label'] }}

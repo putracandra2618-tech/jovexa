@@ -87,7 +87,7 @@ Payment Gateway digunakan untuk:
 13. Jika pembayaran berhasil:
     - Status pembayaran menjadi `paid`
     - Pesanan menjadi `queued` dan otomatis masuk antrean Worker.
-14. Customer dapat melihat perkembangan/status pesanan.
+14. Customer dapat melihat perkembangan/status pesanan. Pembatalan customer hanya sebelum pembayaran; setelah dibayar, tombolnya diganti Request Refund lewat WhatsApp sampai hasil dikirim.
 15. Setelah pekerjaan selesai dan hasil dikirim:
     - Customer menerima hasil pekerjaan.
 16. Customer dapat mengunduh hasil pekerjaan.
@@ -170,6 +170,8 @@ Gunakan status pesanan berikut:
 
 Cabang: `waiting_customer`, `revision`, `expired`, dan `cancelled`.
 
+Request Refund customer tersedia untuk `paid`, `queued`, `in_progress`, `waiting_customer`, `revision`, dan `completed`; tidak tersedia sebelum pembayaran atau setelah `delivered`.
+
 Penjelasan:
 
 ### waiting_verification
@@ -182,22 +184,22 @@ Pesanan sudah disetujui Admin dan menunggu pembayaran.
 Pembayaran sudah berhasil dan pesanan otomatis masuk antrean Worker.
 
 ### queued
-Pesanan sudah dibayar dan menunggu diklaim Worker.
+Pesanan sudah dibayar dan menunggu diklaim Worker. Customer tidak bisa membatalkan; tersedia Request Refund lewat WhatsApp.
 
 ### waiting_customer
 Admin atau Worker membutuhkan informasi tambahan dari Customer.
 
 ### in_progress
-Pesanan sedang dikerjakan.
+Pesanan sedang dikerjakan. Worker sudah menerima pesanan; Customer tidak bisa membatalkan, tetapi bisa Request Refund lewat WhatsApp.
 
 ### revision
 Pekerjaan perlu diperbaiki sebelum dikirim.
 
 ### completed
-Pekerjaan sudah selesai dan hasil sudah tersedia.
+Pekerjaan sudah selesai dan hasil sudah tersedia. Request Refund masih tersedia.
 
 ### delivered
-Hasil pekerjaan sudah dikirim dan dapat diakses Customer.
+Hasil pekerjaan sudah dikirim dan dapat diakses Customer. Request Refund tidak tersedia.
 
 ---
 
