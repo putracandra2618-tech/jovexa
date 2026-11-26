@@ -13,6 +13,7 @@ use App\Models\OrderFile;
 use App\Models\Service;
 use App\Services\OrderFileDownloader;
 use App\Services\OrderWorkflow;
+use App\Services\RevisionService;
 use App\Support\OrderNumberGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class OrderController extends Controller
         private readonly OrderNumberGenerator $orderNumbers,
         private readonly OrderWorkflow $workflow,
         private readonly OrderFileDownloader $downloads,
+        private readonly RevisionService $revisions,
     ) {}
 
     /**
@@ -37,6 +39,7 @@ class OrderController extends Controller
         $orders = $request->user()
             ->orders()
             ->with(['service', 'statusRecord'])
+            ->withCount('revisionRequests')
             ->latest()
             ->paginate(10);
 
@@ -99,6 +102,7 @@ class OrderController extends Controller
             'statusHistory.author',
             'statusHistory.fromStatusRecord',
             'statusHistory.toStatusRecord',
+            'revisionRequests.requester',
         ]);
 
         return view('orders.show', [
@@ -169,10 +173,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Let the customer request a revision after the work has been delivered.
-     *
-     * Allowed from Completed and Delivered statuses so the customer may push
-     * back before or after the final delivery step.
+     * Let the customer request a revision while the order can still be revised.
      */
     public function requestRevision(Request $request, Order $order): RedirectResponse
     {
@@ -181,25 +182,19 @@ class OrderController extends Controller
         abort_unless(
             $order->status->canTransitionTo(OrderStatus::Revision),
             403,
-            'Revisi hanya bisa diminta saat hasil pengerjaan sudah dikirim.'
+            'Pesanan ini tidak bisa diajukan revisi.'
         );
 
-        $request->validate([
-            'revision_note' => ['nullable', 'string', 'max:1000'],
+        $validated = $request->validate([
+            'revision_note' => ['required', 'string', 'max:1000'],
         ], [
+            'revision_note.required' => 'Tuliskan catatan revisi agar tim kami tahu yang perlu diperbaiki.',
             'revision_note.max' => 'Catatan revisi maksimal 1000 karakter.',
         ]);
 
-        $note = $request->string('revision_note')->trim()->value();
+        $this->revisions->request($order, $request->user(), $validated['revision_note']);
 
-        $this->workflow->transitionTo(
-            $order,
-            OrderStatus::Revision,
-            $request->user(),
-            $note !== '' ? "Revisi diminta oleh customer: {$note}" : 'Revisi diminta oleh customer.',
-        );
-
-        return back()->with('success', 'Permintaan revisi berhasil dikirim. Tim kami akan segera menghubungi kamu.');
+        return back()->with('success', 'Permintaan revisi berhasil dikirim. Tim kami akan segera menindaklanjuti.');
     }
 
     /**

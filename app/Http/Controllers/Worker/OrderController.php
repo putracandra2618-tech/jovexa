@@ -11,6 +11,8 @@ use App\Models\OrderFile;
 use App\Models\User;
 use App\Services\OrderFileDownloader;
 use App\Services\OrderWorkflow;
+use App\Services\RevisionService;
+use App\Services\UserNotificationService;
 use App\Services\WorkerOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +30,8 @@ class OrderController extends Controller
         private readonly OrderWorkflow $workflow,
         private readonly OrderFileDownloader $downloads,
         private readonly WorkerOrderService $workerOrders,
+        private readonly RevisionService $revisions,
+        private readonly UserNotificationService $notifications,
     ) {}
 
     /**
@@ -41,6 +45,7 @@ class OrderController extends Controller
         $orders = Order::query()
             ->assignedTo($worker)
             ->with(['service', 'user', 'statusRecord'])
+            ->withCount('revisionRequests')
             ->when($request->filled('status'), function ($query) use ($request): void {
                 $status = OrderStatus::tryFrom($request->string('status')->toString());
 
@@ -120,6 +125,7 @@ class OrderController extends Controller
             'statusHistory.author',
             'statusHistory.fromStatusRecord',
             'statusHistory.toStatusRecord',
+            'revisionRequests.requester',
         ]);
 
         return view('worker.orders.show', [

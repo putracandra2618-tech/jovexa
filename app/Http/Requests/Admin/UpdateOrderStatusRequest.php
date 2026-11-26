@@ -56,7 +56,18 @@ class UpdateOrderStatusRequest extends FormRequest
                     }
                 },
             ],
-            'note' => ['nullable', 'string', 'max:1000'],
+            'note' => [
+                'nullable',
+                'string',
+                'max:1000',
+                function (string $attribute, mixed $value, callable $fail): void {
+                    $target = OrderStatus::tryFrom((string) $this->input('status'));
+
+                    if ($target === OrderStatus::Revision && trim((string) $value) === '') {
+                        $fail('Catatan revisi wajib diisi.');
+                    }
+                },
+            ],
         ];
     }
 

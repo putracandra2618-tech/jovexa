@@ -6,8 +6,10 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
+use App\Http\Controllers\Customer\ProfileController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpersonationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController as CustomerOrderController;
 use App\Http\Controllers\OrderPaymentController;
 use App\Http\Controllers\ServiceController;
@@ -101,9 +103,15 @@ Route::middleware(['auth', 'role:'.UserRole::Customer->value])->prefix('dashboar
         ->middleware('throttle:uploads')
         ->name('orders.revision');
     Route::delete('pesanan/{order}', [CustomerOrderController::class, 'destroy'])->name('orders.destroy');
-    
-    Route::get('profil', [\App\Http\Controllers\Customer\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('profil', [\App\Http\Controllers\Customer\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('profil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('profil', [ProfileController::class, 'update'])->name('profile.update');
+});
+
+Route::middleware('auth')->prefix('notifikasi')->name('notifications.')->group(function (): void {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::post('dibaca-semua', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+    Route::post('{notification}/dibaca', [NotificationController::class, 'markAsRead'])->name('read');
 });
 
 Route::middleware(['auth', 'role:'.UserRole::Customer->value])

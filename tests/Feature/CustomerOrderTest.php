@@ -5,8 +5,10 @@ namespace Tests\Feature;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderFile;
+use App\Models\RevisionRequest;
 use App\Models\Service;
 use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -245,10 +247,18 @@ class CustomerOrderTest extends TestCase
         $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
 
         $this->actingAs($order->user)
-            ->post(route('customer.orders.revision', $order), [])
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Tolong sesuaikan dengan format terbaru.',
+            ])
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
+        $this->assertDatabaseHas('order_revision_requests', [
+            'order_id' => $order->getKey(),
+            'requested_by' => $order->user_id,
+            'revision_number' => 1,
+            'note' => 'Tolong sesuaikan dengan format terbaru.',
+        ]);
     }
 
     public function test_customer_can_request_revision_while_order_is_in_progress(): void
@@ -256,7 +266,9 @@ class CustomerOrderTest extends TestCase
         $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
 
         $this->actingAs($order->user)
-            ->post(route('customer.orders.revision', $order))
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Tolong ubah warna diagram pada bagian kedua.',
+            ])
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
@@ -268,7 +280,9 @@ class CustomerOrderTest extends TestCase
         $other = User::factory()->customer()->create();
 
         $this->actingAs($other)
-            ->post(route('customer.orders.revision', $order))
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Catatan dari customer lain.',
+            ])
             ->assertForbidden();
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
@@ -286,6 +300,95 @@ class CustomerOrderTest extends TestCase
             ->assertSessionHasErrors('revision_note');
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_revision_note_is_required(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+
+        $this->actingAs($order->user)
+            ->from(route('customer.orders.show', $order))
+            ->post(route('customer.orders.revision', $order), ['revision_note' => '   '])
+            ->assertSessionHasErrors('revision_note');
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
+    }
+
+    public function test_revision_request_notifies_staff_without_notifying_the_requester(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $admin = User::factory()->admin()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->completed()->assignedTo($worker)->create();
+
+        $this->actingAs($customer)
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Tolong perbaiki bagian daftar pustaka.',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $admin->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::RevisionRequested,
+        ]);
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $worker->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::RevisionRequested,
+        ]);
+        $this->assertDatabaseMissing('user_notifications', ['user_id' => $customer->getKey()]);
+    }
+
+    public function test_revision_notes_are_visible_on_the_order_detail_page(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $order = Order::factory()->for($customer)->completed()->create();
+        $note = 'Tolong perbaiki bagian kesimpulan dan tambahkan referensi.';
+
+        RevisionRequest::factory()->for($order)->create([
+            'requested_by' => $customer->getKey(),
+            'revision_number' => 1,
+            'note' => $note,
+        ]);
+
+        $this->actingAs($customer)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Revisi 1/3')
+            ->assertSee($note);
+    }
+
+    public function test_customer_cannot_request_a_fourth_revision(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $order = Order::factory()->for($customer)->completed()->create();
+
+        foreach (['Perbaikan pertama.', 'Perbaikan kedua.', 'Perbaikan ketiga.'] as $number => $note) {
+            RevisionRequest::factory()->for($order)->create([
+                'requested_by' => $customer->getKey(),
+                'revision_number' => $number + 1,
+                'note' => $note,
+            ]);
+        }
+
+        $this->actingAs($customer)
+            ->from(route('customer.orders.show', $order))
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Permintaan keempat.',
+            ])
+            ->assertSessionHasErrors('revision_note');
+
+        $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
+        $this->assertSame(3, $order->revisionRequests()->count());
+
+        $this->actingAs($customer)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Minta Revisi')
+            ->assertSee('Kuota revisi sudah habis')
+            ->assertSee('Revisi 3/3');
     }
 
     public function test_customer_can_upload_extra_files_only_while_waiting_for_response(): void
@@ -325,6 +428,30 @@ class CustomerOrderTest extends TestCase
 
         $this->assertSame(OrderStatus::InProgress, $order->status);
         $this->assertSame($worker->getKey(), $order->worker_id);
+    }
+
+    public function test_staff_information_request_is_visible_and_notified_to_the_customer(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->inProgress()->assignedTo($worker)->create();
+        $note = 'Mohon kirim logo resolusi tinggi untuk bagian sampan.';
+
+        $this->actingAs($worker)
+            ->post(route('worker.orders.information', $order), ['note' => $note])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $customer->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::InformationRequested,
+        ]);
+
+        $this->actingAs($customer)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Pesan dari tim Jovexa')
+            ->assertSee($note);
     }
 
     public function test_customer_cannot_upload_extra_files_while_the_order_is_in_progress(): void

@@ -69,12 +69,21 @@
                             <th>Customer</th>
                             <th>Jasa</th>
                             <th>Status</th>
+                            <th>Revisi</th>
                             <th>Diambil</th>
                             <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php $currentStage = null; @endphp
                         @foreach ($orders as $order)
+                            @php $stage = $order->status->stage(); @endphp
+                            @if ($stage !== $currentStage)
+                                <tr class="table-light">
+                                    <th colspan="7">{{ $order->status->stageLabel() }}</th>
+                                </tr>
+                                @php $currentStage = $stage; @endphp
+                            @endif
                             <tr>
                                 <td class="fw-semibold">{{ $order->order_number }}</td>
                                 <td>
@@ -86,7 +95,8 @@
                                     <x-badge :variant="$order->status->badgeClass()">
                                         {{ $order->status->label() }}
                                     </x-badge>
-                                </td>
+                                    </td>
+                                <td>{{ $order->revision_requests_count }}/{{ \App\Services\RevisionService::MAX_PER_ORDER }}</td>
                                 <td>{{ $order->worker_claimed_at?->format('d M Y H:i') ?? '—' }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('worker.orders.show', $order) }}"

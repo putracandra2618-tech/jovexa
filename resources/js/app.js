@@ -5,6 +5,7 @@ import { initLiveSearch, initStatusFilter } from './ui/filters';
 import { initPasswordStrength } from './ui/password-strength';
 import { initDropzone, initCharCounter } from './ui/upload';
 import { initNavDrawer } from './ui/drawer';
+import { initNotifications } from './ui/notifications';
 
 const onDomReady = (callback) => {
     if (document.readyState === 'loading') {
@@ -410,6 +411,7 @@ export const initPage = () => {
     // Admin memakai tema Spark, jadi pencarian topbar tidak ikut di balik
     // gerbang body.playful di bawah.
     initAdminSearch();
+    initNotifications();
 
     // Modal playful dipasang lebih dulu agar submit-state melihat status
     // defaultPrevented ketika pengguna belum menekan tombol konfirmasi.

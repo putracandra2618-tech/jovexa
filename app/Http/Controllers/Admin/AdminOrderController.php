@@ -10,6 +10,8 @@ use App\Models\Order;
 use App\Models\OrderFile;
 use App\Services\OrderFileDownloader;
 use App\Services\OrderWorkflow;
+use App\Services\RevisionService;
+use App\Services\UserNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -24,6 +26,8 @@ class AdminOrderController extends Controller
     public function __construct(
         private readonly OrderWorkflow $workflow,
         private readonly OrderFileDownloader $downloads,
+        private readonly RevisionService $revisions,
+        private readonly UserNotificationService $notifications,
     ) {}
 
     /**
@@ -68,6 +72,7 @@ class AdminOrderController extends Controller
             'statusHistory.author',
             'statusHistory.fromStatusRecord',
             'statusHistory.toStatusRecord',
+            'revisionRequests.requester',
         ]);
 
         return view('admin.orders.show', [
@@ -84,7 +89,8 @@ class AdminOrderController extends Controller
 
         return view('admin.orders.revision', [
             'orders' => Order::query()
-                ->with(['service', 'user', 'worker', 'statusRecord'])
+                ->with(['service', 'user', 'worker', 'statusRecord', 'latestRevisionRequest'])
+                ->withCount('revisionRequests')
                 ->whereStatus(OrderStatus::Revision)
                 ->when($search !== '', fn ($query) => $query->search($search))
                 ->latest()
@@ -104,6 +110,7 @@ class AdminOrderController extends Controller
         return view('admin.orders.history', [
             'orders' => Order::query()
                 ->with(['service', 'user', 'worker', 'statusRecord'])
+                ->withCount('revisionRequests')
                 ->withStatus([OrderStatus::Delivered, OrderStatus::Cancelled])
                 ->when($search !== '', fn ($query) => $query->search($search))
                 ->latest()

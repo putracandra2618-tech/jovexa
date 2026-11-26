@@ -157,6 +157,26 @@ class Order extends Model
     }
 
     /**
+     * Every structured revision request made for this order.
+     *
+     * @return HasMany<RevisionRequest, $this>
+     */
+    public function revisionRequests(): HasMany
+    {
+        return $this->hasMany(RevisionRequest::class);
+    }
+
+    /**
+     * The most recent revision note, when one exists.
+     *
+     * @return HasOne<RevisionRequest, $this>
+     */
+    public function latestRevisionRequest(): HasOne
+    {
+        return $this->hasOne(RevisionRequest::class)->latestOfMany();
+    }
+
+    /**
      * Limit the query to orders matching the given free text term.
      *
      * An order is addressable by its own number or by anything that identifies

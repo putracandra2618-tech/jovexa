@@ -1,3 +1,7 @@
+@php
+    $actions = app(\App\Support\OrderActions::class)->for($order, auth()->user());
+@endphp
+
 @extends('layouts.customer')
 
 @section('title', 'Pesanan '.$order->order_number)
@@ -31,7 +35,7 @@
             @foreach ($steps as $index => $step)
                 @php
                     $state = $currentStep === -1
-                        ? ($index === 0 ? 'muted' : 'muted')
+                        ? 'muted'
                         : match (true) {
                             $index < $currentStep => 'done',
                             $index === $currentStep => 'current',
@@ -55,37 +59,30 @@
 
     <div class="row g-4">
         <div class="col-lg-8">
-            <x-card title="Status Pengerjaan">
+            <x-card title="Status Pengerjaan" data-turbo-cache="false">
+                @php
+                    $informationRequest = $order->statusHistory
+                        ->filter(fn ($entry) => $entry->to_status === \App\Enums\OrderStatus::WaitingCustomer && filled($entry->note))
+                        ->sortByDesc('id')
+                        ->first();
+                @endphp
+
                 @if ($order->isPayable())
-                    <p class="page-subtitle mb-3">
+                    <p class="page-subtitle mb-0">
                         Pesanan ini belum dibayar, jadi belum masuk ke antrean pengerjaan.
                     </p>
-
-                    <a href="{{ route('customer.orders.pay', $order) }}" class="btn-custom btn-custom-primary">
-                        <i class="bi bi-wallet2"></i> Bayar Sekarang
-                    </a>
                 @elseif ($order->status === \App\Enums\OrderStatus::WaitingCustomer)
-                    <p class="page-subtitle mb-3">
+                    <p class="page-subtitle mb-0">
                         Tim Jovexa butuh informasi tambahan darimu. Unggah file pendukung agar
                         pengerjaan bisa dilanjutkan.
                     </p>
 
-                    <form method="POST" action="{{ route('customer.orders.requirements', $order) }}"
-                          enctype="multipart/form-data" data-loading>
-                        @csrf
-
-                        <label class="form-label-custom" for="requirements">Unggah File Pendukung</label>
-                        <input id="requirements" name="requirements[]" type="file" multiple
-                               accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg"
-                               class="form-control-file mb-2">
-                        <small class="form-hint">
-                            PDF, DOC, DOCX, TXT, ZIP, PNG, atau JPG. Bisa pilih beberapa file sekaligus.
-                        </small>
-
-                        <button type="submit" class="btn-custom btn-custom-primary mt-3">
-                            <i class="bi bi-cloud-arrow-up"></i> Kirim File
-                        </button>
-                    </form>
+                    @if ($informationRequest)
+                        <x-alert variant="warning" class="mt-3">
+                            <strong>Pesan dari tim Jovexa:</strong><br>
+                            <span style="white-space: pre-line">{{ $informationRequest->note }}</span>
+                        </x-alert>
+                    @endif
                 @elseif ($order->canDownloadResults())
                     <div class="jx-result-banner">
                         <span class="jx-result-icon">
@@ -96,45 +93,16 @@
                             <p class="mb-0">Unduh file hasil pengerjaan di daftar lampiran di bawah.</p>
                         </div>
                     </div>
-
-                    @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Revision))
-                        <div class="mt-4 pt-3" style="border-top: 1.5px dashed var(--jx-line-strong);">
-                            <p class="page-subtitle mb-3">
-                                <i class="bi bi-pencil-square me-1"></i>
-                                Ada yang perlu diperbaiki? Ajukan permintaan revisi beserta catatanmu.
-                            </p>
-
-                            <form method="POST" action="{{ route('customer.orders.revision', $order) }}"
-                                  data-loading
-                                  data-confirm="Ajukan permintaan revisi untuk pesanan ini?">
-                                @csrf
-
-                                <div class="mb-3">
-                                    <label class="form-label-custom" for="revision_note">
-                                        Catatan Revisi <span class="text-muted fw-normal">(opsional)</span>
-                                    </label>
-                                    <textarea id="revision_note" name="revision_note" rows="3"
-                                              class="form-control-custom w-100"
-                                              placeholder="Jelaskan bagian mana yang perlu direvisi..."
-                                              maxlength="1000"
-                                              data-char-counter="1000">{{ old('revision_note') }}</textarea>
-                                    @error('revision_note')
-                                        <div class="form-feedback-custom text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <button type="submit" class="btn-custom btn-custom-warning">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Minta Revisi
-                                </button>
-                            </form>
-                        </div>
-                    @endif
-                @else
+                @elseif ($actions === [])
                     <p class="page-subtitle mb-0">
                         Kamu akan mendapat pembaruan status di halaman ini setiap ada progres.
                     </p>
                 @endif
+
+                <x-order-actions :actions="$actions" />
             </x-card>
+
+            <x-revision-panel :order="$order" />
 
             <x-card title="Kebutuhan Kamu" class="mt-4">
                 <p class="jx-prose mb-0">{{ $order->description }}</p>
@@ -198,17 +166,6 @@
                 <a href="{{ route('services.show', $order->service) }}" class="btn-custom btn-custom-light w-100">
                     <i class="bi bi-box-seam"></i> Lihat Detail Jasa
                 </a>
-
-                @unless ($order->status->isFinal())
-                    <form method="POST" action="{{ route('customer.orders.destroy', $order) }}" class="mt-2"
-                          data-confirm="Batalkan pesanan {{ $order->order_number }}?">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn-custom btn-custom-danger w-100">
-                            Batalkan Pesanan
-                        </button>
-                    </form>
-                @endunless
             </div>
 
             <x-card title="Riwayat Status" class="mt-4">
@@ -216,7 +173,7 @@
                     <p class="page-subtitle mb-0">Belum ada riwayat.</p>
                 @else
                     <ul class="jx-timeline">
-                        @foreach ($order->statusHistory->sortByDesc('created_at') as $entry)
+                        @foreach ($order->statusHistory->sortByDesc('created_at')->sortByDesc('id') as $entry)
                             <li class="jx-timeline-item">
                                 <span class="jx-timeline-dot"></span>
                                 <div>

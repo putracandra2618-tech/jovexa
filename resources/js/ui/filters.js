@@ -77,10 +77,12 @@ const initStatusFilter = () => {
         }
 
         const rows = [...target.querySelectorAll('[data-order-status]')];
+        const stageRows = [...target.querySelectorAll('[data-status-group-row]')];
         const empty = document.querySelector('[data-status-filter-empty]');
 
         const apply = (filter) => {
             let visible = 0;
+            const visibleStages = new Set();
 
             rows.forEach((row) => {
                 const matches = filter === 'all' || row.dataset.orderStatus === filter;
@@ -89,7 +91,12 @@ const initStatusFilter = () => {
 
                 if (matches) {
                     visible += 1;
+                    visibleStages.add(row.dataset.orderStage);
                 }
+            });
+
+            stageRows.forEach((row) => {
+                row.classList.toggle('d-none', !visibleStages.has(row.dataset.statusGroupRow));
             });
 
             if (empty) {

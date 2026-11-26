@@ -79,11 +79,20 @@
                             <th>Worker</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Revisi</th>
                             <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php $currentStage = null; @endphp
                         @foreach ($orders as $order)
+                            @php $stage = $order->status->stage(); @endphp
+                            @if ($stage !== $currentStage)
+                                <tr class="table-light">
+                                    <th colspan="8">{{ $order->status->stageLabel() }}</th>
+                                </tr>
+                                @php $currentStage = $stage; @endphp
+                            @endif
                             <tr>
                                 <td class="fw-semibold">{{ $order->order_number }}</td>
                                 <td>
@@ -100,6 +109,7 @@
                                 </td>
                                 <td class="text-nowrap">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
                                 <td><x-badge :variant="$order->status->badgeClass()">{{ $order->status->label() }}</x-badge></td>
+                                <td>{{ $order->revision_requests_count }}/{{ \App\Services\RevisionService::MAX_PER_ORDER }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('admin.orders.show', $order) }}"
                                        class="btn-custom btn-custom-edit btn-custom-sm">

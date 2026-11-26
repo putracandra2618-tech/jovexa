@@ -1,5 +1,7 @@
 @php
     use App\Enums\OrderStatus;
+
+    $actions = app(\App\Support\OrderActions::class)->for($order, auth()->user());
 @endphp
 
 @extends('layouts.admin')
@@ -42,7 +44,7 @@
                                        class="btn-custom btn-custom-light btn-custom-sm">
                                         <i class="bi bi-download me-1"></i> Unduh
                                     </a>
-                                    @if($file->isResult() && in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], strict: true))
+                                    @if ($file->isResult() && $order->status === OrderStatus::Completed)
                                         <form method="POST" action="{{ route('worker.orders.file.destroy', [$order, $file]) }}"
                                               data-confirm="Yakin ingin menghapus file ini? File yang dihapus tidak dapat dikembalikan.">
                                             @csrf
@@ -58,10 +60,13 @@
                     </ul>
                 @endif
 
-                @if(in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], strict: true))
-                    <hr class="my-4">
-                    <h5 class="mb-3">Unggah File Hasil</h5>
-                    <form method="POST" action="{{ route('worker.orders.result.store', $order) }}" enctype="multipart/form-data">
+                @if (in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], true))
+                    <hr class="my-4" id="unggah-hasil">
+                    <h5 class="mb-3">
+                        {{ $order->status === OrderStatus::Revision ? 'Unggah Hasil Revisi' : 'Unggah File Hasil' }}
+                    </h5>
+                    <form method="POST" action="{{ route('worker.orders.result.store', $order) }}"
+                          enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <input type="file" name="result" class="form-control" required>
@@ -73,9 +78,11 @@
                 @endif
             </x-card>
 
+            <x-revision-panel :order="$order" />
+
             <x-card title="Riwayat Status" class="mt-4">
                 <ul class="list-unstyled mb-0">
-                    @foreach ($order->statusHistory->sortByDesc('created_at') as $entry)
+                    @foreach ($order->statusHistory->sortByDesc('created_at')->sortByDesc('id') as $entry)
                         <li class="py-2 border-bottom">
                             <div class="fw-semibold">
                                 {{ $entry->from_status?->label() ?? 'Pesanan dibuat' }} &rarr; {{ $entry->to_status->label() }}
@@ -94,7 +101,7 @@
         </div>
 
         <div class="col-lg-4">
-            <x-card title="Status">
+            <x-card title="Status" data-turbo-cache="false">
                 <x-badge :variant="$order->status->badgeClass()">{{ $order->status->label() }}</x-badge>
 
                 @if ($order->status === OrderStatus::WaitingCustomer)
@@ -104,65 +111,19 @@
                     </x-alert>
                 @endif
 
-                @if (in_array($order->status, [OrderStatus::InProgress, OrderStatus::Revision], strict: true))
-                    <form method="POST" action="{{ route('worker.orders.status', $order) }}" class="mt-4"
-                          data-confirm="Tandai pekerjaan selesai?">
-                        @csrf
-                        @method('PATCH')
-                        <input type="hidden" name="status" value="{{ OrderStatus::Completed->value }}">
-
-                        <x-form.textarea
-                            name="note"
-                            label="Catatan (opsional)"
-                            rows="2"
-                            placeholder="Contoh: Pekerjaan sudah selesai dan siap dikirim."
-                        />
-
-                        <button type="submit" class="btn-custom btn-custom-primary w-100">
-                            <i class="bi bi-check2-circle me-1"></i> Tandai Selesai
-                        </button>
-                    </form>
-
-                    @if ($order->status->canTransitionTo(OrderStatus::WaitingCustomer))
-                        <form method="POST" action="{{ route('worker.orders.information', $order) }}" class="mt-3">
-                            @csrf
-
-                            <x-form.textarea
-                                name="note"
-                                label="Minta Informasi ke Customer"
-                                rows="3"
-                                required
-                                placeholder="Contoh: Mohon kirim data lengkap bab 1."
-                            />
-
-                            <button type="submit" class="btn-custom btn-custom-light w-100">
-                                <i class="bi bi-chat-left-dots me-1"></i> Minta Informasi
-                            </button>
-                        </form>
-                    @endif
-                @endif
-
-                @if ($order->status === OrderStatus::Completed)
-                    <form method="POST" action="{{ route('worker.orders.send', $order) }}" class="mt-2"
-                          data-confirm="Kirim hasil pekerjaan ke customer?">
-                        @csrf
-                        <button type="submit" class="btn-custom btn-custom-primary w-100">
-                            <i class="bi bi-send me-1"></i> Kirim ke Customer
-                        </button>
-                    </form>
-                @endif
-
-                @if ($order->status === OrderStatus::Delivered)
-                    <x-alert variant="success" class="mt-4">
-                        Pesanan sudah dikirim ke customer. Terima kasih.
+                @if ($actions === [])
+                    <x-alert variant="info" class="mt-4">
+                        @if ($order->status === OrderStatus::Delivered)
+                            Pesanan sudah dikirim ke customer. Terima kasih.
+                        @elseif ($order->status === OrderStatus::Cancelled)
+                            Pesanan ini sudah dibatalkan.
+                        @else
+                            Tidak ada aksi yang bisa dilakukan pada status ini.
+                        @endif
                     </x-alert>
                 @endif
 
-                @if ($order->status === OrderStatus::Cancelled)
-                    <x-alert variant="danger" class="mt-4">
-                        Pesanan ini sudah dibatalkan.
-                    </x-alert>
-                @endif
+                <x-order-actions :actions="$actions" />
             </x-card>
 
             <x-card title="Data Pesanan" class="mt-4">

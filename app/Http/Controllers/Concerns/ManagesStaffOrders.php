@@ -23,7 +23,23 @@ trait ManagesStaffOrders
     {
         $this->ensureCanManageOrder($order);
 
-        $this->workflow->transitionTo($order, $target, $actor, $note);
+        abort_if(
+            $target === OrderStatus::Revision && $actor->isWorker(),
+            403,
+            'Worker tidak bisa meminta revisi. Gunakan permintaan informasi jika butuh data dari customer.',
+        );
+
+        $previousStatus = $order->status;
+
+        if ($target === OrderStatus::Revision) {
+            $this->revisions->request($order, $actor, (string) $note, 'note');
+        } else {
+            $this->workflow->transitionTo($order, $target, $actor, $note);
+
+            if ($previousStatus === OrderStatus::Revision && $target === OrderStatus::Completed) {
+                $this->notifications->revisionApproved($order);
+            }
+        }
 
         return back()->with('success', "Status pesanan diubah ke {$order->fresh()->status->label()}.");
     }
@@ -42,12 +58,16 @@ trait ManagesStaffOrders
             'note.min' => 'Tuliskan minimal 10 karakter agar customer paham.',
         ]);
 
+        $actor = $request->user();
+
         $this->workflow->transitionTo(
             $order,
             OrderStatus::WaitingCustomer,
-            $request->user(),
+            $actor,
             $validated['note'],
         );
+
+        $this->notifications->informationRequested($order, $actor, $validated['note']);
 
         return back()->with('success', 'Permintaan informasi dikirim ke customer.');
     }
@@ -85,7 +105,11 @@ trait ManagesStaffOrders
     {
         $this->ensureCanManageOrder($order);
 
-        abort_unless($order->status === OrderStatus::Completed, 404);
+        abort_unless(
+            in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], true),
+            404,
+            'Hasil hanya bisa diunggah saat pekerjaan selesai atau sedang direvisi.',
+        );
 
         $request->validate([
             'result' => ['required', 'file', 'max:20480', 'mimes:'.implode(',', OrderFile::ALLOWED_EXTENSIONS)],
@@ -135,6 +159,8 @@ trait ManagesStaffOrders
             $request->user(),
             $validated['note'] ?? 'Hasil pekerjaan dikirim ke customer.',
         );
+
+        $this->notifications->resultDelivered($order);
 
         return back()->with('success', 'Hasil pekerjaan berhasil dikirim ke customer.');
     }

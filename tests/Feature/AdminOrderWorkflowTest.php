@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderFile;
+use App\Models\RevisionRequest;
 use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -227,10 +229,30 @@ class AdminOrderWorkflowTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())
             ->patch(route('admin.orders.status', $order), [
                 'status' => OrderStatus::Revision->value,
+                'note' => 'Mohon perbaiki format tabel sebelum dikirim.',
             ])
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
+        $this->assertDatabaseHas('order_revision_requests', [
+            'order_id' => $order->getKey(),
+            'note' => 'Mohon perbaiki format tabel sebelum dikirim.',
+            'revision_number' => 1,
+        ]);
+    }
+
+    public function test_admin_revision_request_requires_a_note(): void
+    {
+        $order = Order::factory()->inProgress()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch(route('admin.orders.status', $order), [
+                'status' => OrderStatus::Revision->value,
+            ])
+            ->assertSessionHasErrors('note');
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
     }
 
     public function test_admin_cannot_mark_an_order_as_paid_manually(): void
@@ -278,6 +300,25 @@ class AdminOrderWorkflowTest extends TestCase
         $this->assertSame(OrderStatus::Completed, $order->fresh()->status);
     }
 
+    public function test_approving_a_revision_notifies_the_customer(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $order = Order::factory()->for($customer)->revision()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch(route('admin.orders.status', $order), [
+                'status' => OrderStatus::Completed->value,
+                'note' => 'Revisi sudah sesuai.',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $customer->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::RevisionApproved,
+        ]);
+    }
+
     public function test_cancelling_a_delivered_order_returns_forbidden(): void
     {
         $order = Order::factory()->delivered()->create();
@@ -300,6 +341,27 @@ class AdminOrderWorkflowTest extends TestCase
             ->get(route('admin.orders.revision'))
             ->assertOk()
             ->assertSee($revision->order_number);
+    }
+
+    public function test_revision_queue_shows_the_latest_customer_note(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $customer = User::factory()->customer()->create();
+        $order = Order::factory()->for($customer)->revision()->create();
+        $note = 'Bagian grafik masih belum sesuai permintaan.';
+
+        RevisionRequest::factory()->for($order)->create([
+            'requested_by' => $customer->getKey(),
+            'revision_number' => 1,
+            'note' => $note,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.revision'))
+            ->assertOk()
+            ->assertSee($order->order_number)
+            ->assertSee($note)
+            ->assertSee('Revisi 1/3');
     }
 
     public function test_history_page_lists_only_final_orders(): void
@@ -385,6 +447,20 @@ class AdminOrderWorkflowTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_admin_order_detail_has_only_one_send_action(): void
+    {
+        Storage::fake('local');
+
+        $order = Order::factory()->completed()->create();
+        OrderFile::factory()->for($order)->result()->stored()->create();
+
+        $response = $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.orders.show', $order))
+            ->assertOk();
+
+        $this->assertSame(1, substr_count((string) $response->getContent(), 'Kirim ke Customer'));
     }
 
     public function test_admin_can_cancel_an_undelivered_order(): void

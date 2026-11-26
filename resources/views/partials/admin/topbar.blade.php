@@ -39,6 +39,8 @@
             <i class="bi bi-arrows-fullscreen"></i>
         </button>
 
+        <x-notification-bell variant="admin" />
+
         @auth
             <div class="dropdown ms-2">
                 <button class="navbar-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown"

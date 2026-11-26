@@ -187,6 +187,22 @@ class WorkerOrderTest extends TestCase
         $this->assertSame(OrderStatus::WaitingCustomer, $order->fresh()->status);
     }
 
+    public function test_worker_cannot_request_a_revision(): void
+    {
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->inProgress()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->patch(route('worker.orders.status', $order), [
+                'status' => OrderStatus::Revision->value,
+                'note' => 'Mohon perbaiki bagian implementasi.',
+            ])
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
+    }
+
     public function test_worker_can_upload_a_result_only_when_the_order_is_completed(): void
     {
         Storage::fake('local');
@@ -214,6 +230,30 @@ class WorkerOrderTest extends TestCase
         Storage::disk('local')->assertExists($file->file_path);
     }
 
+    public function test_worker_can_upload_a_revised_result_without_revision_or_information_actions(): void
+    {
+        Storage::fake('local');
+
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->revision()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->get(route('worker.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Minta Revisi')
+            ->assertDontSee('Minta Informasi')
+            ->assertSee('Unggah Hasil Revisi');
+
+        $this->actingAs($worker)
+            ->post(route('worker.orders.result.store', $order), [
+                'result' => UploadedFile::fake()->create('hasil-revisi.pdf', 100, 'application/pdf'),
+            ])
+            ->assertRedirect();
+
+        $this->assertTrue($order->results()->exists());
+        Storage::disk('local')->assertExists($order->results()->sole()->file_path);
+    }
+
     public function test_worker_can_deliver_after_uploading_a_result(): void
     {
         Storage::fake('local');
@@ -231,6 +271,21 @@ class WorkerOrderTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_worker_order_detail_has_only_one_send_action(): void
+    {
+        Storage::fake('local');
+
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->completed()->assignedTo($worker)->create();
+        OrderFile::factory()->result()->stored()->for($order)->create();
+
+        $response = $this->actingAs($worker)
+            ->get(route('worker.orders.show', $order))
+            ->assertOk();
+
+        $this->assertSame(1, substr_count((string) $response->getContent(), 'Kirim ke Customer'));
     }
 
     public function test_worker_history_only_lists_their_finished_orders(): void

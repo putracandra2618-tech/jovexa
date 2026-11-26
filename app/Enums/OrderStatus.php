@@ -191,6 +191,32 @@ enum OrderStatus: string
     }
 
     /**
+     * The broad stage used to group orders on staff and customer lists.
+     */
+    public function stage(): string
+    {
+        return match ($this) {
+            self::PendingPayment, self::Expired => 'payment',
+            self::Paid, self::WaitingVerification, self::Queued, self::WaitingCustomer => 'queue',
+            self::InProgress, self::Revision, self::Completed => 'work',
+            self::Delivered, self::Cancelled => 'done',
+        };
+    }
+
+    /**
+     * Human readable label for the broad stage.
+     */
+    public function stageLabel(): string
+    {
+        return match ($this->stage()) {
+            'payment' => 'Pembayaran',
+            'queue' => 'Antrean & Verifikasi',
+            'work' => 'Sedang Dikerjakan',
+            default => 'Selesai',
+        };
+    }
+
+    /**
      * Determine whether the status may be set manually by staff.
      */
     public function isSettableByAdmin(): bool

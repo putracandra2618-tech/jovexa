@@ -36,6 +36,7 @@
                 <x-customer-nav-links />
 
                 <div class="jx-nav-actions">
+                    <x-notification-bell variant="customer" />
                     <x-user-menu />
                 </div>
             </nav>

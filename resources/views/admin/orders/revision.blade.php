@@ -43,6 +43,7 @@
                             <th>Nomor Pesanan</th>
                             <th>Customer</th>
                             <th>Jasa</th>
+                            <th>Catatan Terakhir</th>
                             <th>Status</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -53,6 +54,22 @@
                                 <td class="fw-semibold">{{ $order->order_number }}</td>
                                 <td>{{ $order->user->name }}</td>
                                 <td>{{ $order->service->name }}</td>
+                                <td>
+                                    @if ($order->latestRevisionRequest)
+                                        <span class="badge bg-warning text-dark">
+                                            Revisi {{ $order->revision_requests_count }}/{{ \App\Services\RevisionService::MAX_PER_ORDER }}
+                                        </span>
+                                        <div class="small mt-1" style="max-width: 24rem; white-space: pre-line;">
+                                            {{ $order->latestRevisionRequest->clean_note }}
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ $order->latestRevisionRequest->requester?->name ?? 'Sistem' }}
+                                            &middot; {{ $order->latestRevisionRequest->created_at->format('d M Y H:i') }}
+                                        </small>
+                                    @else
+                                        <span class="text-muted">Tidak ada catatan</span>
+                                    @endif
+                                </td>
                                 <td><x-badge :variant="$order->status->badgeClass()">{{ $order->status->label() }}</x-badge></td>
                                 <td class="text-end">
                                     <a href="{{ route('admin.orders.show', $order) }}"

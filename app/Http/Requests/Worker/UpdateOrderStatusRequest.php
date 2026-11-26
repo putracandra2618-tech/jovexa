@@ -31,10 +31,13 @@ class UpdateOrderStatusRequest extends FormRequest
                 Rule::in([
                     OrderStatus::Completed->value,
                     OrderStatus::WaitingCustomer->value,
-                    OrderStatus::Revision->value,
                 ]),
             ],
-            'note' => ['nullable', 'string', 'max:1000'],
+            'note' => [
+                'nullable',
+                'string',
+                'max:1000',
+            ],
         ];
     }
 

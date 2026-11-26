@@ -75,6 +75,16 @@ class User extends Authenticatable
     }
 
     /**
+     * In-app notifications delivered to this account.
+     *
+     * @return HasMany<UserNotification, $this>
+     */
+    public function inAppNotifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    /**
      * Limit the query to users holding the given role.
      *
      * @param  Builder<User>  $query
