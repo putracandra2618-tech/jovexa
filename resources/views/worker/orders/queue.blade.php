@@ -2,7 +2,7 @@
 
 @section('title', 'Antrean Pesanan')
 @section('page-title', 'Antrean Pesanan')
-@section('page-subtitle', 'Pesanan yang sudah diverifikasi Admin dan siap diambil worker.')
+@section('page-subtitle', 'Pesanan yang sudah dibayar dan otomatis masuk antrean worker.')
 
 @section('page-actions')
     <a href="{{ route('worker.orders.index') }}" class="btn-custom btn-custom-light">
@@ -44,7 +44,7 @@
                 <x-empty-state
                     icon="bi-inbox"
                     title="Antrean sedang kosong"
-                    description="Pesanan baru akan muncul di sini setelah Admin memverifikasi pembayaran."
+                    description="Pesanan baru akan muncul di sini setelah pembayaran terkonfirmasi."
                 />
             @endif
         @else

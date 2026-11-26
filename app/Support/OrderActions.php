@@ -40,17 +40,17 @@ class OrderActions
 
         if ($next !== null
             && $next->isSettableByAdmin()
-            && ! in_array($status, [OrderStatus::Queued, OrderStatus::WaitingCustomer, OrderStatus::Revision], true)) {
+            && ! in_array($status, [OrderStatus::Paid, OrderStatus::Queued, OrderStatus::WaitingCustomer, OrderStatus::Revision], true)) {
             $actions[] = $this->statusAction(
                 $order,
                 'admin.orders.status',
                 'next',
                 $next,
-                $status === OrderStatus::WaitingVerification ? 'Lepas ke Antrean Worker' : 'Lanjut ke '.$next->label(),
+                $status === OrderStatus::WaitingVerification ? 'Verifikasi & Minta Bayar' : 'Lanjut ke '.$next->label(),
                 'primary',
                 'Catatan (opsional)',
                 false,
-                'Contoh: Pembayaran sudah dicek, lanjut dikerjakan.',
+                'Contoh: Data sudah dicek, silakan lanjut pembayaran.',
             );
         }
 

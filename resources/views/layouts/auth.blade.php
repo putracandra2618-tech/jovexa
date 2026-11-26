@@ -48,7 +48,7 @@
             <ul class="jx-auth-points">
                 <li>
                     <i class="bi bi-lightning-charge-fill"></i>
-                    Pesanan masuk antrean setelah pembayaran terkonfirmasi
+                    Pesanan masuk antrean otomatis setelah pembayaran terkonfirmasi
                 </li>
                 <li>
                     <i class="bi bi-graph-up-arrow"></i>

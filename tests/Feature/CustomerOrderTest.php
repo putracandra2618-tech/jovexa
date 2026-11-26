@@ -65,7 +65,7 @@ class CustomerOrderTest extends TestCase
         $this->assertSame($customer->getKey(), $order->user_id);
         $this->assertSame($service->getKey(), $order->service_id);
         $this->assertSame(450000, $order->total_price);
-        $this->assertSame(OrderStatus::PendingPayment, $order->status);
+        $this->assertSame(OrderStatus::WaitingVerification, $order->status);
         $this->assertStringStartsWith('JVX-', $order->order_number);
 
         $this->assertCount(2, $order->requirements);
@@ -108,7 +108,7 @@ class CustomerOrderTest extends TestCase
         $history = $order->statusHistory()->sole();
 
         $this->assertNull($history->from_status);
-        $this->assertSame(OrderStatus::PendingPayment, $history->to_status);
+        $this->assertSame(OrderStatus::WaitingVerification, $history->to_status);
         $this->assertSame($customer->getKey(), $history->changed_by);
     }
 
@@ -191,6 +191,27 @@ class CustomerOrderTest extends TestCase
             ->assertSee('data-stepper', escape: false)
             ->assertSee('jx-confirm-modal', escape: false)
             ->assertSee('data-confirm=', escape: false);
+    }
+
+    public function test_an_unreviewed_order_shows_a_review_message_without_a_pay_button(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->waitingVerification()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Pesanan anda sedang di tinjau admin.')
+            ->assertDontSee('Bayar Sekarang');
+    }
+
+    public function test_an_approved_order_offers_the_pay_button(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Bayar Sekarang');
     }
 
     public function test_order_form_renders_the_dropzone_and_character_counter_hooks(): void

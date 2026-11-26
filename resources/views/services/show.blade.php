@@ -57,15 +57,15 @@
                         <ul class="jx-check-list">
                             <li>
                                 <i class="bi bi-check-lg"></i>
-                                <span>Kamu memesan dan membayar lewat kanal Tripay yang tersedia.</span>
+                                <span>Kamu memesan dan mengisi detail kebutuhan pesanan.</span>
                             </li>
                             <li>
                                 <i class="bi bi-check-lg"></i>
-                                <span>Admin memverifikasi pesanan, lalu worker mengerjakan dan menghubungi kamu bila ada yang perlu ditanyakan.</span>
+                                <span>Admin meninjau pesanan; setelah disetujui, kamu membayar lewat kanal Tripay yang tersedia.</span>
                             </li>
                             <li>
                                 <i class="bi bi-check-lg"></i>
-                                <span>Pengerjaan berjalan dan statusnya bisa kamu pantau dari dashboard.</span>
+                                <span>Setelah pembayaran terkonfirmasi, pesanan otomatis masuk antrean worker.</span>
                             </li>
                             <li>
                                 <i class="bi bi-check-lg"></i>
@@ -83,8 +83,8 @@
                                     <i class="bi bi-chevron-down"></i>
                                 </summary>
                                 <div class="jx-faq-answer">
-                                    Estimasi {{ $service->estimated_duration }} hari kerja sejak pesanan
-                                    terverifikasi. Estimasi ini bisa bertambah bila kamu meminta revisi.
+                                    Estimasi {{ $service->estimated_duration }} hari kerja sejak pembayaran
+                                    terkonfirmasi. Estimasi ini bisa bertambah bila kamu meminta revisi.
                                 </div>
                             </details>
 
@@ -103,8 +103,8 @@
                                     <i class="bi bi-chevron-down"></i>
                                 </summary>
                                 <div class="jx-faq-answer">
-                                    Pembayaran dilakukan lewat payment gateway Tripay setelah pesanan dibuat,
-                                    dan pesanan baru diproses setelah pembayaran terkonfirmasi.
+                                    Pembayaran dilakukan lewat payment gateway Tripay setelah admin meninjau
+                                    pesanan, lalu pesanan otomatis masuk antrean worker setelah pembayaran terkonfirmasi.
                                 </div>
                             </details>
                         </div>
@@ -119,7 +119,7 @@
                         </div>
                         <p class="page-subtitle mb-4">
                             Estimasi selesai dalam {{ $service->estimated_duration }} hari kerja sejak
-                            pesanan terverifikasi.
+                            pembayaran terkonfirmasi.
                         </p>
 
                         @auth

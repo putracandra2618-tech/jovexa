@@ -35,9 +35,9 @@ class OrderWorkflowTest extends TestCase
 
     public function test_happy_path_follows_the_expected_sequence(): void
     {
+        $this->assertSame(OrderStatus::PendingPayment, OrderStatus::WaitingVerification->next());
         $this->assertSame(OrderStatus::Paid, OrderStatus::PendingPayment->next());
-        $this->assertSame(OrderStatus::WaitingVerification, OrderStatus::Paid->next());
-        $this->assertSame(OrderStatus::Queued, OrderStatus::WaitingVerification->next());
+        $this->assertSame(OrderStatus::Queued, OrderStatus::Paid->next());
         $this->assertSame(OrderStatus::InProgress, OrderStatus::Queued->next());
         $this->assertSame(OrderStatus::Completed, OrderStatus::InProgress->next());
         $this->assertSame(OrderStatus::Delivered, OrderStatus::Completed->next());
@@ -50,11 +50,20 @@ class OrderWorkflowTest extends TestCase
         $this->assertTrue(OrderStatus::WaitingCustomer->canTransitionTo(OrderStatus::WaitingVerification));
     }
 
-    public function test_verified_orders_enter_the_worker_queue(): void
+    public function test_paid_orders_enter_the_worker_queue_without_admin_verification(): void
     {
-        $this->assertTrue(OrderStatus::WaitingVerification->canTransitionTo(OrderStatus::Queued));
+        $this->assertTrue(OrderStatus::Paid->canTransitionTo(OrderStatus::Queued));
         $this->assertTrue(OrderStatus::Queued->canTransitionTo(OrderStatus::InProgress));
-        $this->assertFalse(OrderStatus::WaitingVerification->canTransitionTo(OrderStatus::InProgress));
+        $this->assertFalse(OrderStatus::Paid->canTransitionTo(OrderStatus::WaitingVerification));
+        $this->assertFalse(OrderStatus::WaitingVerification->canTransitionTo(OrderStatus::Queued));
+    }
+
+    public function test_only_approved_orders_accept_payment(): void
+    {
+        $this->assertTrue(OrderStatus::PendingPayment->isPayable());
+        $this->assertTrue(OrderStatus::Expired->isPayable());
+        $this->assertFalse(OrderStatus::WaitingVerification->isPayable());
+        $this->assertFalse(OrderStatus::Paid->isPayable());
     }
 
     public function test_customer_can_return_an_assigned_order_to_work(): void
@@ -64,11 +73,12 @@ class OrderWorkflowTest extends TestCase
 
     public function test_admin_may_ask_the_customer_a_question_while_the_order_is_handled(): void
     {
-        $this->assertTrue(OrderStatus::Paid->canTransitionTo(OrderStatus::WaitingCustomer));
+        $this->assertTrue(OrderStatus::WaitingVerification->canTransitionTo(OrderStatus::WaitingCustomer));
         $this->assertTrue(OrderStatus::Queued->canTransitionTo(OrderStatus::WaitingCustomer));
         $this->assertTrue(OrderStatus::InProgress->canTransitionTo(OrderStatus::WaitingCustomer));
         $this->assertTrue(OrderStatus::Revision->canTransitionTo(OrderStatus::WaitingCustomer));
 
+        $this->assertFalse(OrderStatus::Paid->canTransitionTo(OrderStatus::WaitingCustomer));
         $this->assertFalse(OrderStatus::PendingPayment->canTransitionTo(OrderStatus::WaitingCustomer));
         $this->assertFalse(OrderStatus::Delivered->canTransitionTo(OrderStatus::WaitingCustomer));
         $this->assertFalse(OrderStatus::Cancelled->canTransitionTo(OrderStatus::WaitingCustomer));
@@ -135,14 +145,17 @@ class OrderWorkflowTest extends TestCase
     {
         $steps = OrderStatus::customerSteps();
         $this->assertCount(6, $steps);
-        $this->assertSame('Bayar', $steps[0]['label']);
-        $this->assertContains(OrderStatus::PendingPayment, $steps[0]['statuses']);
-        $this->assertContains(OrderStatus::Expired, $steps[0]['statuses']);
+        $this->assertSame('Ditinjau Admin', $steps[0]['label']);
+        $this->assertContains(OrderStatus::WaitingVerification, $steps[0]['statuses']);
+        $this->assertSame('Bayar', $steps[1]['label']);
+        $this->assertContains(OrderStatus::PendingPayment, $steps[1]['statuses']);
+        $this->assertContains(OrderStatus::Expired, $steps[1]['statuses']);
         $this->assertSame('Dikerjakan', $steps[3]['label']);
         $this->assertContains(OrderStatus::Revision, $steps[3]['statuses']);
 
-        $this->assertSame(0, OrderStatus::PendingPayment->customerStepIndex());
-        $this->assertSame(0, OrderStatus::Expired->customerStepIndex());
+        $this->assertSame(0, OrderStatus::WaitingVerification->customerStepIndex());
+        $this->assertSame(1, OrderStatus::PendingPayment->customerStepIndex());
+        $this->assertSame(1, OrderStatus::Expired->customerStepIndex());
         $this->assertSame(3, OrderStatus::Revision->customerStepIndex());
         $this->assertSame(-1, OrderStatus::Cancelled->customerStepIndex());
     }
@@ -152,14 +165,14 @@ class OrderWorkflowTest extends TestCase
         $workflow = app(OrderWorkflow::class);
 
         foreach (OrderStatus::GATEWAY_ONLY as $reserved) {
-            $order = Order::factory()->waitingVerification()->create();
+            $order = Order::factory()->pendingPayment()->create();
 
             $this->expectException(InvalidArgumentException::class);
 
             try {
                 $workflow->transitionTo($order, $reserved);
             } finally {
-                $this->assertSame(OrderStatus::WaitingVerification, $order->fresh()->status);
+                $this->assertSame(OrderStatus::PendingPayment, $order->fresh()->status);
                 $this->assertSame(0, $order->statusHistory()->count());
             }
         }
@@ -167,20 +180,20 @@ class OrderWorkflowTest extends TestCase
 
     public function test_a_reserved_status_is_allowed_for_the_gateway_callback(): void
     {
-        $order = Order::factory()->waitingVerification()->create();
+        $order = Order::factory()->pendingPayment()->create();
 
         $updated = app(OrderWorkflow::class)->transitionTo(
             $order,
-            OrderStatus::WaitingCustomer,
+            OrderStatus::Paid,
             note: 'Dikonfirmasi webhook.',
             confirmedByGateway: true,
         );
 
-        $this->assertSame(OrderStatus::WaitingCustomer, $updated->status);
+        $this->assertSame(OrderStatus::Paid, $updated->status);
         $this->assertDatabaseHas('order_status_histories', [
             'order_id' => $order->getKey(),
-            'from_order_status_id' => OrderStatusLookup::idFor(OrderStatus::WaitingVerification->value),
-            'to_order_status_id' => OrderStatusLookup::idFor(OrderStatus::WaitingCustomer->value),
+            'from_order_status_id' => OrderStatusLookup::idFor(OrderStatus::PendingPayment->value),
+            'to_order_status_id' => OrderStatusLookup::idFor(OrderStatus::Paid->value),
         ]);
     }
 

@@ -72,7 +72,7 @@ class OrderController extends Controller
                 'service_id' => $service->getKey(),
                 'order_number' => $this->orderNumbers->generate(),
                 'description' => $request->validated('description'),
-                'order_status_id' => OrderStatusLookup::idFor(OrderStatus::PendingPayment->value),
+                'order_status_id' => OrderStatusLookup::idFor(OrderStatus::WaitingVerification->value),
                 'total_price' => $service->price,
             ]);
 
@@ -85,7 +85,7 @@ class OrderController extends Controller
 
         return redirect()
             ->route('customer.orders.show', $order)
-            ->with('success', 'Pesanan dibuat. Selesaikan pembayaran untuk memulai proses.');
+            ->with('success', 'Pesanan dibuat. Menunggu tinjauan admin sebelum pembayaran.');
     }
 
     /**

@@ -106,34 +106,51 @@ class TripayPaymentTest extends TestCase
 
     public function test_pay_page_requires_a_signed_in_customer(): void
     {
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->get(route('customer.orders.pay', $order))->assertRedirect(route('login'));
     }
 
     public function test_customer_cannot_open_the_pay_page_of_another_customer(): void
     {
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs(User::factory()->customer()->create())
             ->get(route('customer.orders.pay', $order))
             ->assertForbidden();
     }
 
-    public function test_pay_page_is_closed_once_the_order_is_paid(): void
+    public function test_pay_page_is_closed_once_the_order_is_in_the_worker_queue(): void
     {
-        $order = Order::factory()->for(User::factory()->customer())->waitingVerification()->create();
+        $order = Order::factory()->for(User::factory()->customer())->queued()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.pay', $order))
             ->assertNotFound();
     }
 
+    public function test_pay_page_explains_that_an_unreviewed_order_is_still_being_reviewed(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->waitingVerification()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.pay', $order))
+            ->assertRedirect(route('customer.orders.show', $order))
+            ->assertSessionHas('warning', 'Pesanan anda sedang di tinjau admin.');
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.pay.store', $order), ['payment_method' => 'QRIS'])
+            ->assertRedirect(route('customer.orders.show', $order))
+            ->assertSessionHas('warning', 'Pesanan anda sedang di tinjau admin.');
+
+        $this->assertCount(0, $order->payments()->get());
+    }
+
     public function test_pay_page_lists_the_channels_activated_at_the_gateway(): void
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.pay', $order))
@@ -145,7 +162,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.pay', $order))
@@ -164,7 +181,7 @@ class TripayPaymentTest extends TestCase
             'tripay.co.id/api-sandbox/merchant/payment-channel' => Http::response([], 500),
         ]);
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->get(route('customer.orders.pay', $order))
@@ -180,7 +197,7 @@ class TripayPaymentTest extends TestCase
             'tripay.merchant_code' => null,
         ]);
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->from(route('customer.orders.pay', $order))
@@ -195,7 +212,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         Http::fake([
             'tripay.co.id/api-sandbox/transaction/create' => Http::response([
@@ -228,7 +245,7 @@ class TripayPaymentTest extends TestCase
 
         $order = Order::factory()->for(User::factory()->customer()->create([
             'phone' => '081234567890',
-        ]))->create();
+        ]))->pendingPayment()->create();
 
         Http::fake([
             'tripay.co.id/api-sandbox/transaction/create' => Http::response([
@@ -265,7 +282,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
         $payment = $this->makePayment($order);
 
         $this->actingAs($order->user)
@@ -279,7 +296,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->post(route('customer.orders.pay.store', $order), ['payment_method' => 'EWALLET'])
@@ -299,7 +316,7 @@ class TripayPaymentTest extends TestCase
             ], 400),
         ]);
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $this->actingAs($order->user)
             ->post(route('customer.orders.pay.store', $order), ['payment_method' => 'QRIS'])
@@ -313,7 +330,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment), 'signature-palsu')->assertForbidden();
 
@@ -325,7 +342,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         // The signature header is absent entirely; only the payload is sent.
         $this->postJson(route('tripay.notification'), $this->payload($payment), [
@@ -339,27 +356,27 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment), event: 'disbursement')->assertForbidden();
 
         $this->assertSame(OrderStatus::PendingPayment, $payment->order->fresh()->status);
     }
 
-    public function test_valid_paid_callback_moves_the_order_to_the_verification_queue(): void
+    public function test_valid_paid_callback_moves_the_order_straight_into_the_worker_queue(): void
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment))->assertOk();
 
         $this->assertSame(PaymentStatus::Paid, $payment->fresh()->status);
         $this->assertNotNull($payment->fresh()->paid_at);
-        $this->assertSame(OrderStatus::WaitingVerification, $payment->order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $payment->order->fresh()->status);
 
         $this->assertSame(
-            [OrderStatus::Paid, OrderStatus::WaitingVerification],
+            [OrderStatus::Paid, OrderStatus::Queued],
             $payment->order->statusHistory()->orderBy('id')->get()->map(fn ($entry) => $entry->to_status)->all(),
         );
     }
@@ -368,7 +385,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment, [
             'amount_received' => $payment->amount,
@@ -385,7 +402,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment, [
             'total_amount' => $payment->amount + 1,
@@ -399,7 +416,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment, ['status' => 'FAILED']))->assertOk();
 
@@ -412,7 +429,7 @@ class TripayPaymentTest extends TestCase
         $this->withTripayConfigured();
 
         $payment = $this->makePayment(
-            Order::factory()->for(User::factory()->customer())->create(),
+            Order::factory()->for(User::factory()->customer())->pendingPayment()->create(),
             ['expires_at' => now()->subHour()],
         );
 
@@ -429,7 +446,7 @@ class TripayPaymentTest extends TestCase
         $this->withTripayConfigured();
 
         $payment = $this->makePayment(
-            Order::factory()->for(User::factory()->customer())->create(),
+            Order::factory()->for(User::factory()->customer())->pendingPayment()->create(),
             ['expires_at' => now()->subHour()],
         );
 
@@ -462,7 +479,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
         $payment = $this->makePayment($order);
 
         $this->postCallback($this->payload($payment, ['reference' => 'PUB-LAIN']))->assertNotFound();
@@ -474,14 +491,14 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
         $payload = $this->payload($payment);
 
         foreach (range(1, 3) as $attempt) {
             $this->postCallback($payload)->assertOk();
         }
 
-        $this->assertSame(OrderStatus::WaitingVerification, $payment->order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $payment->order->fresh()->status);
         $this->assertSame(2, $payment->order->statusHistory()->count());
     }
 
@@ -498,7 +515,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         // A body whose slashes and non-ASCII characters are escaped by the
         // default encoder. Re-encoding the decoded payload would produce a
@@ -529,14 +546,14 @@ class TripayPaymentTest extends TestCase
         )->assertOk();
 
         $this->assertSame(PaymentStatus::Paid, $payment->fresh()->status);
-        $this->assertSame(OrderStatus::WaitingVerification, $payment->order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $payment->order->fresh()->status);
     }
 
     public function test_callback_does_not_require_a_session(): void
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
         $body = json_encode($this->payload($payment));
 
         // The gateway is a server-to-server caller: no session, no cookies, no
@@ -557,14 +574,14 @@ class TripayPaymentTest extends TestCase
             $body,
         )->assertOk();
 
-        $this->assertSame(OrderStatus::WaitingVerification, $payment->order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $payment->order->fresh()->status);
     }
 
     public function test_replayed_paid_callback_does_not_overwrite_the_recorded_amount_and_fee(): void
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
         $payment = $this->makePayment($order);
 
         $this->postCallback($this->payload($payment, [
@@ -591,7 +608,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
         $payment = $this->makePayment($order);
 
         $this->postCallback($this->payload($payment, ['status' => 'EXPIRED']))->assertOk();
@@ -604,14 +621,14 @@ class TripayPaymentTest extends TestCase
         $this->postCallback($this->payload($payment))->assertOk();
 
         $this->assertSame(PaymentStatus::Paid, $payment->fresh()->status);
-        $this->assertSame(OrderStatus::WaitingVerification, $order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $order->fresh()->status);
     }
 
     public function test_callback_issued_for_another_merchant_is_rejected(): void
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         $this->postCallback($this->payload($payment, ['merchant_code' => 'T99999']))
             ->assertForbidden();
@@ -623,7 +640,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->create());
+        $payment = $this->makePayment(Order::factory()->for(User::factory()->customer())->pendingPayment()->create());
 
         for ($attempt = 1; $attempt <= 60; $attempt++) {
             $this->postCallback($this->payload($payment))->assertOk();
@@ -636,7 +653,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         // Stand in for a concurrent request that is already talking to the
         // gateway. Holding the lock must make this one back off rather than open
@@ -662,7 +679,7 @@ class TripayPaymentTest extends TestCase
     {
         $this->withTripayConfigured();
 
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         // An empty cache plus valid credentials means the gateway could not be
         // reached, so the list on offer is the configured guess rather than the

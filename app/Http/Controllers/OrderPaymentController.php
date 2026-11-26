@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrderStatus;
 use App\Enums\UserRole;
 use App\Models\Order;
 use App\Services\PaymentService;
@@ -22,9 +23,13 @@ class OrderPaymentController extends Controller
     /**
      * Show the checkout screen for an unpaid order.
      */
-    public function create(Request $request, Order $order): View
+    public function create(Request $request, Order $order): View|RedirectResponse
     {
         $this->authorizeOrderOwner($request, $order);
+
+        if ($redirect = $this->reviewRedirect($order)) {
+            return $redirect;
+        }
 
         abort_if(! $order->isPayable(), 404);
 
@@ -42,6 +47,10 @@ class OrderPaymentController extends Controller
     public function store(Request $request, Order $order): RedirectResponse
     {
         $this->authorizeOrderOwner($request, $order);
+
+        if ($redirect = $this->reviewRedirect($order)) {
+            return $redirect;
+        }
 
         abort_if(! $order->isPayable(), 404);
 
@@ -74,6 +83,20 @@ class OrderPaymentController extends Controller
         }
 
         return redirect()->away($checkoutUrl);
+    }
+
+    /**
+     * Send an order still under review back to its detail page with an explanation.
+     */
+    private function reviewRedirect(Order $order): ?RedirectResponse
+    {
+        if ($order->status !== OrderStatus::WaitingVerification) {
+            return null;
+        }
+
+        return redirect()
+            ->route('customer.orders.show', $order)
+            ->with('warning', 'Pesanan anda sedang di tinjau admin.');
     }
 
     /**

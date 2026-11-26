@@ -67,7 +67,11 @@
                         ->first();
                 @endphp
 
-                @if ($order->isPayable())
+                @if ($order->status === \App\Enums\OrderStatus::WaitingVerification)
+                    <x-alert variant="warning">
+                        Pesanan anda sedang di tinjau admin. Setelah disetujui, kamu bisa melanjutkan pembayaran.
+                    </x-alert>
+                @elseif ($order->isPayable())
                     <p class="page-subtitle mb-0">
                         Pesanan ini belum dibayar, jadi belum masuk ke antrean pengerjaan.
                     </p>

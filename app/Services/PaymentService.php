@@ -108,8 +108,8 @@ class PaymentService
     }
 
     /**
-     * Apply a gateway callback to the order, moving it to verification once the
-     * payment is confirmed as successful.
+     * Apply a gateway callback to the order, moving a successful payment straight
+     * into the worker queue.
      *
      * The gateway retries failed notifications, so this is written to be safe to
      * run more than once for the same transaction.
@@ -177,8 +177,8 @@ class PaymentService
 
                 $this->workflow->transitionTo(
                     $order,
-                    OrderStatus::WaitingVerification,
-                    note: 'Pesanan masuk antrean verifikasi Admin.',
+                    OrderStatus::Queued,
+                    note: 'Pembayaran terkonfirmasi, pesanan otomatis masuk antrean worker.',
                 );
             }
 

@@ -74,7 +74,7 @@ class TripayReconcilePaymentsTest extends TestCase
 
     public function test_it_expires_every_pending_payment_on_the_same_order(): void
     {
-        $order = Order::factory()->for(User::factory()->customer())->create();
+        $order = Order::factory()->for(User::factory()->customer())->pendingPayment()->create();
 
         $first = $this->makePayment([
             'order' => $order,
@@ -128,7 +128,7 @@ class TripayReconcilePaymentsTest extends TestCase
         $payment->refresh();
 
         $this->assertSame(PaymentStatus::Paid, $payment->status);
-        $this->assertSame(OrderStatus::WaitingVerification, $payment->order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $payment->order->fresh()->status);
 
         Http::assertSent(fn ($request): bool => str_contains($request->url(), '/transaction/detail'));
     }
@@ -169,7 +169,7 @@ class TripayReconcilePaymentsTest extends TestCase
             ->assertSuccessful();
 
         $this->assertSame(PaymentStatus::Paid, $payment->fresh()->status);
-        $this->assertSame(OrderStatus::WaitingVerification, $payment->order->fresh()->status);
+        $this->assertSame(OrderStatus::Queued, $payment->order->fresh()->status);
     }
 
     public function test_it_stops_reconciling_long_expired_payments(): void
@@ -321,7 +321,9 @@ class TripayReconcilePaymentsTest extends TestCase
 
         $order = $orderOverrides instanceof Order
             ? $orderOverrides
-            : Order::factory()->for(User::factory()->customer())->create($orderOverrides);
+            : Order::factory()->for(User::factory()->customer())->create(array_merge([
+                'order_status_id' => OrderStatusLookup::idFor(OrderStatus::PendingPayment->value),
+            ], $orderOverrides));
         $reference = 'PUB-'.$order->order_number;
 
         $payment = $order->payments()->create(array_merge([

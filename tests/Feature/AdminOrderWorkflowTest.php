@@ -134,7 +134,7 @@ class AdminOrderWorkflowTest extends TestCase
             ->assertSee('q=Budi', escape: false);
     }
 
-    public function test_admin_can_release_a_verified_order_to_the_worker_queue(): void
+    public function test_admin_can_approve_a_reviewed_order_for_payment(): void
     {
         $admin = User::factory()->admin()->create();
         $order = Order::factory()->waitingVerification()->create();
@@ -142,19 +142,32 @@ class AdminOrderWorkflowTest extends TestCase
         $this->actingAs($admin)
             ->from(route('admin.orders.show', $order))
             ->patch(route('admin.orders.status', $order), [
-                'status' => OrderStatus::Queued->value,
-                'note' => 'Pembayaran sudah dicek.',
+                'status' => OrderStatus::PendingPayment->value,
+                'note' => 'Data sudah dicek.',
             ])
             ->assertRedirect(route('admin.orders.show', $order));
 
-        $this->assertSame(OrderStatus::Queued, $order->fresh()->status);
+        $this->assertSame(OrderStatus::PendingPayment, $order->fresh()->status);
 
         $entry = $order->statusHistory()->latest('id')->first();
 
         $this->assertSame(OrderStatus::WaitingVerification, $entry->from_status);
-        $this->assertSame(OrderStatus::Queued, $entry->to_status);
+        $this->assertSame(OrderStatus::PendingPayment, $entry->to_status);
         $this->assertSame($admin->getKey(), $entry->changed_by);
-        $this->assertSame('Pembayaran sudah dicek.', $entry->note);
+        $this->assertSame('Data sudah dicek.', $entry->note);
+    }
+
+    public function test_admin_cannot_release_an_unpaid_order_to_the_worker_queue(): void
+    {
+        $order = Order::factory()->waitingVerification()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->patch(route('admin.orders.status', $order), [
+                'status' => OrderStatus::Queued->value,
+            ])
+            ->assertSessionHasErrors('status');
+
+        $this->assertSame(OrderStatus::WaitingVerification, $order->fresh()->status);
     }
 
     public function test_admin_cannot_bypass_the_worker_queue(): void

@@ -9,7 +9,7 @@ Project ini adalah website penyedia jasa digital, seperti:
 - Jasa digital lainnya
 
 Alur utama:
-Customer memilih jasa → membuat pesanan → melakukan pembayaran → Admin memverifikasi → pesanan masuk antrean → Worker mengklaim dan mengerjakan → hasil dikirim ke Customer.
+Customer memilih jasa → membuat pesanan → Admin meninjau dan menyetujui → Customer membayar → pesanan otomatis masuk antrean → Worker mengklaim dan mengerjakan → hasil dikirim ke Customer.
 
 Role dipisahkan menjadi **Super Admin**, **Admin**, **Worker**, dan **Customer**. Admin menangani operasional jasa/pesanan; Super Admin menangani akun, role, dan impersonation; Worker hanya menangani pesanan yang diklaimnya.
 
@@ -32,9 +32,9 @@ Customer dapat:
 ### Admin
 Admin dapat:
 - Melihat seluruh pesanan masuk
-- Memverifikasi pembayaran
+- Meninjau pesanan sebelum pembayaran
 - Meminta klarifikasi jika informasi belum lengkap
-- Melepas pesanan ke antrean Worker (`queued`)
+- Menyetujui pesanan agar Customer dapat membayar (`pending_payment`)
 - Melakukan revisi, menyelesaikan, dan mengirim hasil
 - Mengunggah hasil pekerjaan
 - Mengelola jasa dan status pesanan operasional
@@ -77,26 +77,27 @@ Payment Gateway digunakan untuk:
 5. Customer membuat pesanan.
 6. Customer mengisi detail pekerjaan yang ingin dikerjakan.
 7. Customer dapat mengupload file pendukung.
-8. Customer melakukan pembayaran melalui Payment Gateway.
-9. Sistem menerima status pembayaran.
-10. Jika pembayaran gagal:
-    - Status pembayaran menjadi `payment_failed`
+8. Customer menunggu Admin meninjau pesanan.
+9. Jika informasi kurang, Admin meminta tambahan data dan Customer mengunggahnya; pesanan kembali ke tinjauan Admin.
+10. Setelah disetujui, Customer melakukan pembayaran melalui Payment Gateway.
+11. Sistem menerima status pembayaran lewat callback.
+12. Jika pembayaran gagal atau transaksi kedaluwarsa:
+    - Status pembayaran menjadi `failed` atau `expired`
     - Customer dapat mencoba membayar kembali.
-11. Jika pembayaran berhasil:
+13. Jika pembayaran berhasil:
     - Status pembayaran menjadi `paid`
-    - Pesanan masuk ke tahap verifikasi Admin.
-12. Customer menunggu proses verifikasi.
-13. Customer dapat melihat perkembangan/status pesanan.
-14. Setelah pekerjaan selesai dan hasil dikirim:
+    - Pesanan menjadi `queued` dan otomatis masuk antrean Worker.
+14. Customer dapat melihat perkembangan/status pesanan.
+15. Setelah pekerjaan selesai dan hasil dikirim:
     - Customer menerima hasil pekerjaan.
-15. Customer dapat mengunduh hasil pekerjaan.
+16. Customer dapat mengunduh hasil pekerjaan.
 
 ---
 
 ## 4. Alur Admin
 
-1. Admin melihat pesanan baru yang sudah dibayar.
-2. Admin memeriksa data Customer, jasa, detail pesanan, file, dan status pembayaran.
+1. Admin melihat pesanan baru yang menunggu tinjauan.
+2. Admin memeriksa data Customer, jasa, detail pesanan, dan file pendukung.
 3. Admin menentukan apakah pesanan valid dan informasinya lengkap.
 
 ### Jika pesanan belum lengkap:
@@ -105,9 +106,10 @@ Payment Gateway digunakan untuk:
 - Setelah Customer mengirim info dan belum ada Worker, pesanan kembali ke `waiting_verification`.
 
 ### Jika pesanan valid:
-- Admin melepas pesanan ke antrean.
-- Status menjadi `queued`.
-- Admin **tidak** boleh langsung mengubah `queued` menjadi `in_progress`.
+- Admin menyetujui pesanan.
+- Status menjadi `pending_payment` dan Customer dapat membayar.
+- Setelah pembayaran terkonfirmasi, status menjadi `paid` lalu `queued` otomatis.
+- Admin **tidak** boleh melepas ke antrean secara manual atau mengubah `queued` menjadi `in_progress`.
 
 4. Worker mengambil pesanan dari antrean; status menjadi `in_progress`.
 5. Jika perlu revisi, Admin atau Worker memindahkan pesanan ke `revision`.
@@ -144,7 +146,7 @@ Payment Gateway digunakan untuk:
 
 ### Pembayaran berhasil
 - Payment status: `paid`
-- Order dapat masuk ke proses verifikasi Admin.
+- Order menjadi `paid` lalu `queued` otomatis dan siap diklaim Worker.
 
 ### Pembayaran gagal
 - Payment status: `failed`
@@ -158,9 +160,9 @@ Sistem harus menggunakan callback/webhook dari Payment Gateway untuk memastikan 
 
 Gunakan status pesanan berikut:
 
-`pending_payment`
+`waiting_verification`
+→ `pending_payment`
 → `paid`
-→ `waiting_verification`
 → `queued`
 → `in_progress`
 → `completed`
@@ -170,17 +172,17 @@ Cabang: `waiting_customer`, `revision`, `expired`, dan `cancelled`.
 
 Penjelasan:
 
+### waiting_verification
+Pesanan baru menunggu pemeriksaan Admin sebelum pembayaran.
+
 ### pending_payment
-Pesanan sudah dibuat tetapi belum dibayar.
+Pesanan sudah disetujui Admin dan menunggu pembayaran.
 
 ### paid
-Pembayaran sudah berhasil.
-
-### waiting_verification
-Pesanan menunggu pemeriksaan Admin.
+Pembayaran sudah berhasil dan pesanan otomatis masuk antrean Worker.
 
 ### queued
-Pesanan sudah diverifikasi dan menunggu diklaim Worker.
+Pesanan sudah dibayar dan menunggu diklaim Worker.
 
 ### waiting_customer
 Admin atau Worker membutuhkan informasi tambahan dari Customer.
@@ -380,9 +382,9 @@ Super Admin:
 
 1. Customer tidak dapat menganggap pesanan aktif sebelum pembayaran berhasil.
 2. Pesanan yang belum dibayar tidak boleh masuk ke proses pengerjaan.
-3. Admin harus memverifikasi pesanan setelah pembayaran berhasil.
+3. Admin harus meninjau dan menyetujui pesanan sebelum pembayaran.
 4. Jika informasi Customer kurang, gunakan status `waiting_customer`.
-5. Admin melepas pesanan ke `queued`; hanya Worker yang dapat mengubahnya ke `in_progress` lewat klaim.
+5. Pembayaran berhasil memindahkan pesanan ke `queued` otomatis; hanya Worker yang dapat mengubahnya ke `in_progress` lewat klaim.
 6. Worker wajib online dan memiliki kuota kurang dari 5 untuk mengklaim pesanan.
 7. Customer dapat melihat status pesanan tetapi tidak dapat mengubah status secara manual.
 8. File hasil pekerjaan hanya dapat diakses oleh Customer yang memiliki pesanan tersebut.
@@ -405,21 +407,21 @@ Buat Pesanan
 ↓
 Upload Detail/File
 ↓
-Bayar
-↓
-PAYMENT GATEWAY
-↓
-Pembayaran Berhasil
-↓
 ADMIN
 ↓
-Verifikasi Pesanan
+Tinjau Pesanan
 ↓
 Pesanan Valid?
-├── Tidak → Minta Informasi Customer → Verifikasi Kembali
+├── Tidak → Minta Informasi Customer → Tinjau Kembali
 └── Ya
     ↓
-    Lepas ke Antrean (queued)
+    Bayar (pending_payment)
+    ↓
+    PAYMENT GATEWAY
+    ↓
+    Pembayaran Berhasil
+    ↓
+    Antrean Otomatis (queued)
     ↓
     WORKER ONLINE
     ↓
@@ -454,7 +456,7 @@ Prioritas:
 6. Webhook pembayaran
 7. Dashboard Customer
 8. Dashboard Admin
-9. Verifikasi Order dan pelepasan ke antrean
+9. Verifikasi Order sebelum pembayaran dan antrean otomatis setelah pembayaran
 10. Dashboard Worker, status online, kuota, dan klaim order
 11. Proses pengerjaan
 12. Upload hasil
@@ -465,7 +467,7 @@ Prioritas:
 Jangan membuat fitur yang belum diperlukan sebelum alur utama berjalan dengan baik.
 
 Tujuan versi awal adalah membuat alur:
-**Pilih Jasa → Order → Bayar → Verifikasi Admin → Antrean → Klaim Worker → Kerjakan → Upload Hasil → Kirim ke Customer**
+**Pilih Jasa → Order → Verifikasi Admin → Bayar → Antrean Otomatis → Klaim Worker → Kerjakan → Upload Hasil → Kirim ke Customer**
 berjalan dengan stabil.
 
 

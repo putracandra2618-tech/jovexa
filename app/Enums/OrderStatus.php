@@ -72,10 +72,10 @@ enum OrderStatus: string
     public function next(): ?self
     {
         return match ($this) {
+            self::WaitingVerification => self::PendingPayment,
             self::PendingPayment => self::Paid,
             self::Expired => self::PendingPayment,
-            self::Paid => self::WaitingVerification,
-            self::WaitingVerification => self::Queued,
+            self::Paid => self::Queued,
             self::Queued => self::InProgress,
             self::WaitingCustomer => self::WaitingVerification,
             self::InProgress => self::Completed,
@@ -96,9 +96,9 @@ enum OrderStatus: string
     public static function customerSteps(): array
     {
         return [
+            ['label' => 'Ditinjau Admin', 'icon' => 'bi-shield-check', 'statuses' => [self::WaitingVerification, self::WaitingCustomer]],
             ['label' => 'Bayar', 'icon' => 'bi-wallet2', 'statuses' => [self::PendingPayment, self::Expired]],
             ['label' => 'Terkonfirmasi', 'icon' => 'bi-receipt', 'statuses' => [self::Paid]],
-            ['label' => 'Diverifikasi', 'icon' => 'bi-shield-check', 'statuses' => [self::WaitingVerification, self::WaitingCustomer]],
             ['label' => 'Dikerjakan', 'icon' => 'bi-hammer', 'statuses' => [self::Queued, self::InProgress, self::Revision]],
             ['label' => 'Selesai', 'icon' => 'bi-stars', 'statuses' => [self::Completed]],
             ['label' => 'Dikirim', 'icon' => 'bi-send-check', 'statuses' => [self::Delivered]],
@@ -150,7 +150,7 @@ enum OrderStatus: string
         }
 
         if ($target === self::WaitingCustomer) {
-            return in_array($this, [self::Paid, self::WaitingVerification, self::Queued, self::InProgress, self::Revision], strict: true);
+            return in_array($this, [self::WaitingVerification, self::Queued, self::InProgress, self::Revision], strict: true);
         }
 
         // A customer answering a question returns the order to its worker when
@@ -196,8 +196,8 @@ enum OrderStatus: string
     public function stage(): string
     {
         return match ($this) {
-            self::PendingPayment, self::Expired => 'payment',
-            self::Paid, self::WaitingVerification, self::Queued, self::WaitingCustomer => 'queue',
+            self::WaitingVerification, self::PendingPayment, self::Expired => 'payment',
+            self::Paid, self::Queued, self::WaitingCustomer => 'queue',
             self::InProgress, self::Revision, self::Completed => 'work',
             self::Delivered, self::Cancelled => 'done',
         };
@@ -209,7 +209,7 @@ enum OrderStatus: string
     public function stageLabel(): string
     {
         return match ($this->stage()) {
-            'payment' => 'Pembayaran',
+            'payment' => 'Verifikasi & Pembayaran',
             'queue' => 'Antrean & Verifikasi',
             'work' => 'Sedang Dikerjakan',
             default => 'Selesai',

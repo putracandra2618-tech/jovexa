@@ -116,7 +116,7 @@
                     </a>
 
                     <p class="form-hint mt-3 mb-0">
-                        Kamu akan diarahkan ke halaman pembayaran setelah pesanan dibuat.
+                        Setelah pesanan dibuat, Admin meninjaunya dulu. Kamu bisa membayar setelah pesanan disetujui.
                     </p>
                 </div>
             </div>

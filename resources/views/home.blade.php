@@ -138,8 +138,8 @@
                         <span class="jx-feature-icon jx-icon-mint"><i class="bi bi-eye"></i></span>
                         <h3 class="jx-feature-title">Progres transparan</h3>
                         <p class="jx-feature-text">
-                            Status pesanan berubah nyata: menunggu pembayaran, diverifikasi, dikerjakan,
-                            sampai dikirim.
+                            Status pesanan berubah nyata: ditinjau Admin, menunggu pembayaran, masuk
+                            antrean, dikerjakan, sampai dikirim.
                         </p>
                     </div>
                 </div>
@@ -324,8 +324,8 @@
                                 <i class="bi bi-chevron-down"></i>
                             </summary>
                             <div class="jx-faq-answer">
-                                Pembayaran memakai payment gateway Tripay. Pesanan baru diteruskan ke
-                                pengerjaan setelah callback pembayaran diterima.
+                                Pembayaran memakai payment gateway Tripay setelah pesanan disetujui Admin.
+                                Setelah callback pembayaran diterima, pesanan otomatis masuk antrean worker.
                             </div>
                         </details>
 

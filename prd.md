@@ -10,7 +10,7 @@
 
 ## 1. Ringkasan Produk
 
-**Jovexa** adalah platform web penyedia jasa digital. Customer dapat melihat katalog jasa, membuat pesanan, mengunggah kebutuhan, membayar melalui payment gateway **Tripay**, lalu memantau progres sampai file hasil dapat diunduh. Admin memverifikasi pembayaran dan melepas pesanan ke antrean, Worker mengambil pesanan dari antrean dan mengerjakannya, lalu Admin atau Worker mengirim hasil ke customer. Super Admin mengelola akun, role, dan impersonation.
+**Jovexa** adalah platform web penyedia jasa digital. Customer dapat melihat katalog jasa, membuat pesanan, mengunggah kebutuhan, membayar melalui payment gateway **Tripay**, lalu memantau progres sampai file hasil dapat diunduh. Admin meninjau dan menyetujui pesanan sebelum pembayaran; setelah pembayaran terkonfirmasi, pesanan otomatis masuk antrean Worker. Worker mengambil pesanan dari antrean dan mengerjakannya, lalu Admin atau Worker mengirim hasil ke customer. Super Admin mengelola akun, role, dan impersonation.
 
 Untuk versi saat ini, role dipisahkan menjadi **Super Admin**, **Admin**, **Worker**, dan **Customer**. Admin hanya menangani operasional jasa dan pesanan; pengelolaan akun dan impersonation hanya dapat dilakukan Super Admin.
 
@@ -19,7 +19,7 @@ Untuk versi saat ini, role dipisahkan menjadi **Super Admin**, **Admin**, **Work
 1. Proses pemesanan jasa yang jelas dan dapat dilacak.
 2. Status pesanan yang transparan bagi customer.
 3. Pembayaran yang dikonfirmasi di sisi server melalui callback Tripay, bukan dari klik browser.
-4. Antrean kerja terstruktur: Admin memverifikasi, Worker mengklaim pesanan, lalu hasil dikirim ke customer.
+4. Antrean kerja terstruktur: Admin meninjau pesanan, pembayaran memicu antrean otomatis, Worker mengklaim pesanan, lalu hasil dikirim ke customer.
 
 **Stack aktual:**
 
@@ -54,7 +54,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 
 ### 3.1 Tujuan MVP
 
-- Menjalankan alur utama secara stabil: **Pilih Jasa → Order → Upload → Bayar → Verifikasi → Kerjakan → Upload Hasil → Kirim ke Customer**.
+- Menjalankan alur utama secara stabil: **Pilih Jasa → Order → Upload → Verifikasi Admin → Bayar → Antrean Otomatis → Kerjakan → Upload Hasil → Kirim ke Customer**.
 - Memastikan pesanan tidak masuk pengerjaan sebelum pembayaran terkonfirmasi.
 - Memastikan status pembayaran hanya berubah berdasarkan callback gateway atau rekonsiliasi server.
 - Memberi customer visibilitas progres dan akses unduh hasil.
@@ -77,7 +77,8 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 |---|---|---|
 | Order-to-payment conversion | Persentase order yang mencapai `paid` | Belum ada analytics |
 | Payment confirmation success | Persentase transaksi yang berhasil dikonfirmasi callback/rekonsiliasi | Belum ada dashboard |
-| Verification latency | Waktu dari `waiting_verification` ke `queued` | Belum diukur |
+| Verification latency | Waktu dari `waiting_verification` ke `pending_payment` | Belum diukur |
+| Payment-to-queue latency | Waktu dari pembayaran `paid` ke `queued` | Belum diukur |
 | Claim latency | Waktu dari `queued` sampai diklaim Worker | Belum diukur |
 | Delivery success | Persentase order `completed` yang berhasil menjadi `delivered` | Belum diukur |
 | Manual correction rate | Jumlah order yang statusnya harus dikoreksi manual | Belum diukur |
@@ -98,7 +99,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 - Melihat katalog dan detail jasa.
 - Membuat pesanan untuk jasa yang berstatus published.
 - Mengisi deskripsi kebutuhan dan mengunggah file pendukung.
-- Membayar melalui Tripay.
+- Membayar melalui Tripay setelah pesanan disetujui Admin.
 - Memantau status dan riwayat pesanan.
 - Mengunggah file tambahan saat diminta Admin atau Worker.
 - Mengunduh file hasil setelah pesanan selesai/dikirim.
@@ -108,7 +109,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 
 - Melihat dashboard dan seluruh pesanan.
 - Mencari dan memfilter pesanan.
-- Memverifikasi pembayaran dan melepas pesanan ke antrean Worker.
+- Meninjau dan menyetujui pesanan sebelum customer membayar.
 - Meminta informasi tambahan kepada customer.
 - Menangani revisi, menyelesaikan pesanan, dan mengirim hasil.
 - Mengelola jasa (tambah, ubah, arsip, tayangkan).
@@ -184,25 +185,24 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 5. Jika belum login, customer diarahkan ke login/register.
 6. Customer mengisi deskripsi kebutuhan (20–5.000 karakter).
 7. Customer dapat mengunggah maksimal 5 file pendukung (maksimal 10 MB per file).
-8. Order dibuat dengan status `pending_payment` dan nomor unik.
-9. Customer membuka halaman pembayaran.
-10. Customer memilih channel Tripay yang tersedia.
-11. Sistem membuat transaksi dan mengarahkan customer ke checkout Tripay.
-12. Tripay mengirim callback.
-13. Jika pembayaran berhasil, order menjadi `paid` lalu `waiting_verification`.
-14. Admin memverifikasi. Bila informasi kurang, order menjadi `waiting_customer` dan customer mengunggah file tambahan.
-15. Jika valid, Admin melepas order ke antrean (`queued`).
-16. Worker yang online mengklaim order; order menjadi `in_progress` dan ter-assign ke Worker tersebut.
-17. Setelah selesai, order menjadi `completed`, file hasil diunggah, lalu dikirim menjadi `delivered`.
-18. Customer mengunduh hasil dari halaman detail pesanan.
+8. Order dibuat dengan status `waiting_verification` dan nomor unik.
+9. Admin meninjau pesanan. Bila informasi kurang, order menjadi `waiting_customer` dan customer mengunggah file tambahan, lalu kembali ke tinjauan Admin.
+10. Jika valid, Admin menyetujui pesanan sehingga status menjadi `pending_payment`.
+11. Customer membuka halaman pembayaran dan memilih channel Tripay yang tersedia.
+12. Sistem membuat transaksi dan mengarahkan customer ke checkout Tripay.
+13. Tripay mengirim callback.
+14. Jika pembayaran berhasil, order menjadi `paid` lalu `queued` otomatis.
+15. Worker yang online mengklaim order; order menjadi `in_progress` dan ter-assign ke Worker tersebut.
+16. Setelah selesai, order menjadi `completed`, file hasil diunggah, lalu dikirim menjadi `delivered`.
+17. Customer mengunduh hasil dari halaman detail pesanan.
 
 ### 6.2 Alur Admin
 
 1. Admin melihat dashboard dan seluruh pesanan.
-2. Admin membuka detail pesanan dan memeriksa data customer, jasa, deskripsi, file, serta pembayaran.
+2. Admin membuka detail pesanan dan memeriksa data customer, jasa, deskripsi, dan file pendukung.
 3. Jika informasi kurang, Admin mengirim permintaan informasi (catatan minimal 10 karakter).
-4. Jika valid, Admin memindahkan order dari `waiting_verification` ke `queued`.
-5. Admin tidak dapat memindahkan `queued` langsung ke `in_progress`; langkah itu hanya boleh terjadi lewat klaim Worker.
+4. Jika valid, Admin menyetujui order dari `waiting_verification` ke `pending_payment`.
+5. Setelah callback `paid`, order masuk `queued` otomatis; Admin tidak dapat memindahkan `queued` langsung ke `in_progress`.
 6. Admin dapat meminta revisi, menandai selesai, mengunggah hasil, dan mengirim hasil.
 7. Jika customer menjawab saat Worker sudah ditugaskan, order kembali ke `in_progress`.
 
@@ -231,17 +231,16 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 
 ```mermaid
 stateDiagram-v2
-    [*] --> pending_payment
+    [*] --> waiting_verification
+    waiting_verification --> pending_payment: Admin setujui
+    waiting_verification --> waiting_customer: minta info
     pending_payment --> paid: callback Tripay
     pending_payment --> expired: callback/sweep
     expired --> pending_payment: bayar ulang
     expired --> paid: pembayaran telat
-    paid --> waiting_verification: otomatis
-    waiting_verification --> queued: Admin verifikasi
+    paid --> queued: otomatis
     queued --> in_progress: Worker klaim
-    waiting_verification --> waiting_customer: minta info
     queued --> waiting_customer: minta info
-    paid --> waiting_customer: minta info
     in_progress --> waiting_customer: minta info
     revision --> waiting_customer: minta info
     waiting_customer --> waiting_verification: customer kirim info (tanpa Worker)
@@ -267,7 +266,8 @@ stateDiagram-v2
 Catatan:
 
 - `paid` dan `expired` hanya boleh dicapai lewat gateway (`confirmedByGateway: true`).
-- `queued` hanya boleh dicapai Admin dari `waiting_verification`.
+- `pending_payment` hanya boleh dicapai Admin dari `waiting_verification`, atau dari `expired` saat customer bayar ulang.
+- `queued` hanya boleh dicapai otomatis dari `paid`.
 - `in_progress` dari `queued` hanya boleh dicapai lewat klaim Worker.
 - `delivered` hanya boleh dicapai lewat aksi kirim dan wajib sudah memiliki file hasil.
 - Order `delivered` dan `cancelled` adalah status final.
@@ -314,7 +314,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | ORD-01 | Membuat order | Hanya untuk jasa `published`; total harga disalin dari harga jasa saat order dibuat; nomor unik `JVX-YYYYMMDD-XXXX` | Sudah ada |
 | ORD-02 | Validasi kebutuhan | Deskripsi wajib 20–5.000 karakter | Sudah ada |
 | ORD-03 | Upload requirement | Maksimal 5 file per request; maksimal 10 MB per file; ekstensi diizinkan; disimpan di disk privat | Sudah ada |
-| ORD-04 | Status awal order | Order baru `pending_payment`; riwayat status awal dicatat | Sudah ada |
+| ORD-04 | Status awal order | Order baru `waiting_verification`; riwayat status awal dicatat | Sudah ada |
 | ORD-05 | Daftar pesanan customer | Hanya order milik sendiri; 10 per halaman; filter tab Semua/Berjalan/Selesai/Perlu tindakan di browser | Sudah ada |
 | ORD-06 | Detail pesanan | Menampilkan stepper progres, ringkasan, file, pembayaran terakhir, dan riwayat status | Sudah ada |
 | ORD-07 | File tambahan | Hanya saat status `waiting_customer`; maksimal 5 file; setelah upload order kembali ke `waiting_verification` bila belum ada Worker, atau `in_progress` bila sudah ter-assign | Sudah ada |
@@ -330,7 +330,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 
 | ID | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|
-| PAY-01 | Halaman pembayaran | Hanya untuk order milik customer dan status `pending_payment`/`expired` | Sudah ada |
+| PAY-01 | Halaman pembayaran | Hanya untuk order milik customer dan status `pending_payment`/`expired`; `waiting_verification` diarahkan kembali dengan pesan "Pesanan anda sedang di tinjau admin" | Sudah ada |
 | PAY-02 | Daftar channel | Mengambil channel aktif dari Tripay; cache; fallback config saat gateway tidak terjangkau; peringatan bila daftar hanya perkiraan | Sudah ada |
 | PAY-03 | Membuat transaksi | Channel divalidasi; transaksi lama yang masih terbuka dipakai ulang; lock non-blocking mencegah transaksi ganda; panggilan gateway dilakukan sebelum baris payment disimpan | Sudah ada |
 | PAY-04 | Checkout | Menyimpan reference, checkout URL, channel, dan waktu kedaluwarsa; customer diarahkan ke checkout Tripay | Sudah ada |
@@ -338,7 +338,7 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | PAY-06 | Idempotensi | Callback `paid` berulang tidak menimpa amount/fee/paid_at; callback pending diabaikan | Sudah ada |
 | PAY-07 | Validasi nominal | Nominal callback harus sama dengan tagihan order | Sudah ada |
 | PAY-08 | Pemetaan status gateway | `PAID/SETTLED/SUCCESS` → `paid`; `EXPIRED` → `expired`; `FAILED/DENIED/CANCELLED` → `failed`; lainnya → `pending` | Sudah ada |
-| PAY-09 | Dampak ke order | `paid` memindahkan order payable ke `paid` lalu `waiting_verification`; `expired` hanya memindahkan order `pending_payment`; `failed` tidak memindahkan order sehingga bisa dibayar ulang | Sudah ada |
+| PAY-09 | Dampak ke order | `paid` memindahkan order payable ke `paid` lalu `queued` otomatis; `expired` hanya memindahkan order `pending_payment`; `failed` tidak memindahkan order sehingga bisa dibayar ulang | Sudah ada |
 | PAY-10 | Expiry otomatis | Command `tripay:expire-stale-payments` dijalankan setiap 5 menit; payment pending yang punya `checkout_url` dan lewat `expires_at` di-expire | Sudah ada |
 | PAY-11 | Rekonsiliasi | Command `tripay:reconcile-payments` berjalan tiap jam; memeriksa pending > 60 menit dan expired dalam 7 hari terakhir; memakai `/transaction/detail` | Sudah ada |
 | PAY-12 | Sinkronisasi channel | Command manual `tripay:sync-channels` untuk menyegarkan cache channel | Sudah ada |
@@ -377,7 +377,7 @@ Catatan operasional: scheduler harus berjalan (`php artisan schedule:work` atau 
 | ADM-12 | Kirim hasil | Hanya saat `completed` dan minimal ada satu file hasil; order menjadi `delivered` | Sudah ada |
 | ADM-13 | Pembatalan admin | Admin dapat membatalkan order selama belum final | Sudah ada |
 | ADM-14 | Unduh file | Admin dapat mengunduh semua file order | Sudah ada |
-| ADM-15 | Pelepasan ke antrean | Admin mengubah `waiting_verification` menjadi `queued` | Sudah ada |
+| ADM-15 | Persetujuan pesanan | Admin mengubah `waiting_verification` menjadi `pending_payment`; antrean `queued` tercapai otomatis setelah callback `paid` | Sudah ada |
 | ADM-16 | Catatan internal | Catatan yang tidak terlihat customer | Belum |
 | ADM-17 | SLA/deadline | Deadline pengerjaan dan peringatan keterlambatan | Belum |
 | ADM-18 | Laporan/export | Export order/pendapatan ke CSV/Excel/PDF | Belum |
@@ -426,7 +426,7 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 | ID | Requirement | Acceptance Criteria | Status |
 |---|---|---|---|
 | AUD-01 | Pencatatan status | Setiap perubahan status menulis baris `order_status_histories` berisi status asal, status tujuan, aktor, catatan, dan waktu | Sudah ada |
-| AUD-02 | Status awal | Order baru mencatat status awal `pending_payment` dengan catatan "Pesanan dibuat." | Sudah ada |
+| AUD-02 | Status awal | Order baru mencatat status awal `waiting_verification` dengan catatan "Pesanan dibuat." | Sudah ada |
 | AUD-03 | Aktor sistem | Perubahan dari callback/scheduler memiliki `changed_by = null` | Sudah ada |
 | AUD-04 | Audit impersonation | Setiap start/stop impersonation dicatat di `user_impersonations` | Sudah ada |
 | AUD-05 | Audit login/admin | Log login, perubahan jasa, dan perubahan user | Belum |
@@ -476,10 +476,11 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 10. Pembatalan order tidak otomatis melakukan refund.
 11. Total harga order adalah snapshot harga jasa saat order dibuat.
 12. Jasa yang diarsipkan tidak dapat dipesan baru; order lama tetap berjalan.
+13. Admin harus menyetujui pesanan sebelum customer dapat membayar; `waiting_verification` menampilkan pesan "Pesanan anda sedang di tinjau admin".
 
 ### 8.2 Status & Hak Akses
 
-1. Admin melepas order tervalidasi ke `queued`; hanya Worker yang dapat mengubah `queued` menjadi `in_progress` lewat klaim.
+1. Admin menyetujui order tervalidasi dari `waiting_verification` ke `pending_payment`; pembayaran berhasil memindahkan order ke `queued` otomatis, dan hanya Worker yang dapat mengubahnya menjadi `in_progress` lewat klaim.
 2. Worker hanya dapat memproses order yang ter-assign kepadanya.
 3. Worker wajib online dan memiliki kuota kurang dari 5 untuk mengklaim order.
 4. Kuota aktif menghitung semua order ter-assign yang belum `delivered`/`cancelled`, termasuk `completed`.
@@ -953,8 +954,9 @@ Baseline MVP dianggap terpenuhi jika:
 - [x] Customer dapat mengunggah requirement dan melihat detail order.
 - [x] Customer dapat membayar lewat Tripay dan diarahkan ke checkout.
 - [x] Callback Tripay memvalidasi signature, merchant, event, dan nominal.
-- [x] Order berpindah ke `waiting_verification` hanya setelah pembayaran `paid`.
-- [x] Admin dapat memverifikasi, meminta info, melepas ke antrean, revisi, dan mengirim hasil.
+- [x] Order berpindah ke `waiting_verification` saat dibuat, lalu ke `pending_payment` setelah Admin menyetujui.
+- [x] Pembayaran `paid` memindahkan order ke `queued` otomatis.
+- [x] Admin dapat meninjau, meminta info, menyetujui, revisi, dan mengirim hasil.
 - [x] Worker dapat online, mengklaim maksimal 5 order aktif, memproses, revisi, dan mengirim hasil.
 - [x] Super Admin dapat mengelola role/akun dan melakukan impersonation dengan audit trail.
 - [x] Pengiriman hasil ditolak jika belum ada file hasil.
@@ -1043,7 +1045,7 @@ Isi jawaban sebelum memulai pengembangan berikutnya:
 | Istilah | Arti |
 |---|---|
 | Customer | Pengguna yang memesan jasa |
-| Admin | Pengguna yang memverifikasi pembayaran, mengelola jasa, dan menangani seluruh pesanan |
+| Admin | Pengguna yang meninjau dan menyetujui pesanan sebelum pembayaran, mengelola jasa, dan menangani seluruh pesanan |
 | Super Admin | Pengguna yang mengelola akun, role, dan impersonation |
 | Worker | Pengguna yang mengklaim dan mengerjakan pesanan dari antrean |
 | Service | Jasa yang ditawarkan |

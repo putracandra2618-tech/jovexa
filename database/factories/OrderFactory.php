@@ -27,13 +27,13 @@ class OrderFactory extends Factory
             'service_id' => Service::factory()->published(),
             'order_number' => app(OrderNumberGenerator::class)->generate(),
             'description' => fake()->paragraph(4),
-            'order_status_id' => $this->statusId(OrderStatus::PendingPayment),
+            'order_status_id' => $this->statusId(OrderStatus::WaitingVerification),
             'total_price' => fake()->numberBetween(100_000, 2_000_000),
         ];
     }
 
     /**
-     * The customer has not paid yet.
+     * The admin approved the order and the customer has not paid yet.
      */
     public function pendingPayment(): static
     {
@@ -43,7 +43,7 @@ class OrderFactory extends Factory
     }
 
     /**
-     * The order is waiting for the admin/worker to verify the payment.
+     * The order is waiting for the admin to review it before payment.
      */
     public function waitingVerification(): static
     {
