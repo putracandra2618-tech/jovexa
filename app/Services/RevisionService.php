@@ -74,6 +74,17 @@ class RevisionService
     }
 
     /**
+     * Whether a customer may request a revision for this order.
+     *
+     * Customers only revise work that has actually been delivered by a worker;
+     * answering an information request must not expose the revision action.
+     */
+    public function canCustomerRequest(Order $order): bool
+    {
+        return $this->canRequest($order) && $order->deliverables()->exists();
+    }
+
+    /**
      * How many revision requests have already been recorded.
      */
     public function used(Order $order): int

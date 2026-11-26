@@ -250,8 +250,10 @@ class WorkerOrderTest extends TestCase
             ])
             ->assertRedirect();
 
-        $this->assertTrue($order->results()->exists());
-        Storage::disk('local')->assertExists($order->results()->sole()->file_path);
+        $this->assertTrue($order->revisions()->exists());
+        $this->assertFalse($order->results()->exists());
+        $this->assertTrue($order->revisions()->sole()->isRevision());
+        Storage::disk('local')->assertExists($order->revisions()->sole()->file_path);
     }
 
     public function test_worker_can_deliver_after_uploading_a_result(): void

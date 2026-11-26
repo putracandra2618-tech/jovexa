@@ -422,6 +422,25 @@ class AdminOrderWorkflowTest extends TestCase
         Storage::disk('local')->assertExists($file->file_path);
     }
 
+    public function test_admin_can_upload_a_revised_result_as_a_revision_file(): void
+    {
+        Storage::fake('local');
+
+        $order = Order::factory()->revision()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->post(route('admin.orders.result.store', $order), [
+                'result' => UploadedFile::fake()->create('hasil-revisi.pdf', 200, 'application/pdf'),
+            ])
+            ->assertRedirect();
+
+        $file = $order->revisions()->sole();
+
+        $this->assertTrue($file->isRevision());
+        $this->assertFalse($order->results()->exists());
+        Storage::disk('local')->assertExists($file->file_path);
+    }
+
     public function test_result_upload_is_blocked_while_the_order_is_not_finished(): void
     {
         Storage::fake('local');

@@ -87,7 +87,7 @@ class OrderWorkflow
             );
         }
 
-        if ($target === OrderStatus::Delivered && ! $order->results()->exists()) {
+        if ($target === OrderStatus::Delivered && ! $order->deliverables()->exists()) {
             throw new InvalidArgumentException('Pesanan harus punya file hasil sebelum dikirim ke customer.');
         }
     }

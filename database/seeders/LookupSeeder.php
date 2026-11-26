@@ -38,5 +38,6 @@ class LookupSeeder extends Seeder
 
         OrderFileKind::ensureIdFor('requirement', 'Persyaratan');
         OrderFileKind::ensureIdFor('result', 'Hasil');
+        OrderFileKind::ensureIdFor('revision', 'Revisi');
     }
 }

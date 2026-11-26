@@ -94,7 +94,7 @@
                         </span>
                         <div>
                             <strong>Hasil pengerjaan sudah siap</strong>
-                            <p class="mb-0">Unduh file hasil pengerjaan di daftar lampiran di bawah.</p>
+                            <p class="mb-0">Unduh file hasil pengerjaan di bagian File Hasil Kerja atau File Hasil Revisi di bawah.</p>
                         </div>
                     </div>
                 @elseif ($actions === [])
@@ -112,35 +112,26 @@
                 <p class="jx-prose mb-0">{{ $order->description }}</p>
             </x-card>
 
-            <x-card title="File" class="mt-4">
-                @if ($order->files->isEmpty())
-                    <p class="page-subtitle mb-0">Belum ada file yang dilampirkan.</p>
-                @else
-                    <ul class="jx-file-list">
-                        @foreach ($order->files as $file)
-                            <li class="jx-file-item">
-                                <span class="jx-file-icon">
-                                    <i class="bi {{ $file->icon() }}"></i>
-                                </span>
+            <x-order-file-list title="File dari Kamu"
+                               :files="$order->requirements"
+                               :order="$order"
+                               label="Contoh/Info"
+                               route="customer.orders.file"
+                               empty-message="Belum ada file dari kamu." />
 
-                                <div class="jx-file-info">
-                                    <div class="jx-file-name">{{ $file->file_name }}</div>
-                                    <small class="text-muted">
-                                        {{ $file->isResult() ? 'Hasil' : 'Pendukung' }} &middot; {{ $file->readableSize() }}
-                                    </small>
-                                </div>
+            <x-order-file-list title="File Hasil Kerja"
+                               :files="$order->results"
+                               :order="$order"
+                               label="Hasil"
+                               route="customer.orders.file"
+                               empty-message="Belum ada file hasil kerja." />
 
-                                @if (! $file->isResult() || $order->canDownloadResults())
-                                    <a href="{{ route('customer.orders.file', [$order, $file]) }}"
-                                       class="btn-custom btn-custom-light btn-custom-sm">
-                                        <i class="bi bi-download"></i> Unduh
-                                    </a>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-            </x-card>
+            <x-order-file-list title="File Hasil Revisi"
+                               :files="$order->revisions"
+                               :order="$order"
+                               label="Revisi"
+                               route="customer.orders.file"
+                               empty-message="Belum ada file hasil revisi." />
         </div>
 
         <div class="col-lg-4">

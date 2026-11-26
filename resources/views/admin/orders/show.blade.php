@@ -17,32 +17,29 @@
                 <p class="mb-0" style="white-space: pre-line">{{ $order->description }}</p>
             </x-card>
 
-            <x-card title="File" class="mt-4">
-                @if ($order->files->isEmpty())
-                    <p class="page-subtitle mb-0">Customer belum melampirkan file.</p>
-                @else
-                    <ul class="list-unstyled mb-0">
-                        @foreach ($order->files as $file)
-                            <li class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi {{ $file->icon() }} fs-5 text-muted"></i>
-                                    <div>
-                                        <div class="fw-semibold">{{ $file->file_name }}</div>
-                                        <small class="text-muted">
-                                            {{ $file->isResult() ? 'Hasil' : 'Pendukung' }} &middot; {{ $file->readableSize() }}
-                                        </small>
-                                    </div>
-                                </div>
+            <x-order-file-list title="File dari Customer"
+                               :files="$order->requirements"
+                               :order="$order"
+                               label="Contoh/Info"
+                               route="admin.orders.file"
+                               variant="staff"
+                               empty-message="Customer belum melampirkan file." />
 
-                                <a href="{{ route('admin.orders.file', [$order, $file]) }}"
-                                   class="btn-custom btn-custom-light btn-custom-sm" data-turbo="false">
-                                    <i class="bi bi-download me-1"></i> Unduh
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-            </x-card>
+            <x-order-file-list title="File Hasil Kerja"
+                               :files="$order->results"
+                               :order="$order"
+                               label="Hasil"
+                               route="admin.orders.file"
+                               variant="staff"
+                               empty-message="Belum ada file hasil kerja." />
+
+            <x-order-file-list title="File Hasil Revisi"
+                               :files="$order->revisions"
+                               :order="$order"
+                               label="Revisi"
+                               route="admin.orders.file"
+                               variant="staff"
+                               empty-message="Belum ada file hasil revisi." />
 
             <x-revision-panel :order="$order" />
 

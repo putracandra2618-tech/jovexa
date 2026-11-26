@@ -127,9 +127,33 @@ class Order extends Model
     }
 
     /**
-     * The latest payment record for the order.
+     * The revised deliverables produced after a revision request.
      *
-     * @return HasOne<Payment, $this>
+     * @return HasMany<OrderFile, $this>
+     */
+    public function revisions(): HasMany
+    {
+        return $this->files()->where(
+            'order_file_kind_id',
+            OrderFileKindLookup::idFor(OrderFile::KIND_REVISION),
+        );
+    }
+
+    /**
+     * Every deliverable the customer may receive, including revisions.
+     *
+     * @return HasMany<OrderFile, $this>
+     */
+    public function deliverables(): HasMany
+    {
+        return $this->files()->whereIn('order_file_kind_id', [
+            OrderFileKindLookup::idFor(OrderFile::KIND_RESULT),
+            OrderFileKindLookup::idFor(OrderFile::KIND_REVISION),
+        ]);
+    }
+
+    /**
+     * The latest payment record for the order.
      */
     public function latestPayment(): HasOne
     {

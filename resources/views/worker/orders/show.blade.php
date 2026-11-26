@@ -23,60 +23,48 @@
                 <p class="mb-0" style="white-space: pre-line">{{ $order->description }}</p>
             </x-card>
 
-            <x-card title="File" class="mt-4">
-                @if ($order->files->isEmpty())
-                    <p class="page-subtitle mb-0">Customer belum melampirkan file.</p>
-                @else
-                    <ul class="list-unstyled mb-0">
-                        @foreach ($order->files as $file)
-                            <li class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi {{ $file->icon() }} fs-5 text-muted"></i>
-                                    <div>
-                                        <div class="fw-semibold">{{ $file->file_name }}</div>
-                                        <small class="text-muted">
-                                            {{ $file->isResult() ? 'Hasil' : 'Pendukung' }} &middot; {{ $file->readableSize() }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ route('worker.orders.file', [$order, $file]) }}"
-                                       class="btn-custom btn-custom-light btn-custom-sm">
-                                        <i class="bi bi-download me-1"></i> Unduh
-                                    </a>
-                                    @if ($file->isResult() && $order->status === OrderStatus::Completed)
-                                        <form method="POST" action="{{ route('worker.orders.file.destroy', [$order, $file]) }}"
-                                              data-confirm="Yakin ingin menghapus file ini? File yang dihapus tidak dapat dikembalikan.">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-custom btn-custom-danger btn-custom-sm">
-                                                <i class="bi bi-trash me-1"></i> Hapus
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
+            <x-order-file-list title="File dari Customer"
+                               :files="$order->requirements"
+                               :order="$order"
+                               label="Contoh/Info"
+                               route="worker.orders.file"
+                               variant="staff"
+                               empty-message="Customer belum melampirkan file." />
 
-                @if (in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], true))
-                    <hr class="my-4" id="unggah-hasil">
-                    <h5 class="mb-3">
-                        {{ $order->status === OrderStatus::Revision ? 'Unggah Hasil Revisi' : 'Unggah File Hasil' }}
-                    </h5>
-                    <form method="POST" action="{{ route('worker.orders.result.store', $order) }}"
-                          enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <input type="file" name="result" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn-custom btn-custom-primary">
-                            <i class="bi bi-cloud-arrow-up me-1"></i> Unggah
-                        </button>
-                    </form>
-                @endif
-            </x-card>
+            <x-order-file-list title="File Hasil Kerja"
+                               :files="$order->results"
+                               :order="$order"
+                               label="Hasil"
+                               route="worker.orders.file"
+                               variant="staff"
+                               :deletable="true"
+                               empty-message="Belum ada file hasil kerja." />
+
+            <x-order-file-list title="File Hasil Revisi"
+                               :files="$order->revisions"
+                               :order="$order"
+                               label="Revisi"
+                               route="worker.orders.file"
+                               variant="staff"
+                               :deletable="true"
+                               empty-message="Belum ada file hasil revisi." />
+
+            @if (in_array($order->status, [OrderStatus::Completed, OrderStatus::Revision], true))
+                <x-card title="{{ $order->status === OrderStatus::Revision ? 'Unggah Hasil Revisi' : 'Unggah File Hasil' }}" class="mt-4">
+                    <div id="unggah-hasil">
+                        <form method="POST" action="{{ route('worker.orders.result.store', $order) }}"
+                              enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-3">
+                                <input type="file" name="result" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn-custom btn-custom-primary">
+                                <i class="bi bi-cloud-arrow-up me-1"></i> Unggah
+                            </button>
+                        </form>
+                    </div>
+                </x-card>
+            @endif
 
             <x-revision-panel :order="$order" />
 

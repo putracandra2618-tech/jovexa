@@ -97,7 +97,9 @@ class OrderController extends Controller
 
         $order->load([
             'service',
-            'files.kindRecord',
+            'requirements.kindRecord',
+            'results.kindRecord',
+            'revisions.kindRecord',
             'latestPayment.statusRecord',
             'statusHistory.author',
             'statusHistory.fromStatusRecord',
@@ -122,7 +124,7 @@ class OrderController extends Controller
 
         abort_unless($file->order_id === $order->getKey(), 404);
 
-        if ($file->isResult()) {
+        if ($file->isDeliverable()) {
             abort_unless($order->canDownloadResults(), 403);
         }
 
@@ -191,6 +193,12 @@ class OrderController extends Controller
             'revision_note.required' => 'Tuliskan catatan revisi agar tim kami tahu yang perlu diperbaiki.',
             'revision_note.max' => 'Catatan revisi maksimal 1000 karakter.',
         ]);
+
+        if (! $order->deliverables()->exists()) {
+            throw ValidationException::withMessages([
+                'revision_note' => 'Belum ada hasil pekerjaan yang bisa direvisi.',
+            ]);
+        }
 
         $this->revisions->request($order, $request->user(), $validated['revision_note']);
 

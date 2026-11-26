@@ -20,6 +20,8 @@ class OrderFile extends Model
 
     public const KIND_RESULT = 'result';
 
+    public const KIND_REVISION = 'revision';
+
     /**
      * The total number of requirement files one order may hold.
      *
@@ -90,6 +92,22 @@ class OrderFile extends Model
     public function isResult(): bool
     {
         return $this->kind === self::KIND_RESULT;
+    }
+
+    /**
+     * Determine whether the file is a revised work result.
+     */
+    public function isRevision(): bool
+    {
+        return $this->kind === self::KIND_REVISION;
+    }
+
+    /**
+     * Determine whether the file is work produced by the admin/worker.
+     */
+    public function isDeliverable(): bool
+    {
+        return in_array($this->kind, [self::KIND_RESULT, self::KIND_REVISION], true);
     }
 
     /**

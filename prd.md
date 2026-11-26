@@ -102,7 +102,7 @@ Jovexa menjawab masalah tersebut dengan katalog jasa terstruktur, order dengan n
 - Membayar melalui Tripay setelah pesanan disetujui Admin.
 - Memantau status dan riwayat pesanan.
 - Mengunggah file tambahan saat diminta Admin atau Worker.
-- Mengunduh file hasil setelah pesanan selesai/dikirim.
+- Melihat file dalam tiga grup (dari kamu, hasil kerja, hasil revisi) dan mengunduh hasil setelah pesanan selesai/dikirim.
 - Membatalkan pesanan hanya sebelum pembayaran; setelah dibayar, mengajukan refund lewat WhatsApp sampai hasil dikirim.
 
 ### 4.3 Admin
@@ -317,15 +317,16 @@ Catatan: Self-registration selalu menghasilkan role `customer`. Perubahan role d
 | ORD-03 | Upload requirement | Maksimal 5 file per request; maksimal 10 MB per file; ekstensi diizinkan; disimpan di disk privat | Sudah ada |
 | ORD-04 | Status awal order | Order baru `waiting_verification`; riwayat status awal dicatat | Sudah ada |
 | ORD-05 | Daftar pesanan customer | Hanya order milik sendiri; 10 per halaman; filter tab Semua/Berjalan/Selesai/Perlu tindakan di browser | Sudah ada |
-| ORD-06 | Detail pesanan | Menampilkan stepper progres, ringkasan, file, pembayaran terakhir, dan riwayat status | Sudah ada |
+| ORD-06 | Detail pesanan | Menampilkan stepper progres, ringkasan, file dalam grup `File dari Kamu`, `File Hasil Kerja`, `File Hasil Revisi`, pembayaran terakhir, dan riwayat status | Sudah ada |
 | ORD-07 | File tambahan | Hanya saat status `waiting_customer`; maksimal 5 file; setelah upload order kembali ke `waiting_verification` bila belum ada Worker, atau `in_progress` bila sudah ter-assign | Sudah ada |
 | ORD-08 | Pembatalan & refund customer | Customer membatalkan order sebelum pembayaran; setelah pembayaran tombol batal diganti Request Refund lewat WhatsApp sampai hasil dikirim | Sudah ada |
 | ORD-09 | Unduh requirement | Customer dapat mengunduh file requirement miliknya sepanjang order masih ada | Sudah ada |
-| ORD-10 | Unduh hasil | File hasil hanya bisa diunduh saat status `completed` atau `delivered` | Sudah ada |
+| ORD-10 | Unduh hasil | File hasil/revisi hanya bisa diunduh saat status `completed` atau `delivered` | Sudah ada |
 | ORD-11 | Larangan ubah status | Customer tidak dapat mengubah status order secara manual selain aksi tambah file dan pembatalan | Sudah ada |
 | ORD-12 | Edit/hapus order | Customer tidak dapat mengedit atau menghapus order; hanya membatalkan | Sudah ada |
 | ORD-13 | Order oleh admin/guest checkout | Admin membuat order atas nama customer atau checkout tanpa akun | Belum |
 | ORD-14 | Simpan draft order | Customer dapat menyimpan order sebelum membayar sebagai draft terpisah | Di luar lingkup |
+| ORD-15 | Minta revisi customer | Tombol dan endpoint revisi hanya tersedia setelah ada file hasil/revisi; jawaban atas permintaan informasi tidak memunculkannya | Sudah ada |
 
 ### 7.4 Pembayaran Tripay
 
@@ -374,8 +375,8 @@ Catatan operasional: scheduler harus berjalan (`php artisan schedule:work` atau 
 | ADM-08 | Konfirmasi info diterima | Order `waiting_customer` tanpa Worker dikembalikan ke `waiting_verification`; bila sudah ter-assign, customer yang menjawab mengembalikannya ke `in_progress` | Sudah ada |
 | ADM-09 | Minta revisi | Dari `in_progress` atau `completed` ke `revision` | Sudah ada |
 | ADM-10 | Revisi selesai | Dari `revision` ke `completed` | Sudah ada |
-| ADM-11 | Upload hasil | Hanya saat `completed`; satu file per submit; file maksimal 20 MB; upload berikutnya menambah file; disimpan privat | Sudah ada |
-| ADM-12 | Kirim hasil | Hanya saat `completed` dan minimal ada satu file hasil; order menjadi `delivered` | Sudah ada |
+| ADM-11 | Upload hasil | Saat `completed` disimpan sebagai `result`, saat `revision` sebagai `revision`; satu file per submit; file maksimal 20 MB; upload berikutnya menambah file; disimpan privat | Sudah ada |
+| ADM-12 | Kirim hasil | Hanya saat `completed` dan minimal ada satu file deliverable (`result` atau `revision`); order menjadi `delivered` | Sudah ada |
 | ADM-13 | Pembatalan admin | Admin dapat membatalkan order selama belum final | Sudah ada |
 | ADM-14 | Unduh file | Admin dapat mengunduh semua file order | Sudah ada |
 | ADM-15 | Persetujuan pesanan | Admin mengubah `waiting_verification` menjadi `pending_payment`; antrean `queued` tercapai otomatis setelah callback `paid` | Sudah ada |
@@ -445,6 +446,7 @@ Catatan penting: penghapusan customer saat ini memicu cascade pada `orders`, seh
 | FIL-06 | Hapus file | Customer/Admin dapat menghapus file | Belum |
 | FIL-07 | Virus scan | Pemindaian malware sebelum file disimpan | Belum |
 | FIL-08 | Cloud storage | Dukungan S3/object storage | Belum |
+| FIL-09 | Jenis file | `requirement` dari customer, `result` dari worker/admin, `revision` saat mengunggah ulang hasil pada status `revision` | Sudah ada |
 
 ### 7.11 Operasional & Developer Experience
 
@@ -556,7 +558,7 @@ Tabel lookup:
 | `service_statuses` | `id`, `code` (unik), `name` | `draft`, `published`, `archived` |
 | `order_statuses` | `id`, `code` (unik), `name` | nilai `OrderStatus` |
 | `payment_statuses` | `id`, `code` (unik), `name` | `pending`, `paid`, `failed`, `expired` |
-| `order_file_kinds` | `id`, `code` (unik), `name` | `requirement`, `result` |
+| `order_file_kinds` | `id`, `code` (unik), `name` | `requirement`, `result`, `revision` |
 
 `code` adalah sumber nilai enum; model domain mengekspos accessor `role`, `status`, `kind`, `from_status`, dan `to_status` agar kode pemanggil tetap memakai enum.
 
@@ -644,7 +646,7 @@ Referensi diagram lengkap: [docs/erd.md](docs/erd.md).
 ### 10.3 Performa
 
 - Pagination pada katalog, daftar order customer/admin/worker, jasa, dan pengguna.
-- Eager loading relasi utama (`service`, `user`, `worker`, `files`, `latestPayment`, `statusHistory`).
+- Eager loading relasi utama (`service`, `user`, `worker`, `requirements`, `results`, `revisions`, `deliverables`, `latestPayment`, `statusHistory`).
 - Channel pembayaran di-cache agar tidak memanggil gateway setiap request.
 - Gap: belum ada pengukuran performa, profiling, atau tuning index lanjutan.
 

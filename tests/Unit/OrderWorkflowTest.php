@@ -229,4 +229,14 @@ class OrderWorkflowTest extends TestCase
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
     }
+
+    public function test_an_order_with_a_revision_file_can_be_delivered(): void
+    {
+        $order = Order::factory()->completed()->create();
+        OrderFile::factory()->revision()->for($order)->create();
+
+        app(OrderWorkflow::class)->transitionTo($order, OrderStatus::Delivered);
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
 }

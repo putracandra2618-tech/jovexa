@@ -65,7 +65,7 @@ erDiagram
 
     order_file_kinds {
         bigint id PK
-        varchar code UK "requirement | result"
+        varchar code UK "requirement | result | revision"
         varchar name
         timestamp created_at
         timestamp updated_at
@@ -244,7 +244,7 @@ payment_statuses ──< payments
 - **Model tetap mengekspos enum.** Accessor `role`, `status`, `kind`, `from_status`, dan `to_status` memetakan lookup row kembali ke enum agar kode lama tetap berjalan.
 - **`orders` → `payments` adalah 1:N**, bukan 1:1. Satu order boleh punya beberapa percobaan transaksi (mis. gagal lalu bayar ulang). Yang aktif ditampilkan lewat `Order::latestPayment()` (`latestOfMany()`).
 - **`order_status_histories`** adalah audit trail tiap perubahan status. `changed_by` nullable karena perubahan bisa datang dari webhook gateway / scheduler, bukan user.
-- **`order_files.order_file_kind_id`** membedakan `requirement` (unggahan customer) dan `result` (hasil kerja Admin/Worker) dalam satu tabel.
+- **`order_files.order_file_kind_id`** membedakan `requirement` (unggahan customer), `result` (hasil kerja Admin/Worker), dan `revision` (hasil revisi yang diunggah ulang saat status `revision`) dalam satu tabel.
 - **`orders.worker_id`** menyimpan Worker yang mengklaim order. `worker_claimed_at` mencatat waktu klaim; keduanya nullable.
 - **`user_impersonations`** menyimpan audit start/stop impersonation beserta snapshot nama/email pelaku dan target, sehingga riwayat tetap terbaca setelah akun berubah atau dihapus.
 - **`uploaded_by` dan `orders.worker_id` memakai `nullOnDelete`**, sehingga file/order tetap tersimpan saat akun Worker dihapus. Penghapusan Worker dengan order aktif tetap dicegah di level aplikasi.

@@ -31,28 +31,13 @@
                 </form>
             </x-card>
 
-            @if ($order->results->isNotEmpty())
-                <x-card title="File Hasil Saat Ini" class="mt-4">
-                    <ul class="list-unstyled mb-0">
-                        @foreach ($order->results as $file)
-                            <li class="d-flex align-items-center justify-content-between py-2 border-bottom">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi {{ $file->icon() }} fs-5 text-muted"></i>
-                                    <div>
-                                        <div class="fw-semibold">{{ $file->file_name }}</div>
-                                        <small class="text-muted">{{ $file->readableSize() }}</small>
-                                    </div>
-                                </div>
-
-                                <a href="{{ route('admin.orders.file', [$order, $file]) }}"
-                                   class="btn-custom btn-custom-light btn-custom-sm" data-turbo="false">
-                                    <i class="bi bi-download me-1"></i> Unduh
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </x-card>
-            @endif
+            <x-order-file-list title="File Hasil Saat Ini"
+                               :files="$order->deliverables"
+                               :order="$order"
+                               route="admin.orders.file"
+                               variant="staff"
+                               :show-label="false"
+                               empty-message="Belum ada file hasil saat ini." />
         </div>
     </div>
 @endsection

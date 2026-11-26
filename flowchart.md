@@ -345,6 +345,7 @@ Minimal halaman:
 - Detail Pesanan
 - Pembayaran
 - Status Pesanan
+- File dari Kamu / File Hasil Kerja / File Hasil Revisi
 - Download Hasil
 
 ---
@@ -358,7 +359,7 @@ Admin:
 - Verifikasi Pesanan
 - Pelepasan ke Antrean
 - Pesanan Sedang Dikerjakan
-- Upload Hasil
+- Upload Hasil / Hasil Revisi
 - Pesanan Revisi
 - Riwayat Pesanan
 - Kelola Jasa
@@ -368,7 +369,7 @@ Worker:
 - Antrean Pesanan
 - Pesanan Saya
 - Detail Pesanan
-- Upload Hasil
+- Upload Hasil / Hasil Revisi
 - Riwayat Saya
 
 Super Admin:
@@ -432,7 +433,7 @@ Pesanan Valid?
     Kerjakan Pesanan (in_progress)
     ↓
     Perlu Revisi?
-    ├── Ya → Revisi → Periksa Kembali
+    ├── Ya → Revisi → Upload Hasil Revisi → Periksa Kembali
     └── Tidak
         ↓
         Upload Hasil

@@ -94,7 +94,7 @@ trait ManagesStaffOrders
         abort_unless($order->status === OrderStatus::Completed, 404);
 
         return view($this->viewPrefix.'.deliver', [
-            'order' => $order->load('service'),
+            'order' => $order->load('service', 'deliverables.kindRecord'),
         ]);
     }
 
@@ -119,19 +119,25 @@ trait ManagesStaffOrders
             'result.mimes' => 'Format file hasil tidak didukung.',
         ]);
 
+        $isRevision = $order->status === OrderStatus::Revision;
+        $kind = $isRevision ? OrderFile::KIND_REVISION : OrderFile::KIND_RESULT;
+        $folder = $isRevision ? 'revisions' : 'results';
         $file = $request->file('result');
-        $path = $file->store("orders/{$order->getKey()}/results", 'local');
+        $path = $file->store("orders/{$order->getKey()}/{$folder}", 'local');
 
         $order->files()->create([
             'file_name' => Str::limit($file->getClientOriginalName(), 255, ''),
             'file_path' => $path,
             'file_type' => $file->getClientMimeType(),
             'file_size' => $file->getSize(),
-            'order_file_kind_id' => OrderFileKindLookup::idFor(OrderFile::KIND_RESULT),
+            'order_file_kind_id' => OrderFileKindLookup::idFor($kind),
             'uploaded_by' => $request->user()->getKey(),
         ]);
 
-        return back()->with('success', 'Hasil pekerjaan berhasil diunggah.');
+        return back()->with(
+            'success',
+            $isRevision ? 'Hasil revisi berhasil diunggah.' : 'Hasil pekerjaan berhasil diunggah.',
+        );
     }
 
     /**
@@ -143,7 +149,7 @@ trait ManagesStaffOrders
 
         abort_unless($order->status === OrderStatus::Completed, 404);
 
-        if (! $order->results()->exists()) {
+        if (! $order->deliverables()->exists()) {
             throw ValidationException::withMessages([
                 'result' => 'Unggah hasil pekerjaan sebelum mengirim ke customer.',
             ]);

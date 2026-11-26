@@ -342,6 +342,7 @@ class CustomerOrderTest extends TestCase
     public function test_customer_can_request_revision_on_a_completed_order(): void
     {
         $order = Order::factory()->for(User::factory()->customer())->completed()->create();
+        $this->createDeliverable($order);
 
         $this->actingAs($order->user)
             ->post(route('customer.orders.revision', $order), [
@@ -358,6 +359,7 @@ class CustomerOrderTest extends TestCase
     public function test_customer_can_request_revision_on_a_delivered_order(): void
     {
         $order = Order::factory()->for(User::factory()->customer())->delivered()->create();
+        $this->createDeliverable($order);
 
         $this->actingAs($order->user)
             ->post(route('customer.orders.revision', $order), [
@@ -374,9 +376,10 @@ class CustomerOrderTest extends TestCase
         ]);
     }
 
-    public function test_customer_can_request_revision_while_order_is_in_progress(): void
+    public function test_customer_can_request_revision_while_order_is_in_progress_with_a_result(): void
     {
         $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
+        $this->createDeliverable($order);
 
         $this->actingAs($order->user)
             ->post(route('customer.orders.revision', $order), [
@@ -434,6 +437,7 @@ class CustomerOrderTest extends TestCase
         $admin = User::factory()->admin()->create();
         $worker = User::factory()->worker()->create();
         $order = Order::factory()->for($customer)->completed()->assignedTo($worker)->create();
+        $this->createDeliverable($order);
 
         $this->actingAs($customer)
             ->post(route('customer.orders.revision', $order), [
@@ -477,6 +481,7 @@ class CustomerOrderTest extends TestCase
     {
         $customer = User::factory()->customer()->create();
         $order = Order::factory()->for($customer)->completed()->create();
+        $this->createDeliverable($order);
 
         foreach (['Perbaikan pertama.', 'Perbaikan kedua.', 'Perbaikan ketiga.'] as $number => $note) {
             RevisionRequest::factory()->for($order)->create([
@@ -691,5 +696,88 @@ class CustomerOrderTest extends TestCase
             OrderFile::MAX_REQUIREMENT_FILES,
             $order->requirements()->count(),
         );
+    }
+
+    public function test_order_detail_groups_requirement_result_and_revision_files(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->completed()->create();
+
+        OrderFile::factory()->for($order)->requirement()->create(['file_name' => 'contoh.pdf']);
+        OrderFile::factory()->for($order)->result()->create(['file_name' => 'hasil.pdf']);
+        OrderFile::factory()->for($order)->revision()->create(['file_name' => 'revisi.pdf']);
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'File dari Kamu',
+                'contoh.pdf',
+                'File Hasil Kerja',
+                'hasil.pdf',
+                'File Hasil Revisi',
+                'revisi.pdf',
+            ]);
+    }
+
+    public function test_replying_to_an_information_request_does_not_offer_revision(): void
+    {
+        Storage::fake('local');
+
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()
+            ->for(User::factory()->customer())
+            ->waitingCustomer()
+            ->assignedTo($worker)
+            ->create();
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.requirements', $order), [
+                'requirements' => [UploadedFile::fake()->create('foto.png', 90, 'image/png')],
+            ])
+            ->assertRedirect();
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('File dari Kamu')
+            ->assertSee('foto.png')
+            ->assertDontSee('Minta Revisi');
+    }
+
+    public function test_customer_cannot_request_revision_before_a_result_exists(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
+
+        $this->actingAs($order->user)
+            ->from(route('customer.orders.show', $order))
+            ->post(route('customer.orders.revision', $order), [
+                'revision_note' => 'Tolong perbaiki hasilnya.',
+            ])
+            ->assertSessionHasErrors([
+                'revision_note' => 'Belum ada hasil pekerjaan yang bisa direvisi.',
+            ]);
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
+    }
+
+    public function test_revision_file_is_locked_until_the_work_is_delivered(): void
+    {
+        Storage::fake('local');
+
+        $order = Order::factory()->for(User::factory()->customer())->inProgress()->create();
+        $path = UploadedFile::fake()->create('revisi.pdf', 50, 'application/pdf')->store('orders/test', 'local');
+        $file = OrderFile::factory()->for($order)->revision()->create(['file_path' => $path]);
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.file', [$order, $file]))
+            ->assertForbidden();
+    }
+
+    private function createDeliverable(Order $order): OrderFile
+    {
+        return OrderFile::factory()->for($order)->result()->create();
     }
 }

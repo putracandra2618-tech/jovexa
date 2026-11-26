@@ -164,7 +164,7 @@ class OrderActions
             ];
         }
 
-        if ($status->canTransitionTo(OrderStatus::Revision) && $this->revisions->canRequest($order)) {
+        if ($this->revisions->canCustomerRequest($order)) {
             $actions[] = $this->revisionAction($order, 'customer.orders.revision');
         }
 
@@ -208,7 +208,7 @@ class OrderActions
             ];
         }
 
-        if ($isCompleted && $order->results()->exists()) {
+        if ($isCompleted && $order->deliverables()->exists()) {
             $actions[] = [
                 'key' => 'send',
                 'type' => 'form',

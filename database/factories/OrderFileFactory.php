@@ -56,6 +56,17 @@ class OrderFileFactory extends Factory
     }
 
     /**
+     * A revised deliverable produced by the admin/worker.
+     */
+    public function revision(): static
+    {
+        return $this->state(fn (): array => [
+            'order_file_kind_id' => $this->kindId(OrderFile::KIND_REVISION),
+            'file_name' => 'revisi-'.$this->faker->word().'.pdf',
+        ]);
+    }
+
+    /**
      * Attach a real temporary file to the private disk.
      */
     public function stored(): static
@@ -71,9 +82,12 @@ class OrderFileFactory extends Factory
      */
     private function kindId(string $kind): int
     {
-        return OrderFileKindLookup::ensureIdFor(
-            $kind,
-            $kind === OrderFile::KIND_REQUIREMENT ? 'Persyaratan' : 'Hasil',
-        );
+        $names = [
+            OrderFile::KIND_REQUIREMENT => 'Persyaratan',
+            OrderFile::KIND_RESULT => 'Hasil',
+            OrderFile::KIND_REVISION => 'Revisi',
+        ];
+
+        return OrderFileKindLookup::ensureIdFor($kind, $names[$kind] ?? $kind);
     }
 }
