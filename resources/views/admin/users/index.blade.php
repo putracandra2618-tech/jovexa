@@ -122,7 +122,7 @@
                                                 </form>
 
                                                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                                                      data-confirm="Hapus akun {{ $user->name }} secara permanen? Tindakan ini tidak bisa dibatalkan.">
+                                                       data-confirm="Hapus akun {{ $user->name }}? Akun beserta seluruh datanya akan dipindahkan ke menu soft delete dan dapat dipulihkan.">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn-custom btn-custom-danger btn-custom-sm">

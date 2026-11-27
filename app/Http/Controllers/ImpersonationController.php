@@ -73,7 +73,7 @@ class ImpersonationController extends Controller
 
         abort_unless($impersonatorId !== null, 403);
 
-        $superAdmin = User::query()->find($impersonatorId);
+        $superAdmin = User::query()->find($impersonatorId); 
 
         if ($superAdmin === null || ! $superAdmin->isSuperAdmin()) {
             Auth::guard('web')->logout();

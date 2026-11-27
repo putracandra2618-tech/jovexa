@@ -21,3 +21,7 @@ Schedule::command('tripay:reconcile-payments')
 Schedule::command('orders:notify-stale-verification')
     ->everyFiveMinutes()
     ->withoutOverlapping();
+
+Schedule::command('orders:notify-unclaimed-queue')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

@@ -76,7 +76,7 @@
                     @endphp
 
                     <a href="{{ route('worker.orders.index', $tabQuery) }}"
-                       class="jx-status-tab {{ $activeCategory === $categoryKey ? 'is-active' : '' }}"
+                       class="jx-status-tab jx-status-tab--{{ $categoryKey }} {{ $activeCategory === $categoryKey ? 'is-active' : '' }}"
                        aria-pressed="{{ $activeCategory === $categoryKey ? 'true' : 'false' }}">
                         {{ $categoryLabel }}
                     </a>

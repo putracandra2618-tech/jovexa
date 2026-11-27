@@ -233,8 +233,21 @@ enum OrderStatus: string
             'all' => 'Semua',
             'pending' => 'Berjalan',
             'success' => 'Selesai',
-            'failed' => 'Perlu tindakan',
         ];
+    }
+
+    /**
+     * The tab category a status belongs to.
+     *
+     * Statuses that need action are grouped together with completed orders, while
+     * their badges keep their own contextual colour.
+     */
+    public function category(): string
+    {
+        return match ($this) {
+            self::WaitingCustomer, self::Revision, self::Expired, self::Cancelled => 'success',
+            default => $this->badgeClass(),
+        };
     }
 
     /**
@@ -248,7 +261,7 @@ enum OrderStatus: string
 
         return array_values(array_filter(
             self::cases(),
-            fn (self $status): bool => $status->badgeClass() === $category,
+            fn (self $status): bool => $status->category() === $category,
         ));
     }
 

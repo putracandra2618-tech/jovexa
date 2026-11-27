@@ -25,6 +25,16 @@ class OrderWorkflowTest extends TestCase
         }
     }
 
+    public function test_action_required_statuses_share_the_completed_category(): void
+    {
+        $this->assertSame(['all', 'pending', 'success'], array_keys(OrderStatus::categories()));
+
+        foreach ([OrderStatus::WaitingCustomer, OrderStatus::Revision, OrderStatus::Expired, OrderStatus::Cancelled] as $status) {
+            $this->assertSame('success', $status->category());
+            $this->assertContains($status, OrderStatus::statusesForCategory('success'));
+        }
+    }
+
     public function test_payment_success_is_limited_to_paid(): void
     {
         $this->assertTrue(PaymentStatus::Paid->isSuccessful());

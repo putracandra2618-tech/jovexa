@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['order_id', 'from_order_status_id', 'to_order_status_id', 'changed_by', 'note'])]
 class OrderStatusHistory extends Model
 {
     /** @use HasFactory<OrderStatusHistoryFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public const InformationReplyPrefix = 'Customer: ';
 

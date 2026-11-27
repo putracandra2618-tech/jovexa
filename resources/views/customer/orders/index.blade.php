@@ -26,17 +26,14 @@
             </x-empty-state>
         @else
             <div class="jx-status-tabs mb-4" data-status-filter-group data-status-filter-target="[data-orders-table]">
-                <button type="button" class="jx-status-tab is-active" data-status-filter="all" aria-pressed="true">
+                <button type="button" class="jx-status-tab jx-status-tab--all is-active" data-status-filter="all" aria-pressed="true">
                     Semua
                 </button>
-                <button type="button" class="jx-status-tab" data-status-filter="pending" aria-pressed="false">
+                <button type="button" class="jx-status-tab jx-status-tab--pending" data-status-filter="pending" aria-pressed="false">
                     Berjalan
                 </button>
-                <button type="button" class="jx-status-tab" data-status-filter="success" aria-pressed="false">
+                <button type="button" class="jx-status-tab jx-status-tab--success" data-status-filter="success" aria-pressed="false">
                     Selesai
-                </button>
-                <button type="button" class="jx-status-tab" data-status-filter="failed" aria-pressed="false">
-                    Perlu tindakan
                 </button>
             </div>
 
@@ -62,7 +59,7 @@
                                 </tr>
                                 @php $currentStage = $stage; @endphp
                             @endif
-                            <tr data-order-status="{{ $order->status->badgeClass() }}" data-order-stage="{{ $stage }}">
+                            <tr data-order-status="{{ $order->status->category() }}" data-order-stage="{{ $stage }}">
                                 <td class="fw-semibold">{{ $order->order_number }}</td>
                                 <td>
                                     <a href="{{ route('services.show', $order->service) }}">{{ $order->service->name }}</a>

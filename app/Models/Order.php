@@ -15,13 +15,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 #[Fillable(['user_id', 'worker_id', 'service_id', 'order_number', 'description', 'order_status_id', 'total_price', 'worker_claimed_at'])]
 class Order extends Model
 {
     /** @use HasFactory<OrderFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * Get the attributes that should be cast.

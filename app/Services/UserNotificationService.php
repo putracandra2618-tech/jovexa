@@ -114,6 +114,27 @@ class UserNotificationService
     }
 
     /**
+     * Alert admins that a queued order has not been claimed by a worker.
+     */
+    public function unclaimedQueueReminder(Order $order): void
+    {
+        User::query()
+            ->whereIn('role_id', [
+                Role::idFor(UserRole::Admin->value),
+                Role::idFor(UserRole::SuperAdmin->value),
+            ])
+            ->each(function (User $admin) use ($order): void {
+                $admin->inAppNotifications()->firstOrCreate([
+                    'order_id' => $order->getKey(),
+                    'type' => UserNotification::UnclaimedQueue,
+                ], [
+                    'title' => 'Ada antrean yang belum di ambil worker',
+                    'body' => 'Pesanan '.$order->order_number.' sudah menunggu worker lebih dari 2 hari.',
+                ]);
+            });
+    }
+
+    /**
      * Tell the staff member who requested information that the customer replied.
      */
     public function informationReplied(Order $order, User $recipient, string $note): void

@@ -26,6 +26,7 @@
     --jx-mango-soft: #FFF3D9;
     --jx-sky: #8FC7FF;
     --jx-sky-soft: #E8F3FF;
+    --jx-blue: #2F80ED;
     --jx-lilac: #C3B4FF;
     --jx-lilac-soft: #F1EDFF;
 
@@ -3770,30 +3771,47 @@
 }
 
 .jx-status-tab {
+    --jx-tab-accent: var(--jx-line-strong, #D3E3D9);
+
     padding: 0.5rem 1.05rem;
     font-size: 0.88rem;
     font-weight: 800;
-    color: var(--jx-ink-soft);
-    background-color: var(--jx-surface);
-    border: 1.5px solid var(--jx-line-strong);
-    border-radius: var(--jx-radius-pill);
+    color: var(--jx-ink-soft, #3D5B52);
+    background-color: var(--jx-surface, #FFFFFF);
+    border: 1.5px solid var(--jx-tab-accent);
+    border-radius: var(--jx-radius-pill, 999px);
     cursor: pointer;
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
+        border-width 0.2s ease,
         color 0.2s ease,
         transform 0.15s ease;
 }
 
+.jx-status-tab--all {
+    --jx-tab-accent: var(--jx-blue, #2F80ED);
+}
+
+.jx-status-tab--pending {
+    --jx-tab-accent: var(--jx-rose, #E5484D);
+}
+
+.jx-status-tab--success {
+    --jx-tab-accent: var(--jx-green, #1F7A4D);
+}
+
 .jx-status-tab:hover {
-    color: var(--jx-ink);
-    border-color: var(--jx-mint);
+    color: var(--jx-ink, #16302A);
+    border-color: var(--jx-tab-accent);
 }
 
 .jx-status-tab.is-active {
-    color: var(--jx-ink);
-    background-color: var(--jx-mint);
-    border-color: var(--jx-mint);
+    color: var(--jx-ink, #16302A);
+    background-color: var(--jx-surface, #FFFFFF);
+    border-color: var(--jx-tab-accent);
+    border-width: 2.5px;
+    box-shadow: 0 3px 10px rgba(22, 48, 42, 0.12);
     transform: translateY(-1px);
 }
 

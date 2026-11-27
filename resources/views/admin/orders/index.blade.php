@@ -84,7 +84,7 @@
                     @endphp
 
                     <a href="{{ route('admin.orders.index', $tabQuery) }}"
-                       class="jx-status-tab {{ $activeCategory === $categoryKey ? 'is-active' : '' }}"
+                       class="jx-status-tab jx-status-tab--{{ $categoryKey }} {{ $activeCategory === $categoryKey ? 'is-active' : '' }}"
                        aria-pressed="{{ $activeCategory === $categoryKey ? 'true' : 'false' }}">
                         {{ $categoryLabel }}
                     </a>
@@ -134,8 +134,8 @@
                                     <a href="{{ route('admin.orders.show', $order) }}"
                                        class="btn-custom btn-custom-edit btn-custom-sm">
                                         Kelola
-                                    </a>
-                                </td>
+                                     </a>
+                                  </td>
                             </tr>
                         @endforeach
                     </tbody>

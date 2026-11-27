@@ -11,6 +11,17 @@
 @endsection
 
 @section('content')
+    @foreach ($unclaimedQueueAlerts as $alert)
+        @if ($alert->order !== null)
+            <x-alert variant="warning" title="Ada antrean yang belum di ambil worker" class="mb-4 fs-5">
+                Pesanan <strong>{{ $alert->order->order_number }}</strong> sudah lebih dari 2 hari menunggu worker.
+                <a href="{{ route('admin.orders.index', ['status' => 'queued']) }}" class="alert-link">
+                    Lihat antrean
+                </a>
+            </x-alert>
+        @endif
+    @endforeach
+
     <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
         <div class="col">
             <x-stat-card label="Menunggu Verifikasi" :value="$waitingVerificationCount" icon="bi-inbox"

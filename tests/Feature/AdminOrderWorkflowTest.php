@@ -95,9 +95,9 @@ class AdminOrderWorkflowTest extends TestCase
     public function test_order_queue_topbar_search_carries_the_active_category(): void
     {
         $this->actingAs(User::factory()->admin()->create())
-            ->get(route('admin.orders.index', ['category' => 'failed']))
+            ->get(route('admin.orders.index', ['category' => 'success']))
             ->assertOk()
-            ->assertSee('<input type="hidden" name="category" value="failed">', escape: false);
+            ->assertSee('<input type="hidden" name="category" value="success">', escape: false);
     }
 
     public function test_revision_queue_can_be_searched_and_targets_its_own_list(): void
@@ -502,13 +502,13 @@ class AdminOrderWorkflowTest extends TestCase
         $pending = Order::factory()->for($customer)->inProgress()->create();
 
         $response = $this->actingAs(User::factory()->admin()->create())
-            ->get(route('admin.orders.index', ['q' => 'Budi', 'category' => 'failed', 'page' => 2]));
+            ->get(route('admin.orders.index', ['q' => 'Budi', 'category' => 'success', 'page' => 2]));
 
         $response->assertOk()
             ->assertViewHas('orders', fn ($orders): bool => $orders->total() === 11
                 && $orders->currentPage() === 2)
             ->assertDontSee($pending->order_number)
-            ->assertSee('category=failed', escape: false)
+            ->assertSee('category=success', escape: false)
             ->assertSee('q=Budi', escape: false)
             ->assertSee('aria-pressed="true"', escape: false);
     }

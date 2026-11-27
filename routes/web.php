@@ -4,6 +4,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\TrashController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboardController;
 use App\Http\Controllers\Customer\ProfileController;
@@ -37,6 +38,11 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
     Route::put('jasa/{service}', [AdminServiceController::class, 'update'])->name('services.update');
     Route::patch('jasa/{service}/arsip', [AdminServiceController::class, 'archive'])->name('services.archive');
     Route::patch('jasa/{service}/tayang', [AdminServiceController::class, 'publish'])->name('services.publish');
+    Route::delete('jasa/{service}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
+
+    Route::get('soft-delete/jasa', [TrashController::class, 'services'])->name('trash.services');
+    Route::post('soft-delete/jasa/{service}/pulihkan', [TrashController::class, 'restoreService'])->withTrashed()->name('trash.services.restore');
+    Route::delete('soft-delete/jasa/{service}', [TrashController::class, 'forceDeleteService'])->withTrashed()->name('trash.services.force-delete');
 
     Route::get('pesanan', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('pesanan/revisi', [AdminOrderController::class, 'revision'])->name('orders.revision');
@@ -47,6 +53,10 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
     Route::post('pesanan/{order}/batal', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('pesanan/{order}/file/{file}', [AdminOrderController::class, 'download'])->name('orders.file');
 
+    Route::get('soft-delete/pesanan', [TrashController::class, 'orders'])->name('trash.orders');
+    Route::post('soft-delete/pesanan/{order}/pulihkan', [TrashController::class, 'restoreOrder'])->withTrashed()->name('trash.orders.restore');
+    Route::delete('soft-delete/pesanan/{order}', [TrashController::class, 'forceDeleteOrder'])->withTrashed()->name('trash.orders.force-delete');
+
     Route::middleware(['role:'.UserRole::SuperAdmin->value])->group(function (): void {
         Route::get('pengguna', [UserController::class, 'index'])->name('users.index');
         Route::get('pengguna/create', [UserController::class, 'create'])->name('users.create');
@@ -55,6 +65,10 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
         Route::put('pengguna/{user}', [UserController::class, 'update'])->name('users.update');
         Route::post('pengguna/{user}/login-sebagai', [ImpersonationController::class, 'store'])->name('users.impersonate');
         Route::delete('pengguna/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        Route::get('soft-delete/pengguna', [TrashController::class, 'users'])->name('trash.users');
+        Route::post('soft-delete/pengguna/{user}/pulihkan', [TrashController::class, 'restoreUser'])->withTrashed()->name('trash.users.restore');
+        Route::delete('soft-delete/pengguna/{user}', [TrashController::class, 'forceDeleteUser'])->withTrashed()->name('trash.users.force-delete');
     });
 
     Route::middleware(['auth'])->group(function () {

@@ -10,12 +10,13 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['order_id', 'transaction_id', 'tripay_reference', 'payment_method', 'payment_channel', 'amount', 'amount_received', 'total_fee', 'payment_status_id', 'checkout_url', 'expires_at', 'paid_at'])]
 class Payment extends Model
 {
     /** @use HasFactory<PaymentFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * Get the attributes that should be cast.

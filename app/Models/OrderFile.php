@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 #[Fillable(['order_id', 'file_name', 'file_path', 'file_type', 'file_size', 'order_file_kind_id', 'uploaded_by'])]
 class OrderFile extends Model
 {
     /** @use HasFactory<OrderFileFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public const KIND_REQUIREMENT = 'requirement';
 

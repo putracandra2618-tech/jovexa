@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\ProfileUpdateRequest;
 use App\Http\Requests\Admin\UserRequest;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\TrashService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -110,7 +111,7 @@ class UserController extends Controller
     /**
      * Delete a user account.
      */
-    public function destroy(Request $request, User $user): RedirectResponse
+    public function destroy(Request $request, User $user, TrashService $trash): RedirectResponse
     {
         $auth = $request->user();
 
@@ -122,13 +123,9 @@ class UserController extends Controller
             return back()->with('error', 'Akun Super Admin tidak dapat dihapus dari halaman ini.');
         }
 
-        if ($user->isWorker() && Order::query()->activeForWorker($user)->exists()) {
-            return back()->with('error', 'Worker masih memiliki pesanan aktif. Selesaikan atau batalkan pesanan terlebih dahulu.');
-        }
+        $trash->softDeleteUser($user);
 
-        $user->delete();
-
-        return back()->with('success', "Akun {$user->name} berhasil dihapus.");
+        return back()->with('success', "Akun {$user->name} berhasil dipindahkan ke soft delete beserta seluruh datanya.");
     }
 
     /**

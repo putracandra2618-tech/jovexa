@@ -125,7 +125,18 @@
                                             </button>
                                         </form>
                                     @endif
-                                </td>
+
+                                    <form method="POST"
+                                          action="{{ route('admin.services.destroy', $service) }}"
+                                          class="d-inline"
+                                          data-confirm="Hapus jasa &quot;{{ $service->name }}&quot;? Jasa dan pesanannya akan dipindahkan ke menu soft delete.">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-custom btn-custom-danger btn-custom-sm">
+                                            <i class="bi bi-trash me-1"></i> Hapus
+                                        </button>
+                                    </form>
+                                 </td>
                             </tr>
                         @endforeach
                     </tbody>

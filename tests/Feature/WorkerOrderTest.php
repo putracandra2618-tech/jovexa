@@ -169,13 +169,13 @@ class WorkerOrderTest extends TestCase
         $pending = Order::factory()->inProgress()->assignedTo($worker)->create();
 
         $response = $this->actingAs($worker)
-            ->get(route('worker.orders.index', ['category' => 'failed', 'page' => 2]));
+            ->get(route('worker.orders.index', ['category' => 'success', 'page' => 2]));
 
         $response->assertOk()
             ->assertViewHas('orders', fn ($orders): bool => $orders->total() === 11
                 && $orders->currentPage() === 2)
             ->assertDontSee($pending->order_number)
-            ->assertSee('category=failed', escape: false)
+            ->assertSee('category=success', escape: false)
             ->assertSee('aria-pressed="true"', escape: false);
     }
 

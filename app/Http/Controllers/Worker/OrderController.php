@@ -226,7 +226,7 @@ class OrderController extends Controller
 
         $path = $file->file_path;
 
-        $file->delete();
+        $file->forceDelete();
 
         Storage::disk('local')->delete($path);
 

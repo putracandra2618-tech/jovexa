@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServiceRequest;
 use App\Models\Lookup\ServiceStatus as ServiceStatusLookup;
 use App\Models\Service;
+use App\Services\TrashService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -99,6 +100,18 @@ class ServiceController extends Controller
         return redirect()
             ->route('admin.services.index')
             ->with('success', "Jasa \"{$service->name}\" berhasil diarsipkan.");
+    }
+
+    /**
+     * Move the service and its orders to the trash.
+     */
+    public function destroy(Service $service, TrashService $trash): RedirectResponse
+    {
+        $trash->softDeleteService($service);
+
+        return redirect()
+            ->route('admin.services.index')
+            ->with('success', "Jasa \"{$service->name}\" berhasil dipindahkan ke soft delete.");
     }
 
     /**

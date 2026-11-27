@@ -33,6 +33,18 @@
                     $user?->isSuperAdmin()
                         ? ['route' => 'admin.users.index', 'pattern' => 'admin.users.*', 'label' => 'Kelola Pengguna', 'icon' => 'bi-people']
                         : null,
+                    [
+                        'route' => 'admin.trash.services',
+                        'label' => 'Soft Delete',
+                        'icon' => 'bi-trash3',
+                        'children' => array_values(array_filter([
+                            $user?->isSuperAdmin()
+                                ? ['route' => 'admin.trash.users', 'pattern' => 'admin.trash.users', 'label' => 'Pengguna', 'icon' => 'bi-people']
+                                : null,
+                            ['route' => 'admin.trash.services', 'pattern' => 'admin.trash.services', 'label' => 'Jasa', 'icon' => 'bi-box-seam'],
+                            ['route' => 'admin.trash.orders', 'pattern' => 'admin.trash.orders', 'label' => 'Pesanan', 'icon' => 'bi-briefcase'],
+                        ])),
+                    ],
                 ])),
             ],
         ];

@@ -354,7 +354,7 @@ class AdminUserManagementTest extends TestCase
             ->assertSessionHas('success')
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('users', ['id' => $customer->id]);
+        $this->assertSoftDeleted('users', ['id' => $customer->id]);
     }
 
     public function test_super_admin_can_delete_admin(): void
@@ -366,7 +366,7 @@ class AdminUserManagementTest extends TestCase
             ->delete(route('admin.users.destroy', $admin))
             ->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('users', ['id' => $admin->id]);
+        $this->assertSoftDeleted('users', ['id' => $admin->id]);
     }
 
     public function test_super_admin_cannot_delete_self(): void
@@ -393,17 +393,18 @@ class AdminUserManagementTest extends TestCase
         $this->assertDatabaseHas('users', ['id' => $otherSuperAdmin->id]);
     }
 
-    public function test_worker_with_active_orders_cannot_be_deleted(): void
+    public function test_worker_with_active_orders_is_soft_deleted_together_with_them(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
         $worker = User::factory()->worker()->online()->create();
-        Order::factory()->inProgress()->assignedTo($worker)->create();
+        $order = Order::factory()->inProgress()->assignedTo($worker)->create();
 
         $this->actingAs($superAdmin)
             ->delete(route('admin.users.destroy', $worker))
-            ->assertSessionHas('error');
+            ->assertSessionHas('success');
 
-        $this->assertDatabaseHas('users', ['id' => $worker->id]);
+        $this->assertSoftDeleted('users', ['id' => $worker->id]);
+        $this->assertSoftDeleted('orders', ['id' => $order->id]);
     }
 
     public function test_super_admin_can_delete_user_with_orders_and_related_data(): void
@@ -427,11 +428,11 @@ class AdminUserManagementTest extends TestCase
             ->assertSessionHas('success')
             ->assertRedirect();
 
-        $this->assertDatabaseMissing('users', ['id' => $customer->id]);
-        $this->assertDatabaseMissing('orders', ['id' => $order->id]);
+        $this->assertSoftDeleted('users', ['id' => $customer->id]);
+        $this->assertSoftDeleted('orders', ['id' => $order->id]);
     }
 
-    public function test_deleting_a_worker_keeps_the_files_they_uploaded(): void
+    public function test_deleting_a_worker_soft_deletes_the_files_they_uploaded(): void
     {
         $superAdmin = User::factory()->superAdmin()->create();
         $worker = User::factory()->worker()->create();
@@ -444,9 +445,9 @@ class AdminUserManagementTest extends TestCase
             ->delete(route('admin.users.destroy', $worker))
             ->assertSessionHas('success');
 
-        $this->assertDatabaseHas('order_files', [
+        $this->assertSoftDeleted('order_files', [
             'id' => $file->getKey(),
-            'uploaded_by' => null,
+            'uploaded_by' => $worker->getKey(),
         ]);
     }
 

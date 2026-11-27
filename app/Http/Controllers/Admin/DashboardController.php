@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Service;
+use App\Models\UserNotification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -22,7 +23,16 @@ class DashboardController extends Controller
         $waitingCustomer = Order::query()->whereStatus(OrderStatus::WaitingCustomer)->count();
         $revision = Order::query()->whereStatus(OrderStatus::Revision)->count();
 
+        $unclaimedQueueAlerts = $request->user()->inAppNotifications()
+            ->where('type', UserNotification::UnclaimedQueue)
+            ->whereHas('order', fn ($query) => $query
+                ->whereStatus(OrderStatus::Queued)
+                ->whereNull('worker_id'))
+            ->latestFirst()
+            ->get();
+
         return view('admin.dashboard', [
+            'unclaimedQueueAlerts' => $unclaimedQueueAlerts,
             'waitingVerificationCount' => $waitingVerification,
             'queuedCount' => $queued,
             'inProgressCount' => $inProgress,

@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['user_id', 'order_id', 'type', 'title', 'body', 'read_at'])]
 class UserNotification extends Model
 {
     /** @use HasFactory<UserNotificationFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public const RevisionRequested = 'revision_requested';
 
@@ -28,6 +29,8 @@ class UserNotification extends Model
     public const InformationReplied = 'information_replied';
 
     public const VerificationReminder = 'verification_reminder';
+
+    public const UnclaimedQueue = 'unclaimed_queue';
 
     /**
      * @return array<string, string>
