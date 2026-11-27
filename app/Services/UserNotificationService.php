@@ -100,6 +100,21 @@ class UserNotificationService
     }
 
     /**
+     * Tell the staff member who requested information that the customer replied.
+     */
+    public function informationReplied(Order $order, User $recipient, string $note): void
+    {
+        $this->notify(
+            collect([$recipient]),
+            $order,
+            UserNotification::InformationReplied,
+            'Customer membalas informasi',
+            'Pesanan '.$order->order_number.': '.Str::limit($note, 120),
+            $order->user,
+        );
+    }
+
+    /**
      * @param  Collection<int, User>  $recipients
      */
     private function notify(

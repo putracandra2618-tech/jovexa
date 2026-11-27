@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderFile;
 use App\Models\User;
+use App\Models\UserNotification;
 use App\Services\WorkerOrderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -256,7 +257,7 @@ class WorkerOrderTest extends TestCase
             ->assertOk()
             ->assertDontSee('Minta Revisi')
             ->assertDontSee('Minta Informasi')
-            ->assertSee('Unggah Hasil Revisi');
+            ->assertSee('Kirim Hasil Revisi ke Customer');
 
         $this->actingAs($worker)
             ->post(route('worker.orders.result.store', $order), [
@@ -287,6 +288,86 @@ class WorkerOrderTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_worker_can_upload_and_deliver_the_result_in_one_action(): void
+    {
+        Storage::fake('local');
+
+        $customer = User::factory()->customer()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->inProgress()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->post(route('worker.orders.deliver-now', $order), [
+                'result' => UploadedFile::fake()->create('hasil.pdf', 100, 'application/pdf'),
+                'note' => 'Silakan dicek.',
+            ])
+            ->assertRedirect();
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+        $this->assertTrue($order->results()->exists());
+        $this->assertSame(2, $order->statusHistory()->count());
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $customer->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::ResultDelivered,
+        ]);
+    }
+
+    public function test_worker_can_send_a_revised_result_directly_to_the_customer(): void
+    {
+        Storage::fake('local');
+
+        $customer = User::factory()->customer()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->revision()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->post(route('worker.orders.deliver-now', $order), [
+                'result' => UploadedFile::fake()->create('hasil-revisi.pdf', 100, 'application/pdf'),
+            ])
+            ->assertRedirect();
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+        $this->assertTrue($order->revisions()->sole()->isRevision());
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $customer->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::RevisionApproved,
+        ]);
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $customer->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::ResultDelivered,
+        ]);
+    }
+
+    public function test_worker_cannot_deliver_without_an_uploaded_result(): void
+    {
+        Storage::fake('local');
+
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->inProgress()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->post(route('worker.orders.deliver-now', $order))
+            ->assertSessionHasErrors('result');
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+    }
+
+    public function test_worker_order_detail_offers_a_single_delivery_action(): void
+    {
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->inProgress()->assignedTo($worker)->create();
+
+        $this->actingAs($worker)
+            ->get(route('worker.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Kirim ke Customer')
+            ->assertDontSee('Tandai Siap Dikirim')
+            ->assertDontSee('Unggah Hasil');
     }
 
     public function test_worker_order_detail_has_only_one_send_action(): void

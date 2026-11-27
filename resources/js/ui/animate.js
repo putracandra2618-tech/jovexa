@@ -455,7 +455,10 @@ const initScrollPolish = () => {
             header.classList.toggle('is-scrolled', scrolled > 8);
         }
 
-        backToTop.classList.toggle('is-visible', scrolled > 480);
+        const backToTopVisible = scrolled > 480;
+
+        backToTop.classList.toggle('is-visible', backToTopVisible);
+        document.body.classList.toggle('jx-back-to-top-visible', backToTopVisible);
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });

@@ -235,7 +235,7 @@ class AdminOrderWorkflowTest extends TestCase
         $this->assertSame(OrderStatus::WaitingVerification, $order->fresh()->status);
     }
 
-    public function test_admin_can_send_the_order_back_for_revision(): void
+    public function test_admin_cannot_request_a_revision(): void
     {
         $order = Order::factory()->inProgress()->create();
 
@@ -244,28 +244,31 @@ class AdminOrderWorkflowTest extends TestCase
                 'status' => OrderStatus::Revision->value,
                 'note' => 'Mohon perbaiki format tabel sebelum dikirim.',
             ])
-            ->assertRedirect();
+            ->assertForbidden();
 
-        $this->assertSame(OrderStatus::Revision, $order->fresh()->status);
-        $this->assertDatabaseHas('order_revision_requests', [
-            'order_id' => $order->getKey(),
-            'note' => 'Mohon perbaiki format tabel sebelum dikirim.',
-            'revision_number' => 1,
-        ]);
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+        $this->assertDatabaseCount('order_revision_requests', 0);
     }
 
-    public function test_admin_revision_request_requires_a_note(): void
+    public function test_admin_revision_action_is_not_offered(): void
     {
         $order = Order::factory()->inProgress()->create();
 
         $this->actingAs(User::factory()->admin()->create())
-            ->patch(route('admin.orders.status', $order), [
-                'status' => OrderStatus::Revision->value,
-            ])
-            ->assertSessionHasErrors('note');
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Minta Revisi');
+    }
 
-        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
-        $this->assertDatabaseCount('order_revision_requests', 0);
+    public function test_verification_action_has_no_note_field(): void
+    {
+        $order = Order::factory()->waitingVerification()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Verifikasi & Minta Bayar')
+            ->assertDontSee('Catatan (opsional)');
     }
 
     public function test_admin_cannot_mark_an_order_as_paid_manually(): void
@@ -508,6 +511,55 @@ class AdminOrderWorkflowTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+    }
+
+    public function test_admin_can_upload_and_deliver_the_result_in_one_action(): void
+    {
+        Storage::fake('local');
+
+        $customer = User::factory()->customer()->create();
+        $order = Order::factory()->for($customer)->inProgress()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->post(route('admin.orders.deliver-now', $order), [
+                'result' => UploadedFile::fake()->create('hasil-akhir.pdf', 200, 'application/pdf'),
+                'note' => 'Silakan dicek.',
+            ])
+            ->assertRedirect();
+
+        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
+        $this->assertTrue($order->results()->exists());
+        $this->assertSame(2, $order->statusHistory()->count());
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $customer->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::ResultDelivered,
+        ]);
+    }
+
+    public function test_admin_cannot_deliver_without_an_uploaded_result(): void
+    {
+        Storage::fake('local');
+
+        $order = Order::factory()->inProgress()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->post(route('admin.orders.deliver-now', $order))
+            ->assertSessionHasErrors('result');
+
+        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
+    }
+
+    public function test_admin_order_detail_offers_a_single_delivery_action(): void
+    {
+        $order = Order::factory()->inProgress()->create();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Kirim ke Customer')
+            ->assertDontSee('Lanjut ke Siap Dikirim')
+            ->assertDontSee('Tandai Siap Dikirim');
     }
 
     public function test_admin_order_detail_has_only_one_send_action(): void

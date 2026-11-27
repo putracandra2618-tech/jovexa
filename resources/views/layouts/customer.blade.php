@@ -91,6 +91,8 @@
     </footer>
 </div>
 
+<x-whatsapp-bubble />
+
 <div class="modal fade" id="jx-confirm-modal" tabindex="-1" aria-labelledby="jx-confirm-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

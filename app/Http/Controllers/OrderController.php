@@ -10,6 +10,7 @@ use App\Models\Lookup\OrderFileKind as OrderFileKindLookup;
 use App\Models\Lookup\OrderStatus as OrderStatusLookup;
 use App\Models\Order;
 use App\Models\OrderFile;
+use App\Models\OrderStatusHistory;
 use App\Models\Service;
 use App\Services\OrderFileDownloader;
 use App\Services\OrderWorkflow;
@@ -45,7 +46,7 @@ class OrderController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('orders.index', [
+        return view('customer.orders.index', [
             'orders' => $orders,
         ]);
     }
@@ -57,7 +58,7 @@ class OrderController extends Controller
     {
         abort_unless($service->status === ServiceStatus::Published, 404);
 
-        return view('orders.create', [
+        return view('customer.orders.create', [
             'service' => $service,
         ]);
     }
@@ -109,7 +110,7 @@ class OrderController extends Controller
             'revisionRequests.requester',
         ]);
 
-        return view('orders.show', [
+        return view('customer.orders.show', [
             'order' => $order,
         ]);
     }
@@ -134,8 +135,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Let the customer add more requirement files while the order is still
-     * waiting on the admin/worker.
+     * Let the customer answer an information request with text, files, or both.
      */
     public function addRequirements(Request $request, Order $order): RedirectResponse
     {
@@ -144,21 +144,30 @@ class OrderController extends Controller
         abort_unless(
             $order->status === OrderStatus::WaitingCustomer,
             403,
-            'File tambahan hanya bisa diunggah saat tim Jovexa meminta informasi.'
+            'Informasi hanya bisa dikirim saat tim Jovexa meminta informasi.'
         );
 
-        $request->validate([
-            'requirements' => ['required', 'array', 'max:5'],
+        $validated = $request->validate([
+            'note' => ['nullable', 'string', 'max:1000'],
+            'requirements' => ['nullable', 'array', 'max:5'],
             'requirements.*' => ['file', 'max:10240', 'mimes:'.implode(',', OrderFile::ALLOWED_EXTENSIONS)],
         ], [
-            'requirements.required' => 'Pilih minimal satu file.',
+            'note.max' => 'Balasan maksimal 1000 karakter.',
+            'requirements.max' => 'Maksimal 5 file per pengiriman.',
             'requirements.*.max' => 'Setiap file maksimal 10 MB.',
             'requirements.*.mimes' => 'Format lampiran tidak didukung. Gunakan dokumen, gambar, atau arsip.',
         ]);
 
-        $incoming = count($request->file('requirements', []));
+        $note = trim((string) ($validated['note'] ?? ''));
+        $incomingFiles = $request->file('requirements', []);
 
-        if ($order->requirements()->count() + $incoming > OrderFile::MAX_REQUIREMENT_FILES) {
+        if ($note === '' && $incomingFiles === []) {
+            throw ValidationException::withMessages([
+                'note' => 'Tuliskan balasan atau unggah minimal satu file.',
+            ]);
+        }
+
+        if ($order->requirements()->count() + count($incomingFiles) > OrderFile::MAX_REQUIREMENT_FILES) {
             throw ValidationException::withMessages([
                 'requirements' => 'Jumlah lampiran per pesanan maksimal '.OrderFile::MAX_REQUIREMENT_FILES.' file.',
             ]);
@@ -166,14 +175,21 @@ class OrderController extends Controller
 
         $this->storeRequirements($order, $request);
 
+        $targetStatus = $order->worker_id === null ? OrderStatus::WaitingVerification : OrderStatus::InProgress;
+        $informationRequester = $order->informationRequester();
+
         $this->workflow->transitionTo(
             $order,
-            $order->worker_id === null ? OrderStatus::WaitingVerification : OrderStatus::InProgress,
+            $targetStatus,
             $request->user(),
-            'Customer menambahkan informasi pendukung.',
+            $note !== '' ? OrderStatusHistory::InformationReplyPrefix.$note : 'Customer menambahkan informasi pendukung.',
         );
 
-        return back()->with('success', 'File pendukung berhasil diunggah.');
+        if ($note !== '' && $informationRequester !== null) {
+            $this->notifications->informationReplied($order->fresh() ?? $order, $informationRequester, $note);
+        }
+
+        return back()->with('success', 'Informasi berhasil dikirim.');
     }
 
     /**

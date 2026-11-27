@@ -25,6 +25,8 @@ class UserNotification extends Model
 
     public const InformationRequested = 'information_requested';
 
+    public const InformationReplied = 'information_replied';
+
     /**
      * @return array<string, string>
      */

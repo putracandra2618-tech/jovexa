@@ -33,7 +33,7 @@ class OrderPaymentController extends Controller
 
         abort_if(! $order->isPayable(), 404);
 
-        return view('orders.pay', [
+        return view('customer.orders.pay', [
             'order' => $order->load(['service', 'latestPayment.statusRecord']),
             'channels' => $this->tripay->availableChannels(),
             'gatewayReady' => $this->tripay->isConfigured(),

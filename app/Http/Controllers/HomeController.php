@@ -12,7 +12,7 @@ class HomeController extends Controller
      */
     public function __invoke(): View
     {
-        return view('home', [
+        return view('publik.home', [
             'featuredServices' => Service::query()
                 ->published()
                 ->orderBy('price')

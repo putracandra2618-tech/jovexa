@@ -7,8 +7,11 @@ use App\Models\Lookup\OrderFileKind as OrderFileKindLookup;
 use App\Models\Order;
 use App\Models\OrderFile;
 use App\Models\User;
+use App\Models\UserNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -24,9 +27,9 @@ trait ManagesStaffOrders
         $this->ensureCanManageOrder($order);
 
         abort_if(
-            $target === OrderStatus::Revision && $actor->isWorker(),
+            $target === OrderStatus::Revision,
             403,
-            'Worker tidak bisa meminta revisi. Gunakan permintaan informasi jika butuh data dari customer.',
+            'Permintaan revisi hanya bisa diajukan oleh customer.',
         );
 
         $previousStatus = $order->status;
@@ -42,6 +45,31 @@ trait ManagesStaffOrders
         }
 
         return back()->with('success', "Status pesanan diubah ke {$order->fresh()->status->label()}.");
+    }
+
+    /**
+     * Track whether the current staff member has already opened a customer reply.
+     */
+    protected function markInformationReplyViewed(Order $order, User $viewer): bool
+    {
+        $reply = $order->latestInformationReply();
+
+        if ($reply === null) {
+            return false;
+        }
+
+        $sessionKey = 'information_reply_seen.'.$viewer->getKey().'.'.$order->getKey();
+        $alreadyViewed = session()->get($sessionKey) === $reply->getKey();
+
+        session()->put($sessionKey, $reply->getKey());
+
+        $viewer->inAppNotifications()
+            ->where('order_id', $order->getKey())
+            ->where('type', UserNotification::InformationReplied)
+            ->unread()
+            ->update(['read_at' => now()]);
+
+        return $alreadyViewed;
     }
 
     /**
@@ -120,19 +148,8 @@ trait ManagesStaffOrders
         ]);
 
         $isRevision = $order->status === OrderStatus::Revision;
-        $kind = $isRevision ? OrderFile::KIND_REVISION : OrderFile::KIND_RESULT;
-        $folder = $isRevision ? 'revisions' : 'results';
-        $file = $request->file('result');
-        $path = $file->store("orders/{$order->getKey()}/{$folder}", 'local');
 
-        $order->files()->create([
-            'file_name' => Str::limit($file->getClientOriginalName(), 255, ''),
-            'file_path' => $path,
-            'file_type' => $file->getClientMimeType(),
-            'file_size' => $file->getSize(),
-            'order_file_kind_id' => OrderFileKindLookup::idFor($kind),
-            'uploaded_by' => $request->user()->getKey(),
-        ]);
+        $this->storeResultFile($order, $request->file('result'), $isRevision, $request->user());
 
         return back()->with(
             'success',
@@ -169,6 +186,82 @@ trait ManagesStaffOrders
         $this->notifications->resultDelivered($order);
 
         return back()->with('success', 'Hasil pekerjaan berhasil dikirim ke customer.');
+    }
+
+    /**
+     * Upload the result and deliver it in a single staff action.
+     */
+    protected function deliverWorkInOneStep(Request $request, Order $order): RedirectResponse
+    {
+        $this->ensureCanManageOrder($order);
+
+        $previousStatus = $order->status;
+
+        abort_unless(
+            in_array($previousStatus, [OrderStatus::InProgress, OrderStatus::Revision], true),
+            404,
+            'Hasil bisa dikirim langsung saat pekerjaan sedang dikerjakan atau direvisi.',
+        );
+
+        $validated = $request->validate([
+            'result' => ['required', 'file', 'max:20480', 'mimes:'.implode(',', OrderFile::ALLOWED_EXTENSIONS)],
+            'note' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'result.required' => 'Pilih file hasil pekerjaan.',
+            'result.max' => 'Ukuran file maksimal 20 MB.',
+            'result.mimes' => 'Format file hasil tidak didukung.',
+            'note.max' => 'Catatan maksimal 1000 karakter.',
+        ]);
+
+        DB::transaction(function () use ($request, $order, $validated, $previousStatus): void {
+            $this->storeResultFile(
+                $order,
+                $request->file('result'),
+                $previousStatus === OrderStatus::Revision,
+                $request->user(),
+            );
+
+            $this->workflow->transitionTo(
+                $order,
+                OrderStatus::ReadyForDelivery,
+                $request->user(),
+                $previousStatus === OrderStatus::Revision ? null : 'Pekerjaan siap dikirim ke customer.',
+            );
+
+            $this->workflow->transitionTo(
+                $order,
+                OrderStatus::Delivered,
+                $request->user(),
+                $validated['note'] ?? 'Hasil pekerjaan dikirim ke customer.',
+            );
+        });
+
+        if ($previousStatus === OrderStatus::Revision) {
+            $this->notifications->revisionApproved($order);
+        }
+
+        $this->notifications->resultDelivered($order->fresh());
+
+        return back()->with('success', 'Hasil pekerjaan berhasil dikirim ke customer.');
+    }
+
+    /**
+     * Persist the uploaded deliverable using the kind that matches the current stage.
+     */
+    private function storeResultFile(Order $order, UploadedFile $file, bool $isRevision, User $uploader): void
+    {
+        $kind = $isRevision ? OrderFile::KIND_REVISION : OrderFile::KIND_RESULT;
+        $folder = $isRevision ? 'revisions' : 'results';
+        $path = $file->store("orders/{$order->getKey()}/{$folder}", 'local');
+
+        $order->files()->create([
+            'file_name' => Str::limit($file->getClientOriginalName(), 255, ''),
+            'file_path' => $path,
+            'file_type' => $file->getClientMimeType(),
+            'file_size' => $file->getSize(),
+            'order_file_kind_id' => OrderFileKindLookup::idFor($kind),
+            'uploaded_by' => $uploader->getKey(),
+        ]);
     }
 
     /**

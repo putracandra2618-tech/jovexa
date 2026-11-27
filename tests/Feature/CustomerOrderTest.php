@@ -684,6 +684,136 @@ class CustomerOrderTest extends TestCase
         $this->assertSame($worker->getKey(), $order->worker_id);
     }
 
+    public function test_customer_can_reply_with_text_without_uploading_a_file(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->waitingCustomer()->create();
+
+        $this->actingAs($order->user)
+            ->get(route('customer.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Kirim Informasi')
+            ->assertSee('Balasan Teks');
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.requirements', $order), [
+                'note' => 'Judul bab satu sudah saya perbaiki sesuai catatan.',
+            ])
+            ->assertRedirect();
+
+        $this->assertCount(0, $order->fresh()->requirements);
+        $this->assertSame(OrderStatus::WaitingVerification, $order->fresh()->status);
+        $this->assertDatabaseHas('order_status_histories', [
+            'order_id' => $order->getKey(),
+            'note' => 'Customer: Judul bab satu sudah saya perbaiki sesuai catatan.',
+        ]);
+    }
+
+    public function test_customer_text_reply_is_notified_and_visible_to_the_admin_who_requested_it(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $admin = User::factory()->admin()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->inProgress()->assignedTo($worker)->create();
+        $requestNote = 'Mohon kirim daftar bab yang sudah direvisi.';
+        $reply = 'Daftar bab sudah saya kirim lewat teks, mohon dicek.';
+
+        $this->actingAs($admin)
+            ->post(route('admin.orders.information', $order), ['note' => $requestNote])
+            ->assertRedirect();
+
+        $this->actingAs($customer)
+            ->post(route('customer.orders.requirements', $order), ['note' => $reply])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $admin->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::InformationReplied,
+            'body' => 'Pesanan '.$order->order_number.': '.$reply,
+        ]);
+        $this->assertDatabaseMissing('user_notifications', [
+            'user_id' => $worker->getKey(),
+            'type' => UserNotification::InformationReplied,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Balasan dari Customer')
+            ->assertSee($reply);
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Balasan dari Customer');
+
+        $this->assertNotNull(
+            $admin->inAppNotifications()->where('type', UserNotification::InformationReplied)->first()?->read_at
+        );
+
+        $this->actingAs($worker)
+            ->get(route('worker.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Balasan dari Customer')
+            ->assertSee($reply);
+    }
+
+    public function test_customer_text_reply_is_notified_and_visible_to_the_worker_who_requested_it(): void
+    {
+        $customer = User::factory()->customer()->create();
+        $admin = User::factory()->admin()->create();
+        $worker = User::factory()->worker()->create();
+        $order = Order::factory()->for($customer)->inProgress()->assignedTo($worker)->create();
+        $requestNote = 'Mohon kirim logo resolusi tinggi untuk cover.';
+        $reply = 'Logo resolusi tinggi sudah saya siapkan.';
+
+        $this->actingAs($worker)
+            ->post(route('worker.orders.information', $order), ['note' => $requestNote])
+            ->assertRedirect();
+
+        $this->actingAs($customer)
+            ->post(route('customer.orders.requirements', $order), ['note' => $reply])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('user_notifications', [
+            'user_id' => $worker->getKey(),
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::InformationReplied,
+        ]);
+        $this->assertDatabaseMissing('user_notifications', [
+            'user_id' => $admin->getKey(),
+            'type' => UserNotification::InformationReplied,
+        ]);
+
+        $this->actingAs($worker)
+            ->get(route('worker.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Balasan dari Customer')
+            ->assertSee($reply);
+
+        $this->actingAs($worker)
+            ->get(route('worker.orders.show', $order))
+            ->assertOk()
+            ->assertDontSee('Balasan dari Customer');
+
+        $this->actingAs($admin)
+            ->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('Balasan dari Customer')
+            ->assertSee($reply);
+    }
+
+    public function test_customer_cannot_send_an_empty_information_reply(): void
+    {
+        $order = Order::factory()->for(User::factory()->customer())->waitingCustomer()->create();
+
+        $this->actingAs($order->user)
+            ->post(route('customer.orders.requirements', $order), ['note' => '   '])
+            ->assertSessionHasErrors('note');
+
+        $this->assertSame(OrderStatus::WaitingCustomer, $order->fresh()->status);
+    }
+
     public function test_staff_information_request_is_visible_and_notified_to_the_customer(): void
     {
         $customer = User::factory()->customer()->create();

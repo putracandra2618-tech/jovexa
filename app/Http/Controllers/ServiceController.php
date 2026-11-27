@@ -22,7 +22,7 @@ class ServiceController extends Controller
             ->paginate(9)
             ->withQueryString();
 
-        return view('services.index', [
+        return view('publik.services.index', [
             'services' => $services,
             'search' => $search,
         ]);
@@ -42,7 +42,7 @@ class ServiceController extends Controller
             ->limit(3)
             ->get();
 
-        return view('services.show', [
+        return view('publik.services.show', [
             'service' => $service,
             'relatedServices' => $relatedServices,
         ]);

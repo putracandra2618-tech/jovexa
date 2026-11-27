@@ -2,7 +2,7 @@
 
 @foreach ($actions as $action)
     @if ($action['type'] === 'link')
-        <a href="{{ $action['route'] }}" @if ($action['key'] === 'upload-result') id="unggah-hasil" @endif
+        <a href="{{ $action['route'] }}"
            @if (! empty($action['target'])) target="{{ $action['target'] }}" @endif
            @if (! empty($action['rel'])) rel="{{ $action['rel'] }}" @endif
            class="btn-custom btn-custom-{{ $action['variant'] }} w-100 mt-2">
@@ -24,7 +24,8 @@
                 <div class="mb-3">
                     <label for="file-{{ $action['key'] }}" class="form-label-custom">{{ $action['file']['label'] }}</label>
                     <input id="file-{{ $action['key'] }}" type="file" name="{{ $action['file']['name'] }}"
-                           class="form-control" required {!! $action['file']['attributes'] ?? '' !!}>
+                           class="form-control" @if ($action['file']['required'] ?? true) required @endif
+                           {!! $action['file']['attributes'] ?? '' !!}>
                     <small class="form-hint">{{ $action['file']['hint'] }}</small>
                     @error($action['file']['name'])
                         <div class="form-feedback-custom text-danger">{{ $message }}</div>

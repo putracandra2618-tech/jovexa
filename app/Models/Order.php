@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Collection;
 
 #[Fillable(['user_id', 'worker_id', 'service_id', 'order_number', 'description', 'order_status_id', 'total_price', 'worker_claimed_at'])]
 class Order extends Model
@@ -180,6 +181,42 @@ class Order extends Model
     public function statusHistory(): HasMany
     {
         return $this->hasMany(OrderStatusHistory::class);
+    }
+
+    /**
+     * The staff member who asked the customer for additional information.
+     */
+    public function informationRequester(): ?User
+    {
+        return $this->informationStatusHistory()
+            ->first(fn (OrderStatusHistory $entry): bool => $entry->to_status === OrderStatus::WaitingCustomer
+                && filled($entry->note)
+                && $entry->author !== null
+                && ! $entry->author->isCustomer())
+            ?->author;
+    }
+
+    /**
+     * The latest text reply the customer sent for an information request.
+     */
+    public function latestInformationReply(): ?OrderStatusHistory
+    {
+        return $this->informationStatusHistory()
+            ->first(fn (OrderStatusHistory $entry): bool => $entry->from_status === OrderStatus::WaitingCustomer
+                && $entry->author?->isCustomer() === true
+                && $entry->isInformationReply());
+    }
+
+    /**
+     * @return Collection<int, OrderStatusHistory>
+     */
+    private function informationStatusHistory(): Collection
+    {
+        $history = $this->relationLoaded('statusHistory')
+            ? $this->statusHistory
+            : $this->statusHistory()->with('author')->latest('id')->get();
+
+        return $history->sortByDesc('id')->values();
     }
 
     /**

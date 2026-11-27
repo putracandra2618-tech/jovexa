@@ -16,6 +16,8 @@ class OrderStatusHistory extends Model
     /** @use HasFactory<OrderStatusHistoryFactory> */
     use HasFactory;
 
+    public const InformationReplyPrefix = 'Customer: ';
+
     /**
      * The lookup row for the status the order came from.
      *
@@ -72,5 +74,25 @@ class OrderStatusHistory extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'changed_by');
+    }
+
+    /**
+     * Determine whether this entry records a text reply from the customer.
+     */
+    public function isInformationReply(): bool
+    {
+        return str_starts_with((string) $this->note, self::InformationReplyPrefix);
+    }
+
+    /**
+     * The customer's reply without the audit prefix.
+     */
+    public function informationReplyText(): ?string
+    {
+        if (! $this->isInformationReply()) {
+            return null;
+        }
+
+        return trim(substr((string) $this->note, strlen(self::InformationReplyPrefix)));
     }
 }

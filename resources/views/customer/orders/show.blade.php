@@ -89,8 +89,8 @@
                     </p>
                 @elseif ($order->status === \App\Enums\OrderStatus::WaitingCustomer)
                     <p class="page-subtitle mb-0">
-                        Tim Jovexa butuh informasi tambahan darimu. Unggah file pendukung agar
-                        pengerjaan bisa dilanjutkan.
+                        Tim Jovexa butuh informasi tambahan darimu. Balas dengan teks atau unggah
+                        file pendukung agar pengerjaan bisa dilanjutkan.
                     </p>
 
                     @if ($informationRequest)

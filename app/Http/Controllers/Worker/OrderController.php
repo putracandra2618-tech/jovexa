@@ -132,6 +132,7 @@ class OrderController extends Controller
 
         return view('worker.orders.show', [
             'order' => $order,
+            'informationReplyAlreadyViewed' => $this->markInformationReplyViewed($order, auth()->user()),
         ]);
     }
 
@@ -190,6 +191,14 @@ class OrderController extends Controller
     public function sendToCustomer(Request $request, Order $order): RedirectResponse
     {
         return $this->sendOrderToCustomer($request, $order);
+    }
+
+    /**
+     * Upload and deliver the finished work in one step.
+     */
+    public function deliverNow(Request $request, Order $order): RedirectResponse
+    {
+        return $this->deliverWorkInOneStep($request, $order);
     }
 
     /**

@@ -79,6 +79,7 @@ class AdminOrderController extends Controller
 
         return view('admin.orders.show', [
             'order' => $order,
+            'informationReplyAlreadyViewed' => $this->markInformationReplyViewed($order, auth()->user()),
         ]);
     }
 
@@ -173,6 +174,14 @@ class AdminOrderController extends Controller
     public function sendToCustomer(Request $request, Order $order): RedirectResponse
     {
         return $this->sendOrderToCustomer($request, $order);
+    }
+
+    /**
+     * Upload and deliver the finished work in one step.
+     */
+    public function deliverNow(Request $request, Order $order): RedirectResponse
+    {
+        return $this->deliverWorkInOneStep($request, $order);
     }
 
     /**

@@ -2,6 +2,8 @@
     use App\Enums\OrderStatus;
 
     $actions = app(\App\Support\OrderActions::class)->for($order, auth()->user());
+    $informationReply = $order->latestInformationReply();
+    $informationReplyAlreadyViewed ??= false;
 @endphp
 
 @extends('layouts.admin')
@@ -49,8 +51,8 @@
                                :deletable="true"
                                empty-message="Belum ada file hasil revisi." />
 
-            @if (in_array($order->status, [OrderStatus::ReadyForDelivery, OrderStatus::Revision], true))
-                <x-card title="{{ $order->status === OrderStatus::Revision ? 'Unggah Hasil Revisi' : 'Unggah File Hasil' }}" class="mt-4">
+            @if ($order->status === OrderStatus::ReadyForDelivery)
+                <x-card title="Unggah File Hasil" class="mt-4">
                     <div id="unggah-hasil">
                         <form method="POST" action="{{ route('worker.orders.result.store', $order) }}"
                               enctype="multipart/form-data">
@@ -68,7 +70,7 @@
 
             <x-revision-panel :order="$order" />
 
-            <x-card title="Riwayat Status" class="mt-4">
+            <x-card title="Riwayat Status" class="mt-4" data-turbo-cache="false">
                 <ul class="list-unstyled mb-0">
                     @foreach ($order->statusHistory->sortByDesc('created_at')->sortByDesc('id') as $entry)
                         <li class="py-2 border-bottom">
@@ -92,10 +94,17 @@
             <x-card title="Status" data-turbo-cache="false">
                 <x-badge :variant="$order->status->badgeClass()">{{ $order->status->label() }}</x-badge>
 
+                @if ($informationReply && ! $informationReplyAlreadyViewed)
+                    <x-alert variant="success" class="mt-4">
+                        <strong>Balasan dari Customer:</strong><br>
+                        <span style="white-space: pre-line">{{ $informationReply->informationReplyText() }}</span>
+                    </x-alert>
+                @endif
+
                 @if ($order->status === OrderStatus::WaitingCustomer)
                     <x-alert variant="info" class="mt-4">
                         Menunggu customer mengirim informasi tambahan. Pesanan akan kembali otomatis
-                        ke daftar kerjamu setelah customer mengunggah file.
+                        ke daftar kerjamu setelah customer membalas lewat teks atau file.
                     </x-alert>
                 @endif
 

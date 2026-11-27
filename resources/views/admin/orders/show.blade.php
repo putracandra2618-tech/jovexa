@@ -2,6 +2,8 @@
     use App\Enums\OrderStatus;
 
     $actions = app(\App\Support\OrderActions::class)->for($order, auth()->user());
+    $informationReply = $order->latestInformationReply();
+    $informationReplyAlreadyViewed ??= false;
 @endphp
 
 @extends('layouts.admin')
@@ -43,7 +45,7 @@
 
             <x-revision-panel :order="$order" />
 
-            <x-card title="Riwayat Status" class="mt-4">
+            <x-card title="Riwayat Status" class="mt-4" data-turbo-cache="false">
                 <ul class="list-unstyled mb-0">
                     @foreach ($order->statusHistory->sortByDesc('created_at')->sortByDesc('id') as $entry)
                         <li class="py-2 border-bottom">
@@ -67,6 +69,13 @@
             <x-card title="Status" data-turbo-cache="false">
                 <x-badge :variant="$order->status->badgeClass()">{{ $order->status->label() }}</x-badge>
 
+                @if ($informationReply && ! $informationReplyAlreadyViewed)
+                    <x-alert variant="success" class="mt-4">
+                        <strong>Balasan dari Customer:</strong><br>
+                        <span style="white-space: pre-line">{{ $informationReply->informationReplyText() }}</span>
+                    </x-alert>
+                @endif
+
                 @if ($order->status === OrderStatus::Queued)
                     <x-alert variant="info" class="mt-4">
                         @if ($order->worker)
@@ -81,7 +90,7 @@
                 @if ($order->status === OrderStatus::WaitingCustomer && $order->worker)
                     <x-alert variant="info" class="mt-4">
                         Worker <strong>{{ $order->worker->name }}</strong> menunggu informasi dari customer.
-                        Pesanan akan kembali otomatis ke status dikerjakan setelah customer mengunggah file.
+                        Pesanan akan kembali otomatis ke status dikerjakan setelah customer mengirim teks atau mengunggah file.
                     </x-alert>
                 @endif
 

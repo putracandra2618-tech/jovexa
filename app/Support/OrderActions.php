@@ -40,6 +40,7 @@ class OrderActions
 
         if ($next !== null
             && $next->isSettableByAdmin()
+            && $next !== OrderStatus::ReadyForDelivery
             && ! in_array($status, [OrderStatus::Paid, OrderStatus::Queued, OrderStatus::WaitingCustomer, OrderStatus::Revision], true)) {
             $actions[] = $this->statusAction(
                 $order,
@@ -48,9 +49,6 @@ class OrderActions
                 $next,
                 $status === OrderStatus::WaitingVerification ? 'Verifikasi & Minta Bayar' : 'Lanjut ke '.$next->label(),
                 'primary',
-                'Catatan (opsional)',
-                false,
-                'Contoh: Data sudah dicek, silakan lanjut pembayaran.',
             );
         }
 
@@ -69,24 +67,6 @@ class OrderActions
             $actions[] = $this->informationAction($order, 'admin.orders.information', 'request-information');
         }
 
-        if ($status === OrderStatus::Revision) {
-            $actions[] = $this->statusAction(
-                $order,
-                'admin.orders.status',
-                'approve-revision',
-                OrderStatus::ReadyForDelivery,
-                'Setujui Revisi & Siap Dikirim',
-                'primary',
-                'Catatan Persetujuan (opsional)',
-                false,
-                'Contoh: Revisi sudah diperbaiki sesuai catatan.',
-            );
-        }
-
-        if ($status->canTransitionTo(OrderStatus::Revision) && $this->revisions->canRequest($order)) {
-            $actions[] = $this->revisionAction($order, 'admin.orders.status');
-        }
-
         array_push($actions, ...$this->deliveryActions($order, 'admin'));
 
         if ($status->canTransitionTo(OrderStatus::Cancelled)) {
@@ -103,20 +83,6 @@ class OrderActions
     {
         $actions = [];
         $status = $order->status;
-
-        if (in_array($status, [OrderStatus::InProgress, OrderStatus::Revision], true)) {
-            $actions[] = $this->statusAction(
-                $order,
-                'worker.orders.status',
-                'complete',
-                OrderStatus::ReadyForDelivery,
-                'Tandai Siap Dikirim',
-                'primary',
-                'Catatan (opsional)',
-                false,
-                'Contoh: Pekerjaan sudah siap dikirim ke customer.',
-            );
-        }
 
         if ($status === OrderStatus::InProgress && $status->canTransitionTo(OrderStatus::WaitingCustomer)) {
             $actions[] = $this->informationAction($order, 'worker.orders.information', 'request-information');
@@ -150,16 +116,23 @@ class OrderActions
             $actions[] = [
                 'key' => 'requirements',
                 'type' => 'form',
-                'label' => 'Kirim File',
-                'icon' => 'bi-cloud-arrow-up',
+                'label' => 'Kirim Informasi',
+                'icon' => 'bi-chat-left-dots',
                 'variant' => 'primary',
                 'route' => route('customer.orders.requirements', $order),
                 'method' => 'POST',
                 'file' => [
                     'name' => 'requirements[]',
-                    'label' => 'Unggah File Pendukung',
+                    'label' => 'Unggah File Pendukung (opsional)',
                     'hint' => 'PDF, DOC, DOCX, TXT, ZIP, PNG, atau JPG. Bisa pilih beberapa file sekaligus.',
                     'attributes' => 'multiple accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg"',
+                    'required' => false,
+                ],
+                'note' => [
+                    'name' => 'note',
+                    'label' => 'Balasan Teks (opsional)',
+                    'required' => false,
+                    'placeholder' => 'Tuliskan informasi yang diminta tim Jovexa di sini...',
                 ],
             ];
         }
@@ -202,26 +175,51 @@ class OrderActions
         $isRevision = $order->status === OrderStatus::Revision;
         $isReadyForDelivery = $order->status === OrderStatus::ReadyForDelivery;
 
-        if (! $isRevision && ! $isReadyForDelivery) {
+        if (in_array($order->status, [OrderStatus::InProgress, OrderStatus::Revision], true)) {
+            return [[
+                'key' => 'deliver-now',
+                'type' => 'form',
+                'label' => $isRevision ? 'Kirim Hasil Revisi ke Customer' : 'Kirim ke Customer',
+                'icon' => 'bi-send',
+                'variant' => 'primary',
+                'route' => $prefix === 'admin'
+                    ? route('admin.orders.deliver-now', $order)
+                    : route('worker.orders.deliver-now', $order),
+                'method' => 'POST',
+                'confirm' => 'Unggah hasil dan kirim langsung ke customer?',
+                'file' => [
+                    'name' => 'result',
+                    'label' => $isRevision ? 'File Hasil Revisi' : 'File Hasil Pekerjaan',
+                    'hint' => 'PDF, DOC, DOCX, TXT, ZIP, PNG, atau JPG. Maksimal 20 MB.',
+                    'attributes' => 'accept=".pdf,.doc,.docx,.txt,.zip,.png,.jpg,.jpeg"',
+                ],
+                'note' => [
+                    'name' => 'note',
+                    'label' => 'Catatan (opsional)',
+                    'required' => false,
+                    'placeholder' => 'Contoh: Hasil sudah sesuai permintaan.',
+                ],
+            ]];
+        }
+
+        if (! $isReadyForDelivery) {
             return [];
         }
 
         $actions = [];
 
-        if ($isReadyForDelivery || $prefix === 'worker') {
+        if ($prefix === 'worker') {
             $actions[] = [
                 'key' => 'upload-result',
                 'type' => 'link',
-                'label' => $isRevision ? 'Unggah Hasil Revisi' : 'Unggah Hasil',
+                'label' => 'Unggah Hasil',
                 'icon' => 'bi-cloud-arrow-up',
-                'variant' => 'primary',
-                'route' => $prefix === 'admin'
-                    ? route('admin.orders.deliver', $order)
-                    : route('worker.orders.show', $order).'#unggah-hasil',
+                'variant' => 'light',
+                'route' => route('worker.orders.show', $order).'#unggah-hasil',
             ];
         }
 
-        if ($isReadyForDelivery && $order->deliverables()->exists()) {
+        if ($order->deliverables()->exists()) {
             $actions[] = [
                 'key' => 'send',
                 'type' => 'form',
