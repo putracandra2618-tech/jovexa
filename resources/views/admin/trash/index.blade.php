@@ -44,15 +44,6 @@
                                 <th>Dihapus</th>
                                 <th class="text-end">Aksi</th>
                             </tr>
-                        @else
-                            <tr>
-                                <th>Nomor Pesanan</th>
-                                <th>Customer</th>
-                                <th>Jasa</th>
-                                <th>Status</th>
-                                <th>Dihapus</th>
-                                <th class="text-end">Aksi</th>
-                            </tr>
                         @endif
                     </thead>
                     <tbody>
@@ -95,29 +86,6 @@
                                         <form method="POST" action="{{ route('admin.trash.services.force-delete', $item) }}"
                                               class="d-inline"
                                               data-confirm="Hapus permanen jasa &quot;{{ $item->name }}&quot; beserta pesanannya? Tindakan ini tidak bisa dibatalkan.">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-custom btn-custom-danger btn-custom-sm">
-                                                <i class="bi bi-trash me-1"></i> Hapus permanen
-                                            </button>
-                                        </form>
-                                    </td>
-                                @else
-                                    <td class="fw-semibold">{{ $item->order_number }}</td>
-                                    <td>{{ $item->user?->name ?? '-' }}</td>
-                                    <td>{{ $item->service?->name ?? '-' }}</td>
-                                    <td>{{ $item->status?->label() ?? '-' }}</td>
-                                    <td class="text-nowrap">{{ $item->deleted_at?->format('d M Y H:i') }}</td>
-                                    <td class="text-end text-nowrap">
-                                        <form method="POST" action="{{ route('admin.trash.orders.restore', $item) }}" class="d-inline">
-                                            @csrf
-                                            <button type="submit" class="btn-custom btn-custom-primary btn-custom-sm">
-                                                <i class="bi bi-arrow-counterclockwise me-1"></i> Pulihkan
-                                            </button>
-                                        </form>
-                                        <form method="POST" action="{{ route('admin.trash.orders.force-delete', $item) }}"
-                                              class="d-inline"
-                                              data-confirm="Hapus permanen pesanan {{ $item->order_number }} beserta file dan riwayatnya? Tindakan ini tidak bisa dibatalkan.">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn-custom btn-custom-danger btn-custom-sm">

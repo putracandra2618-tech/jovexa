@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
 use App\Services\TrashService;
@@ -29,24 +28,6 @@ class TrashController extends Controller
     public function services(): View
     {
         return $this->render('services', Service::query()->onlyTrashed()->latest('deleted_at')->paginate(10, ['*'], 'services_page'));
-    }
-
-    /**
-     * Show soft deleted orders.
-     */
-    public function orders(): View
-    {
-        $orders = Order::query()
-            ->onlyTrashed()
-            ->with([
-                'user' => fn ($query) => $query->withTrashed(),
-                'service' => fn ($query) => $query->withTrashed(),
-                'statusRecord',
-            ])
-            ->latest('deleted_at')
-            ->paginate(10, ['*'], 'orders_page');
-
-        return $this->render('orders', $orders);
     }
 
     /**
@@ -94,28 +75,6 @@ class TrashController extends Controller
     }
 
     /**
-     * Restore an order and its trashed records.
-     */
-    public function restoreOrder(Order $order): RedirectResponse
-    {
-        $this->trash->restoreOrder($order);
-
-        return back()->with('success', "Pesanan {$order->order_number} berhasil dipulihkan.");
-    }
-
-    /**
-     * Permanently delete an order and its files.
-     */
-    public function forceDeleteOrder(Order $order): RedirectResponse
-    {
-        $number = $order->order_number;
-
-        $this->trash->forceDeleteOrder($order);
-
-        return back()->with('success', "Pesanan {$number} berhasil dihapus permanen.");
-    }
-
-    /**
      * @param  LengthAwarePaginator<mixed>  $trashed
      */
     private function render(string $type, $trashed): View
@@ -126,7 +85,6 @@ class TrashController extends Controller
             'tabs' => [
                 'users' => 'Pengguna',
                 'services' => 'Jasa',
-                'orders' => 'Pesanan',
             ],
         ]);
     }

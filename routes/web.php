@@ -53,10 +53,6 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
     Route::post('pesanan/{order}/batal', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('pesanan/{order}/file/{file}', [AdminOrderController::class, 'download'])->name('orders.file');
 
-    Route::get('soft-delete/pesanan', [TrashController::class, 'orders'])->name('trash.orders');
-    Route::post('soft-delete/pesanan/{order}/pulihkan', [TrashController::class, 'restoreOrder'])->withTrashed()->name('trash.orders.restore');
-    Route::delete('soft-delete/pesanan/{order}', [TrashController::class, 'forceDeleteOrder'])->withTrashed()->name('trash.orders.force-delete');
-
     Route::middleware(['role:'.UserRole::SuperAdmin->value])->group(function (): void {
         Route::get('pengguna', [UserController::class, 'index'])->name('users.index');
         Route::get('pengguna/create', [UserController::class, 'create'])->name('users.create');

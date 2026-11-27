@@ -42,7 +42,6 @@
                                 ? ['route' => 'admin.trash.users', 'pattern' => 'admin.trash.users', 'label' => 'Pengguna', 'icon' => 'bi-people']
                                 : null,
                             ['route' => 'admin.trash.services', 'pattern' => 'admin.trash.services', 'label' => 'Jasa', 'icon' => 'bi-box-seam'],
-                            ['route' => 'admin.trash.orders', 'pattern' => 'admin.trash.orders', 'label' => 'Pesanan', 'icon' => 'bi-briefcase'],
                         ])),
                     ],
                 ])),

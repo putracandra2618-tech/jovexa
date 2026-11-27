@@ -26,7 +26,6 @@
     --jx-mango-soft: #FFF3D9;
     --jx-sky: #8FC7FF;
     --jx-sky-soft: #E8F3FF;
-    --jx-blue: #2F80ED;
     --jx-lilac: #C3B4FF;
     --jx-lilac-soft: #F1EDFF;
 
@@ -3771,48 +3770,58 @@
 }
 
 .jx-status-tab {
-    --jx-tab-accent: var(--jx-line-strong, #D3E3D9);
+    --jx-tab-accent: var(--mt-gray-300, #E4E6EF);
+    --jx-tab-soft: var(--mt-gray-100, #F5F8FA);
 
-    padding: 0.5rem 1.05rem;
-    font-size: 0.88rem;
-    font-weight: 800;
-    color: var(--jx-ink-soft, #3D5B52);
-    background-color: var(--jx-surface, #FFFFFF);
-    border: 1.5px solid var(--jx-tab-accent);
-    border-radius: var(--jx-radius-pill, 999px);
+    padding: 0.55rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--mt-gray-600, #7E8299);
+    background-color: #ffffff;
+    border: 1px solid var(--jx-tab-accent);
+    border-radius: var(--radius-lg, 0.475rem);
     cursor: pointer;
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
-        border-width 0.2s ease,
         color 0.2s ease,
+        box-shadow 0.2s ease,
         transform 0.15s ease;
 }
 
 .jx-status-tab--all {
-    --jx-tab-accent: var(--jx-blue, #2F80ED);
+    --jx-tab-accent: var(--mt-primary, #009EF7);
+    --jx-tab-soft: var(--mt-primary-soft, rgba(0, 158, 247, 0.1));
 }
 
 .jx-status-tab--pending {
-    --jx-tab-accent: var(--jx-rose, #E5484D);
+    --jx-tab-accent: var(--mt-danger, #F1416C);
+    --jx-tab-soft: var(--mt-danger-soft, rgba(241, 65, 108, 0.1));
 }
 
 .jx-status-tab--success {
-    --jx-tab-accent: var(--jx-green, #1F7A4D);
+    --jx-tab-accent: var(--mt-success, #50CD89);
+    --jx-tab-soft: var(--mt-success-soft, rgba(80, 205, 137, 0.1));
 }
 
 .jx-status-tab:hover {
-    color: var(--jx-ink, #16302A);
+    color: var(--mt-gray-800, #3F4254);
+    background-color: var(--mt-gray-100, #F5F8FA);
     border-color: var(--jx-tab-accent);
 }
 
 .jx-status-tab.is-active {
-    color: var(--jx-ink, #16302A);
-    background-color: var(--jx-surface, #FFFFFF);
+    color: var(--jx-tab-accent);
+    background-color: var(--jx-tab-soft);
     border-color: var(--jx-tab-accent);
-    border-width: 2.5px;
-    box-shadow: 0 3px 10px rgba(22, 48, 42, 0.12);
+    box-shadow: 0 0.15rem 0.5rem rgba(24, 28, 50, 0.08);
     transform: translateY(-1px);
+}
+
+.jx-status-tab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 0.15rem var(--jx-tab-soft);
 }
 
 .jx-password-meter {

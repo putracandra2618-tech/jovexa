@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\User;
 use App\Models\UserNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -119,31 +120,11 @@ class SoftDeleteTrashTest extends TestCase
         $this->assertDatabaseHas('orders', ['id' => $order->getKey(), 'deleted_at' => null]);
     }
 
-    public function test_order_soft_deleted_with_its_customer_can_be_permanently_removed_from_trash(): void
+    public function test_order_trash_routes_are_removed(): void
     {
-        $superAdmin = User::factory()->superAdmin()->create();
-        $customer = User::factory()->customer()->create();
-        $order = Order::factory()->for($customer)->cancelled()->create();
-        $file = OrderFile::factory()->for($order)->create();
-
-        $this->actingAs($superAdmin)
-            ->delete(route('admin.users.destroy', $customer))
-            ->assertSessionHas('success');
-
-        $this->assertSoftDeleted('orders', ['id' => $order->getKey()]);
-        $this->assertSoftDeleted('order_files', ['id' => $file->getKey()]);
-
-        $this->actingAs($superAdmin)
-            ->get(route('admin.trash.orders'))
-            ->assertOk()
-            ->assertSee($order->order_number);
-
-        $this->actingAs($superAdmin)
-            ->delete(route('admin.trash.orders.force-delete', $order))
-            ->assertSessionHas('success');
-
-        $this->assertDatabaseMissing('orders', ['id' => $order->getKey()]);
-        $this->assertDatabaseMissing('order_files', ['id' => $file->getKey()]);
+        $this->assertFalse(Route::has('admin.trash.orders'));
+        $this->assertFalse(Route::has('admin.trash.orders.restore'));
+        $this->assertFalse(Route::has('admin.trash.orders.force-delete'));
     }
 
     public function test_regular_admin_cannot_open_the_user_trash(): void
