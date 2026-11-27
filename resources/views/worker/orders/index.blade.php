@@ -22,6 +22,10 @@
                         <input type="hidden" name="q" value="{{ $search }}">
                     @endif
 
+                    @if ($activeCategory !== 'all')
+                        <input type="hidden" name="category" value="{{ $activeCategory }}">
+                    @endif
+
                     <select name="status" class="form-select-custom" data-admin-search-select
                             aria-label="Saring berdasarkan status">
                         <option value="">Semua Status</option>
@@ -43,7 +47,7 @@
                     :total="$orders->total()"
                     :search="$search"
                     route="worker.orders.index"
-                    :filtered="$search !== '' || request()->filled('status')"
+                    :filtered="$search !== '' || request()->filled('status') || $activeCategory !== 'all'"
                 />
             </div>
         </div>
@@ -61,6 +65,24 @@
                 </x-slot:actions>
             </x-empty-state>
         @else
+            <div class="jx-status-tabs mb-4">
+                @foreach ($categories as $categoryKey => $categoryLabel)
+                    @php
+                        $tabQuery = array_filter([
+                            'category' => $categoryKey,
+                            'q' => $search,
+                            'status' => request('status'),
+                        ], fn ($value): bool => $value !== null && $value !== '');
+                    @endphp
+
+                    <a href="{{ route('worker.orders.index', $tabQuery) }}"
+                       class="jx-status-tab {{ $activeCategory === $categoryKey ? 'is-active' : '' }}"
+                       aria-pressed="{{ $activeCategory === $categoryKey ? 'true' : 'false' }}">
+                        {{ $categoryLabel }}
+                    </a>
+                @endforeach
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-custom align-middle mb-0">
                     <thead>
@@ -69,7 +91,6 @@
                             <th>Customer</th>
                             <th>Jasa</th>
                             <th>Status</th>
-                            <th>Revisi</th>
                             <th>Diambil</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -79,8 +100,8 @@
                         @foreach ($orders as $order)
                             @php $stage = $order->status->stage(); @endphp
                             @if ($stage !== $currentStage)
-                                <tr class="table-light">
-                                    <th colspan="7">{{ $order->status->stageLabel() }}</th>
+                                <tr class="table-light" data-status-group-row="{{ $stage }}">
+                                    <th colspan="6">{{ $order->status->stageLabel() }}</th>
                                 </tr>
                                 @php $currentStage = $stage; @endphp
                             @endif
@@ -95,9 +116,8 @@
                                     <x-badge :variant="$order->status->badgeClass()">
                                         {{ $order->status->label() }}
                                     </x-badge>
-                                    </td>
-                                <td>{{ $order->revision_requests_count }}/{{ \App\Services\RevisionService::MAX_PER_ORDER }}</td>
-                                <td>{{ $order->worker_claimed_at?->format('d M Y H:i') ?? '—' }}</td>
+                                </td>
+                                <td>{{ \App\Support\DisplayTime::format($order->worker_claimed_at) }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('worker.orders.show', $order) }}"
                                        class="btn-custom btn-custom-edit btn-custom-sm">
@@ -111,7 +131,7 @@
             </div>
 
             @if ($orders->hasPages())
-                <div class="mt-3 d-flex justify-content-center">
+                <div class="mt-4 d-flex justify-content-center">
                     {{ $orders->links() }}
                 </div>
             @endif

@@ -41,18 +41,20 @@ class OrderController extends Controller
     {
         $search = trim((string) $request->query('q', ''));
         $worker = $request->user();
+        $status = OrderStatus::tryFrom($request->string('status')->toString());
+        $category = $request->string('category')->toString();
+
+        if (! array_key_exists($category, OrderStatus::categories())) {
+            $category = 'all';
+        }
 
         $orders = Order::query()
             ->assignedTo($worker)
             ->with(['service', 'user', 'statusRecord'])
-            ->withCount('revisionRequests')
-            ->when($request->filled('status'), function ($query) use ($request): void {
-                $status = OrderStatus::tryFrom($request->string('status')->toString());
-
-                if ($status !== null) {
-                    $query->whereStatus($status);
-                }
-            })
+            ->when($category !== 'all', fn ($query) => $query->withStatus(
+                OrderStatus::statusesForCategory($category),
+            ))
+            ->when($status !== null, fn ($query) => $query->whereStatus($status))
             ->when($search !== '', fn ($query) => $query->search($search))
             ->latest('worker_claimed_at')
             ->paginate(10)
@@ -60,6 +62,8 @@ class OrderController extends Controller
 
         return view('worker.orders.index', [
             'orders' => $orders,
+            'categories' => OrderStatus::categories(),
+            'activeCategory' => $category,
             'statuses' => OrderStatus::cases(),
             'search' => $search,
         ]);

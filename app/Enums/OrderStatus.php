@@ -208,16 +208,56 @@ enum OrderStatus: string
     }
 
     /**
+     * The ordered stage labels used by staff order tables.
+     *
+     * @return array<string, string>
+     */
+    public static function stages(): array
+    {
+        return [
+            'payment' => 'Verifikasi & Pembayaran',
+            'queue' => 'Antrean & Verifikasi',
+            'work' => 'Sedang Dikerjakan',
+            'done' => 'Selesai',
+        ];
+    }
+
+    /**
+     * The badge categories used by order table tabs.
+     *
+     * @return array<string, string>
+     */
+    public static function categories(): array
+    {
+        return [
+            'all' => 'Semua',
+            'pending' => 'Berjalan',
+            'success' => 'Selesai',
+            'failed' => 'Perlu tindakan',
+        ];
+    }
+
+    /**
+     * @return array<int, self>
+     */
+    public static function statusesForCategory(string $category): array
+    {
+        if ($category === 'all') {
+            return self::cases();
+        }
+
+        return array_values(array_filter(
+            self::cases(),
+            fn (self $status): bool => $status->badgeClass() === $category,
+        ));
+    }
+
+    /**
      * Human readable label for the broad stage.
      */
     public function stageLabel(): string
     {
-        return match ($this->stage()) {
-            'payment' => 'Verifikasi & Pembayaran',
-            'queue' => 'Antrean & Verifikasi',
-            'work' => 'Sedang Dikerjakan',
-            default => 'Selesai',
-        };
+        return self::stages()[$this->stage()] ?? 'Selesai';
     }
 
     /**

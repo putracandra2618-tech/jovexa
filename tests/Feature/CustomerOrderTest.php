@@ -159,7 +159,8 @@ class CustomerOrderTest extends TestCase
             ->get(route('customer.orders.index'))
             ->assertOk()
             ->assertSee($own->order_number)
-            ->assertDontSee($foreign->order_number);
+            ->assertDontSee($foreign->order_number)
+            ->assertDontSee('<th>Revisi</th>', escape: false);
     }
 
     public function test_customer_cannot_open_another_customers_order(): void
@@ -191,7 +192,8 @@ class CustomerOrderTest extends TestCase
             ->assertOk()
             ->assertSee('data-stepper', escape: false)
             ->assertSee('jx-confirm-modal', escape: false)
-            ->assertSee('data-confirm=', escape: false);
+            ->assertSee('data-confirm=', escape: false)
+            ->assertSee('WIB');
     }
 
     public function test_an_unreviewed_order_shows_a_review_message_without_a_pay_button(): void

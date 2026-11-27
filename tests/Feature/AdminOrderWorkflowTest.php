@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\UserNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -34,7 +35,8 @@ class AdminOrderWorkflowTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.orders.index', ['status' => OrderStatus::InProgress->value]))
             ->assertOk()
-            ->assertSee($order->order_number);
+            ->assertSee($order->order_number)
+            ->assertDontSee('<th>Revisi</th>', escape: false);
     }
 
     public function test_order_queue_can_be_searched_by_customer_name(): void
@@ -88,6 +90,14 @@ class AdminOrderWorkflowTest extends TestCase
             ->get(route('admin.orders.index', ['status' => OrderStatus::InProgress->value]))
             ->assertOk()
             ->assertSee('<input type="hidden" name="status" value="in_progress">', escape: false);
+    }
+
+    public function test_order_queue_topbar_search_carries_the_active_category(): void
+    {
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.orders.index', ['category' => 'failed']))
+            ->assertOk()
+            ->assertSee('<input type="hidden" name="category" value="failed">', escape: false);
     }
 
     public function test_revision_queue_can_be_searched_and_targets_its_own_list(): void
@@ -422,147 +432,88 @@ class AdminOrderWorkflowTest extends TestCase
             ->assertSee($delivered->order_number);
     }
 
-    public function test_deliver_screen_is_closed_until_the_work_is_finished(): void
+    public function test_admin_delivery_actions_are_not_available(): void
     {
-        $order = Order::factory()->inProgress()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->get(route('admin.orders.deliver', $order))
-            ->assertNotFound();
-    }
-
-    public function test_admin_can_upload_the_finished_work(): void
-    {
-        Storage::fake('local');
-
         $order = Order::factory()->readyForDelivery()->create();
         $admin = User::factory()->admin()->create();
 
-        $this->actingAs($admin)
-            ->get(route('admin.orders.deliver', $order))
-            ->assertOk();
+        $this->assertFalse(Route::has('admin.orders.deliver'));
+        $this->assertFalse(Route::has('admin.orders.result.store'));
+        $this->assertFalse(Route::has('admin.orders.send'));
+        $this->assertFalse(Route::has('admin.orders.deliver-now'));
 
         $this->actingAs($admin)
-            ->post(route('admin.orders.result.store', $order), [
-                'result' => UploadedFile::fake()->create('hasil-akhir.pdf', 200, 'application/pdf'),
-            ])
-            ->assertRedirect();
-
-        $file = $order->results()->sole();
-
-        $this->assertTrue($file->isResult());
-        Storage::disk('local')->assertExists($file->file_path);
-    }
-
-    public function test_admin_can_upload_a_revised_result_as_a_revision_file(): void
-    {
-        Storage::fake('local');
-
-        $order = Order::factory()->revision()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.orders.result.store', $order), [
-                'result' => UploadedFile::fake()->create('hasil-revisi.pdf', 200, 'application/pdf'),
-            ])
-            ->assertRedirect();
-
-        $file = $order->revisions()->sole();
-
-        $this->assertTrue($file->isRevision());
-        $this->assertFalse($order->results()->exists());
-        Storage::disk('local')->assertExists($file->file_path);
-    }
-
-    public function test_result_upload_is_blocked_while_the_order_is_not_finished(): void
-    {
-        Storage::fake('local');
-
-        $order = Order::factory()->waitingVerification()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.orders.result.store', $order), [
-                'result' => UploadedFile::fake()->create('hasil.pdf', 200, 'application/pdf'),
-            ])
+            ->get("/admin/pesanan/{$order->getKey()}/selesai")
             ->assertNotFound();
 
-        $this->assertCount(0, $order->files);
+        $this->actingAs($admin)
+            ->post("/admin/pesanan/{$order->getKey()}/hasil")
+            ->assertNotFound();
+
+        $this->actingAs($admin)
+            ->post("/admin/pesanan/{$order->getKey()}/kirim")
+            ->assertNotFound();
+
+        $this->actingAs($admin)
+            ->post("/admin/pesanan/{$order->getKey()}/kirim-hasil")
+            ->assertNotFound();
     }
 
-    public function test_cannot_deliver_without_an_uploaded_result(): void
-    {
-        $order = Order::factory()->readyForDelivery()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.orders.send', $order))
-            ->assertSessionHasErrors();
-
-        $this->assertSame(OrderStatus::ReadyForDelivery, $order->fresh()->status);
-    }
-
-    public function test_admin_can_deliver_the_finished_work(): void
-    {
-        Storage::fake('local');
-
-        $order = Order::factory()->readyForDelivery()->create();
-        OrderFile::factory()->for($order)->result()->stored()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.orders.send', $order))
-            ->assertRedirect();
-
-        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
-    }
-
-    public function test_admin_can_upload_and_deliver_the_result_in_one_action(): void
-    {
-        Storage::fake('local');
-
-        $customer = User::factory()->customer()->create();
-        $order = Order::factory()->for($customer)->inProgress()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.orders.deliver-now', $order), [
-                'result' => UploadedFile::fake()->create('hasil-akhir.pdf', 200, 'application/pdf'),
-                'note' => 'Silakan dicek.',
-            ])
-            ->assertRedirect();
-
-        $this->assertSame(OrderStatus::Delivered, $order->fresh()->status);
-        $this->assertTrue($order->results()->exists());
-        $this->assertSame(2, $order->statusHistory()->count());
-        $this->assertDatabaseHas('user_notifications', [
-            'user_id' => $customer->getKey(),
-            'order_id' => $order->getKey(),
-            'type' => UserNotification::ResultDelivered,
-        ]);
-    }
-
-    public function test_admin_cannot_deliver_without_an_uploaded_result(): void
-    {
-        Storage::fake('local');
-
-        $order = Order::factory()->inProgress()->create();
-
-        $this->actingAs(User::factory()->admin()->create())
-            ->post(route('admin.orders.deliver-now', $order))
-            ->assertSessionHasErrors('result');
-
-        $this->assertSame(OrderStatus::InProgress, $order->fresh()->status);
-    }
-
-    public function test_admin_order_detail_offers_a_single_delivery_action(): void
+    public function test_admin_order_detail_does_not_offer_a_delivery_action(): void
     {
         $order = Order::factory()->inProgress()->create();
 
         $this->actingAs(User::factory()->admin()->create())
             ->get(route('admin.orders.show', $order))
             ->assertOk()
-            ->assertSee('Kirim ke Customer')
+            ->assertDontSee('Kirim ke Customer')
+            ->assertDontSee('Kirim Hasil Revisi ke Customer')
             ->assertDontSee('Lanjut ke Siap Dikirim')
             ->assertDontSee('Tandai Siap Dikirim');
     }
 
-    public function test_admin_order_detail_has_only_one_send_action(): void
+    public function test_admin_order_list_groups_orders_by_stage_in_one_table(): void
+    {
+        Order::factory()->waitingVerification()->create();
+        Order::factory()->queued()->create();
+        Order::factory()->inProgress()->create();
+        Order::factory()->completed()->create();
+
+        $response = $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.orders.index'));
+
+        $response->assertOk()
+            ->assertSee('data-status-group-row="payment"', escape: false)
+            ->assertSee('data-status-group-row="queue"', escape: false)
+            ->assertSee('data-status-group-row="work"', escape: false)
+            ->assertSee('data-status-group-row="done"', escape: false)
+            ->assertSee('Verifikasi &amp; Pembayaran', escape: false)
+            ->assertSee('Antrean &amp; Verifikasi', escape: false)
+            ->assertSee('Sedang Dikerjakan')
+            ->assertSee('Selesai');
+
+        $this->assertSame(1, substr_count($response->getContent(), '<table'));
+    }
+
+    public function test_admin_order_list_paginates_the_active_category(): void
+    {
+        $customer = User::factory()->customer()->create(['name' => 'Budi Santoso']);
+        Order::factory()->count(11)->for($customer)->revision()->create();
+        $pending = Order::factory()->for($customer)->inProgress()->create();
+
+        $response = $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.orders.index', ['q' => 'Budi', 'category' => 'failed', 'page' => 2]));
+
+        $response->assertOk()
+            ->assertViewHas('orders', fn ($orders): bool => $orders->total() === 11
+                && $orders->currentPage() === 2)
+            ->assertDontSee($pending->order_number)
+            ->assertSee('category=failed', escape: false)
+            ->assertSee('q=Budi', escape: false)
+            ->assertSee('aria-pressed="true"', escape: false);
+    }
+
+    public function test_admin_order_detail_has_no_send_action(): void
     {
         Storage::fake('local');
 
@@ -573,7 +524,7 @@ class AdminOrderWorkflowTest extends TestCase
             ->get(route('admin.orders.show', $order))
             ->assertOk();
 
-        $this->assertSame(1, substr_count((string) $response->getContent(), 'Kirim ke Customer'));
+        $this->assertSame(0, substr_count((string) $response->getContent(), 'Kirim ke Customer'));
     }
 
     public function test_admin_can_cancel_an_undelivered_order(): void

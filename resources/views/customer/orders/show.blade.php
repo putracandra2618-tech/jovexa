@@ -162,7 +162,7 @@
                     <dd class="fw-bold">{{ 'Rp'.number_format($order->total_price, 0, ',', '.') }}</dd>
 
                     <dt>Dibuat</dt>
-                    <dd>{{ $order->created_at->format('d M Y H:i') }}</dd>
+                    <dd>{{ \App\Support\DisplayTime::format($order->created_at) }}</dd>
 
                     @if ($order->latestPayment)
                         <dt>Pembayaran</dt>
@@ -193,7 +193,7 @@
                                         &rarr; {{ $entry->to_status->label() }}
                                     </div>
                                     <small class="text-muted">
-                                        {{ $entry->created_at->format('d M Y H:i') }}
+                                        {{ \App\Support\DisplayTime::format($entry->created_at) }}
                                         @if ($entry->author) &middot; {{ $entry->author->name }} @endif
                                     </small>
                                     @if ($entry->note)

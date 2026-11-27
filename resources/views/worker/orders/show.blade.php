@@ -78,7 +78,7 @@
                                 {{ $entry->from_status?->label() ?? 'Pesanan dibuat' }} &rarr; {{ $entry->to_status->label() }}
                             </div>
                             <small class="text-muted">
-                                {{ $entry->created_at->format('d M Y H:i') }}
+                                {{ \App\Support\DisplayTime::format($entry->created_at) }}
                                 @if ($entry->author) &middot; {{ $entry->author->name }} @endif
                             </small>
                             @if ($entry->note)
@@ -134,7 +134,7 @@
                     <dd>Rp {{ number_format($order->total_price, 0, ',', '.') }}</dd>
 
                     <dt class="text-muted fw-normal small">Diambil</dt>
-                    <dd class="mb-0">{{ $order->worker_claimed_at?->format('d M Y H:i') ?? '—' }}</dd>
+                    <dd class="mb-0">{{ \App\Support\DisplayTime::format($order->worker_claimed_at) }}</dd>
                 </dl>
             </x-card>
         </div>

@@ -100,6 +100,20 @@ class UserNotificationService
     }
 
     /**
+     * Remind the customer that verification is still pending.
+     */
+    public function verificationReminder(Order $order): void
+    {
+        $order->user->inAppNotifications()->firstOrCreate([
+            'order_id' => $order->getKey(),
+            'type' => UserNotification::VerificationReminder,
+        ], [
+            'title' => 'Pesanan belum diverifikasi',
+            'body' => 'Pesanan '.$order->order_number.' belum diverifikasi. Silakan hubungi CS untuk bantuan.',
+        ]);
+    }
+
+    /**
      * Tell the staff member who requested information that the customer replied.
      */
     public function informationReplied(Order $order, User $recipient, string $note): void

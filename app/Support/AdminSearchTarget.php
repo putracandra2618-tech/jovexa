@@ -10,9 +10,12 @@ namespace App\Support;
  */
 class AdminSearchTarget
 {
+    /**
+     * @param  array<int, string>  $filters
+     */
     public function __construct(
         public readonly string $action,
         public readonly string $placeholder,
-        public readonly ?string $filter = null,
+        public readonly array $filters = [],
     ) {}
 }

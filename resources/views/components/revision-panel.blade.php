@@ -28,7 +28,7 @@
                             &middot; {{ $request->requester?->name ?? 'Sistem' }}
                         </div>
                         <div class="small mt-1" style="white-space: pre-line">{{ $request->clean_note }}</div>
-                        <small class="text-muted">{{ $request->created_at->format('d M Y H:i') }}</small>
+                        <small class="text-muted">{{ \App\Support\DisplayTime::format($request->created_at) }}</small>
                     </li>
                 @endforeach
             </ul>

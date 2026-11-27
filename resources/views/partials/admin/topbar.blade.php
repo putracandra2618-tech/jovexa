@@ -18,10 +18,12 @@
 <div class="navbar-search-wrapper">
     @if ($searchTarget)
         <form method="GET" action="{{ route($searchTarget->action) }}" data-admin-search>
-            {{-- Keep the secondary filter active when the keyword narrows the list. --}}
-            @if ($searchTarget->filter && request()->filled($searchTarget->filter))
-                <input type="hidden" name="{{ $searchTarget->filter }}" value="{{ request($searchTarget->filter) }}">
-            @endif
+            {{-- Keep the secondary filters active when the keyword narrows the list. --}}
+            @foreach ($searchTarget->filters as $filter)
+                @if (request()->filled($filter))
+                    <input type="hidden" name="{{ $filter }}" value="{{ request($filter) }}">
+                @endif
+            @endforeach
 
             <label for="main-search" class="visually-hidden">{{ $searchTarget->placeholder }}</label>
             <input type="search" id="main-search" name="q" value="{{ $search }}" class="navbar-search-input"

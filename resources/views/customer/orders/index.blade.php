@@ -48,7 +48,6 @@
                             <th>Jasa</th>
                             <th>Total</th>
                             <th>Status</th>
-                            <th>Revisi</th>
                             <th>Dibuat</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -59,7 +58,7 @@
                             @php $stage = $order->status->stage(); @endphp
                             @if ($stage !== $currentStage)
                                 <tr class="table-light" data-status-group-row="{{ $stage }}">
-                                    <th colspan="7">{{ $order->status->stageLabel() }}</th>
+                                    <th colspan="6">{{ $order->status->stageLabel() }}</th>
                                 </tr>
                                 @php $currentStage = $stage; @endphp
                             @endif
@@ -70,7 +69,6 @@
                                 </td>
                                 <td class="fw-semibold">{{ 'Rp'.number_format($order->total_price, 0, ',', '.') }}</td>
                                 <td><x-badge :variant="$order->status->badgeClass()">{{ $order->status->label() }}</x-badge></td>
-                                <td>{{ $order->revision_requests_count }}/{{ \App\Services\RevisionService::MAX_PER_ORDER }}</td>
                                 <td class="text-muted">{{ $order->created_at->format('d M Y') }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('customer.orders.show', $order) }}"

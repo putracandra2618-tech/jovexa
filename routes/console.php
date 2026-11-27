@@ -17,3 +17,7 @@ Schedule::command('tripay:expire-stale-payments')
 Schedule::command('tripay:reconcile-payments')
     ->hourly()
     ->withoutOverlapping();
+
+Schedule::command('orders:notify-stale-verification')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

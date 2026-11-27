@@ -42,7 +42,7 @@
                                         {{ $order->status->label() }}
                                     </x-badge>
                                 </td>
-                                <td>{{ $order->worker_claimed_at?->format('d M Y H:i') ?? '—' }}</td>
+                                <td>{{ \App\Support\DisplayTime::format($order->worker_claimed_at) }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('worker.orders.show', $order) }}"
                                        class="btn-custom btn-custom-light btn-custom-sm">

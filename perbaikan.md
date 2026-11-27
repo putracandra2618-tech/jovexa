@@ -1,5 +1,3 @@
-1. saat admin minta info ke user dan user menjawab alert jawaban terkirim juga ke worker, dan alert tidak hilang, harusnya kalo sudah di buka hilang.benarkan jadi kalo yang minta admin kirim ke admin kalo yang minta worker kirim ke worker
-
-2. di admin saat file kerja belum di kirim ke user (klik detail) admin malah bisa minta revisi, padahal yang bisa mengajukan revisi itu hanya user
-
-3. hapus kolom catatan kalo pas mau verif di atasnya tombol verif dan terima, itu hapus aja
+1. di admin kenapa bisa kirim tugas, harusnya kan ga bisa
+2. di halaman admin dan worker tabel pesanan kan sekarang campur antara selesai sedang berjalan dll, gimana kalau di pisah
+3. jika 30 menit admin tidak verif orderan beri alert ke pada user untuk menghubngi cs

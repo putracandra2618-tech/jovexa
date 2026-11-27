@@ -34,7 +34,7 @@
                                 <div class="small mt-1">{{ $notification->body }}</div>
                             </div>
                             <div class="d-flex flex-column align-items-end gap-1">
-                                <small class="text-muted">{{ $notification->created_at->format('d M Y H:i') }}</small>
+                                <small class="text-muted">{{ \App\Support\DisplayTime::format($notification->created_at) }}</small>
                                 @if ($notification->read_at === null)
                                     <form method="POST" action="{{ route('notifications.read', $notification) }}">
                                         @csrf

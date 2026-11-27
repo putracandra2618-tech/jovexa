@@ -74,7 +74,7 @@
                                     </span>
                                 </td>
                                 <td class="text-nowrap">Rp {{ number_format($order->total_price, 0, ',', '.') }}</td>
-                                <td>{{ $order->created_at->format('d M Y H:i') }}</td>
+                                <td>{{ \App\Support\DisplayTime::format($order->created_at) }}</td>
                                 <td class="text-end">
                                     <form method="POST" action="{{ route('worker.orders.claim', $order) }}"
                                           data-confirm="Ambil pesanan {{ $order->order_number }}? Kuota aktif akan bertambah.">

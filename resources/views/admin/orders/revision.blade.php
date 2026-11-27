@@ -64,7 +64,7 @@
                                         </div>
                                         <small class="text-muted">
                                             {{ $order->latestRevisionRequest->requester?->name ?? 'Sistem' }}
-                                            &middot; {{ $order->latestRevisionRequest->created_at->format('d M Y H:i') }}
+                                            &middot; {{ \App\Support\DisplayTime::format($order->latestRevisionRequest->created_at) }}
                                         </small>
                                     @else
                                         <span class="text-muted">Tidak ada catatan</span>

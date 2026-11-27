@@ -133,7 +133,50 @@ class WorkerOrderTest extends TestCase
             ->get(route('worker.orders.index'))
             ->assertOk()
             ->assertSee($own->order_number)
-            ->assertDontSee($other->order_number);
+            ->assertDontSee($other->order_number)
+            ->assertDontSee('<th>Revisi</th>', escape: false);
+    }
+
+    public function test_worker_order_list_groups_orders_by_stage_in_one_table(): void
+    {
+        $worker = User::factory()->worker()->create();
+
+        Order::factory()->waitingVerification()->assignedTo($worker)->create();
+        Order::factory()->queued()->assignedTo($worker)->create();
+        Order::factory()->inProgress()->assignedTo($worker)->create();
+        Order::factory()->completed()->assignedTo($worker)->create();
+
+        $response = $this->actingAs($worker)->get(route('worker.orders.index'));
+
+        $response->assertOk()
+            ->assertSee('data-status-group-row="payment"', escape: false)
+            ->assertSee('data-status-group-row="queue"', escape: false)
+            ->assertSee('data-status-group-row="work"', escape: false)
+            ->assertSee('data-status-group-row="done"', escape: false)
+            ->assertSee('Verifikasi &amp; Pembayaran', escape: false)
+            ->assertSee('Antrean &amp; Verifikasi', escape: false)
+            ->assertSee('Sedang Dikerjakan')
+            ->assertSee('Selesai');
+
+        $this->assertSame(1, substr_count($response->getContent(), '<table'));
+    }
+
+    public function test_worker_order_list_paginates_the_active_category(): void
+    {
+        $worker = User::factory()->worker()->create();
+
+        Order::factory()->count(11)->revision()->assignedTo($worker)->create();
+        $pending = Order::factory()->inProgress()->assignedTo($worker)->create();
+
+        $response = $this->actingAs($worker)
+            ->get(route('worker.orders.index', ['category' => 'failed', 'page' => 2]));
+
+        $response->assertOk()
+            ->assertViewHas('orders', fn ($orders): bool => $orders->total() === 11
+                && $orders->currentPage() === 2)
+            ->assertDontSee($pending->order_number)
+            ->assertSee('category=failed', escape: false)
+            ->assertSee('aria-pressed="true"', escape: false);
     }
 
     public function test_worker_cannot_view_another_workers_order(): void

@@ -36,16 +36,19 @@ class AdminOrderController extends Controller
     public function index(Request $request): View
     {
         $search = trim((string) $request->query('q', ''));
+        $status = OrderStatus::tryFrom($request->string('status')->toString());
+        $category = $request->string('category')->toString();
+
+        if (! array_key_exists($category, OrderStatus::categories())) {
+            $category = 'all';
+        }
 
         $orders = Order::query()
             ->with(['service', 'user', 'worker', 'statusRecord'])
-            ->when($request->filled('status'), function ($query) use ($request): void {
-                $status = OrderStatus::tryFrom($request->string('status')->toString());
-
-                if ($status !== null) {
-                    $query->whereStatus($status);
-                }
-            })
+            ->when($category !== 'all', fn ($query) => $query->withStatus(
+                OrderStatus::statusesForCategory($category),
+            ))
+            ->when($status !== null, fn ($query) => $query->whereStatus($status))
             ->when($search !== '', fn ($query) => $query->search($search))
             ->latest()
             ->paginate(10)
@@ -53,6 +56,8 @@ class AdminOrderController extends Controller
 
         return view('admin.orders.index', [
             'orders' => $orders,
+            'categories' => OrderStatus::categories(),
+            'activeCategory' => $category,
             'statuses' => OrderStatus::cases(),
             'search' => $search,
         ]);
@@ -150,38 +155,6 @@ class AdminOrderController extends Controller
     public function download(Order $order, OrderFile $file): BinaryFileResponse
     {
         return $this->downloadOrderFile($order, $file);
-    }
-
-    /**
-     * Show the form to deliver the finished work.
-     */
-    public function deliver(Order $order): View
-    {
-        return $this->showDeliverForm($order);
-    }
-
-    /**
-     * Attach a result file to an order.
-     */
-    public function storeResult(Request $request, Order $order): RedirectResponse
-    {
-        return $this->storeOrderResult($request, $order);
-    }
-
-    /**
-     * Send the finished work to the customer.
-     */
-    public function sendToCustomer(Request $request, Order $order): RedirectResponse
-    {
-        return $this->sendOrderToCustomer($request, $order);
-    }
-
-    /**
-     * Upload and deliver the finished work in one step.
-     */
-    public function deliverNow(Request $request, Order $order): RedirectResponse
-    {
-        return $this->deliverWorkInOneStep($request, $order);
     }
 
     /**

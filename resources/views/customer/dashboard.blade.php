@@ -11,6 +11,29 @@
 @endsection
 
 @section('content')
+    @foreach ($verificationReminders as $reminder)
+        @php
+            $reminderOrder = $reminder->order;
+            $waLink = $reminderOrder === null
+                ? null
+                : \App\Support\WhatsappContact::link(
+                    config('jovexa.contact.whatsapp'),
+                    'hallo min, pesanan saya belum di verifikasi '.$reminderOrder->order_number,
+                );
+        @endphp
+
+        @if ($reminderOrder !== null)
+            <x-alert variant="warning" title="Pesanan belum diverifikasi" class="mb-4 fs-5">
+                Pesanan <strong>{{ $reminderOrder->order_number }}</strong> sudah lebih dari 30 menit menunggu verifikasi.
+                @if ($waLink)
+                    <a href="{{ $waLink }}" target="_blank" rel="noopener" class="alert-link">
+                        Hubungi CS via WhatsApp
+                    </a>
+                @endif
+            </x-alert>
+        @endif
+    @endforeach
+
     <div class="row g-4">
         <div class="col-md-4">
             <x-stat-card label="Pesanan Aktif" :value="$activeCount" icon="bi-hourglass-split"

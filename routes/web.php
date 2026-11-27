@@ -44,10 +44,6 @@ Route::middleware(['auth', 'role:'.UserRole::Admin->value.','.UserRole::SuperAdm
     Route::get('pesanan/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::patch('pesanan/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
     Route::post('pesanan/{order}/minta-informasi', [AdminOrderController::class, 'requestInformation'])->name('orders.information');
-    Route::get('pesanan/{order}/selesai', [AdminOrderController::class, 'deliver'])->name('orders.deliver');
-    Route::post('pesanan/{order}/hasil', [AdminOrderController::class, 'storeResult'])->name('orders.result.store');
-    Route::post('pesanan/{order}/kirim', [AdminOrderController::class, 'sendToCustomer'])->name('orders.send');
-    Route::post('pesanan/{order}/kirim-hasil', [AdminOrderController::class, 'deliverNow'])->name('orders.deliver-now');
     Route::post('pesanan/{order}/batal', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
     Route::get('pesanan/{order}/file/{file}', [AdminOrderController::class, 'download'])->name('orders.file');
 

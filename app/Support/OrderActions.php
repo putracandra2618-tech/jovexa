@@ -67,8 +67,6 @@ class OrderActions
             $actions[] = $this->informationAction($order, 'admin.orders.information', 'request-information');
         }
 
-        array_push($actions, ...$this->deliveryActions($order, 'admin'));
-
         if ($status->canTransitionTo(OrderStatus::Cancelled)) {
             $actions[] = $this->cancelAction($order, 'admin.orders.cancel');
         }
@@ -88,7 +86,7 @@ class OrderActions
             $actions[] = $this->informationAction($order, 'worker.orders.information', 'request-information');
         }
 
-        array_push($actions, ...$this->deliveryActions($order, 'worker'));
+        array_push($actions, ...$this->deliveryActions($order));
 
         return $actions;
     }
@@ -170,7 +168,7 @@ class OrderActions
     /**
      * @return list<array<string, mixed>>
      */
-    private function deliveryActions(Order $order, string $prefix): array
+    private function deliveryActions(Order $order): array
     {
         $isRevision = $order->status === OrderStatus::Revision;
         $isReadyForDelivery = $order->status === OrderStatus::ReadyForDelivery;
@@ -182,9 +180,7 @@ class OrderActions
                 'label' => $isRevision ? 'Kirim Hasil Revisi ke Customer' : 'Kirim ke Customer',
                 'icon' => 'bi-send',
                 'variant' => 'primary',
-                'route' => $prefix === 'admin'
-                    ? route('admin.orders.deliver-now', $order)
-                    : route('worker.orders.deliver-now', $order),
+                'route' => route('worker.orders.deliver-now', $order),
                 'method' => 'POST',
                 'confirm' => 'Unggah hasil dan kirim langsung ke customer?',
                 'file' => [
@@ -208,16 +204,14 @@ class OrderActions
 
         $actions = [];
 
-        if ($prefix === 'worker') {
-            $actions[] = [
-                'key' => 'upload-result',
-                'type' => 'link',
-                'label' => 'Unggah Hasil',
-                'icon' => 'bi-cloud-arrow-up',
-                'variant' => 'light',
-                'route' => route('worker.orders.show', $order).'#unggah-hasil',
-            ];
-        }
+        $actions[] = [
+            'key' => 'upload-result',
+            'type' => 'link',
+            'label' => 'Unggah Hasil',
+            'icon' => 'bi-cloud-arrow-up',
+            'variant' => 'light',
+            'route' => route('worker.orders.show', $order).'#unggah-hasil',
+        ];
 
         if ($order->deliverables()->exists()) {
             $actions[] = [
@@ -226,9 +220,7 @@ class OrderActions
                 'label' => 'Kirim ke Customer',
                 'icon' => 'bi-send',
                 'variant' => 'primary',
-                'route' => $prefix === 'admin'
-                    ? route('admin.orders.send', $order)
-                    : route('worker.orders.send', $order),
+                'route' => route('worker.orders.send', $order),
                 'method' => 'POST',
                 'confirm' => 'Kirim hasil pekerjaan ke customer?',
             ];
